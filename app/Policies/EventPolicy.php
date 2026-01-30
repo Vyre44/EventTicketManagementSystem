@@ -2,65 +2,89 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\Event;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
+/**
+ * EventPolicy
+ *
+ * Etkinlikler üzerinde rol tabanlı yetki kontrollerini yönetir.
+ *
+ * - Admin tüm etkinliklerde tam yetkilidir.
+ * - Organizer sadece kendi etkinliklerinde işlem yapabilir.
+ * - Attendee erişemez.
+ *
+ * Yöntemler:
+ * - viewAny: Listeleme yetkisi
+ * - view: Detay görüntüleme yetkisi
+ * - create: Oluşturma yetkisi
+ * - update: Güncelleme yetkisi
+ * - delete: Silme yetkisi
+ */
 class EventPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+    private function isAdmin(User $user): bool
+    {
+        /**
+         * Kullanıcı admin mi?
+         */
+        return $user->role === UserRole::ADMIN;
+    }
+
+    private function isOrganizer(User $user): bool
+    {
+        /**
+         * Kullanıcı organizer mı?
+         */
+        return $user->role === UserRole::ORGANIZER;
+    }
+
+    private function ownsEvent(User $user, Event $event): bool
+    {
+        /**
+         * Kullanıcı etkinliğin sahibi mi?
+         */
+        return $event->organizer_id === $user->id;
+    }
+
     public function viewAny(User $user): bool
     {
-        return false;
+        /**
+         * Kullanıcı etkinlikleri listeleyebilir mi?
+         */
+        return $this->isAdmin($user) || $this->isOrganizer($user);
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Event $event): bool
     {
-        return false;
+        /**
+         * Kullanıcı etkinliği görüntüleyebilir mi?
+         */
+        return $this->isAdmin($user) || ($this->isOrganizer($user) && $this->ownsEvent($user, $event));
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return false;
+        /**
+         * Kullanıcı etkinlik oluşturabilir mi?
+         */
+        return $this->isAdmin($user) || $this->isOrganizer($user);
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Event $event): bool
     {
-        return $user->id === $event->organizer_id || $user->role === 'admin';
+        /**
+         * Kullanıcı etkinliği güncelleyebilir mi?
+         */
+        return $this->isAdmin($user) || ($this->isOrganizer($user) && $this->ownsEvent($user, $event));
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Event $event): bool
     {
-        return $user->id === $event->organizer_id || $user->role === 'admin';
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Event $event): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Event $event): bool
-    {
-        return false;
+        /**
+         * Kullanıcı etkinliği silebilir mi?
+         */
+        return $this->update($user, $event);
     }
 }

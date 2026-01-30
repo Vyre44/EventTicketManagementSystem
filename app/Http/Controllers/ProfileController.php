@@ -9,21 +9,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+// ProfileController: Kullanıcı profilini düzenleme, güncelleme ve silme işlemlerini yöneten controller.
+// - Kullanıcı kendi profilini güncelleyebilir veya hesabını silebilir.
+// - E-posta değişirse doğrulama sıfırlanır.
+// - Hesap silme işlemi güvenlik için şifre ister.
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
+   // Kullanıcı profilini düzenleme formunu gösterir.
     public function edit(Request $request): View
     {
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
     }
-
-    /**
-     * Update the user's profile information.
-     */
+    // Kullanıcı profilini günceller. E-posta değişirse doğrulama sıfırlanır.
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
@@ -37,9 +36,7 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Delete the user's account.
-     */
+    // Kullanıcı hesabını siler. Şifre doğrulaması ister, oturumu kapatır ve ana sayfaya yönlendirir.
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

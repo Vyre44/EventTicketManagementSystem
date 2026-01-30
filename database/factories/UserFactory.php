@@ -9,6 +9,16 @@ use Illuminate\Support\Str;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
+/**
+ * UserFactory
+ *
+ * Test ve seed işlemleri için kullanıcı üretir.
+ * Varsayılan olarak attendee rolünde ve "password" şifresiyle gelir.
+ *
+ * Metotlar:
+ * - definition: Varsayılan kullanıcı verisi
+ * - unverified: Doğrulanmamış kullanıcı üretir
+ */
 class UserFactory extends Factory
 {
     /**
@@ -23,11 +33,15 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        return [
+        /**
+         * Varsayılan kullanıcı verisi
+         */
+         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 'attendee',
             'remember_token' => Str::random(10),
         ];
     }
@@ -37,7 +51,10 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        /**
+         * Kullanıcının email adresini doğrulanmamış olarak işaretler
+         */
+         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

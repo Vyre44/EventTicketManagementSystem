@@ -2,7 +2,12 @@
 
 namespace App\Enums;
 
-//User role enum
+/**
+ * UserRole: Kullanıcı rolünü temsil eden enum.
+ * - ADMIN: Yönetici.
+ * - ORGANIZER: Etkinlik düzenleyici.
+ * - ATTENDEE: Katılımcı.
+ */
 enum UserRole: string
 {
     case ADMIN = 'admin';

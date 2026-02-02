@@ -14,24 +14,31 @@ use Symfony\Component\HttpFoundation\Response;
 class RoleMiddleware
 {
     // İzin verilen rolleri kontrol eder. Uygun değilse erişimi engeller.
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, $roles): Response
     {
         $user = $request->user();
 
-        // Kullanıcı login değilse login sayfasına yönlendir.
+
+        // Kullanıcı login değilse
         if (! $user) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
             return redirect()->route('login');
         }
 
         // Enum cast varsa role enum olabilir -> stringe indir
         $currentRole = $user->role instanceof \BackedEnum
             ? $user->role->value
-            : $user->role;
+            : (string) $user->role;
 
         // Kullanıcı rolü izin verilen roller arasında değilse 403 döner.
-        if (! in_array($currentRole, $roles, true)) {
+        if (! in_array($currentRole, is_array($roles) ? $roles : explode(',', $roles), true)) {
             abort(403, 'Unauthorized.');
         }
+// Route kullanımı örneği:
+// Admin group: middleware(['auth','role:admin']) + prefix('admin') + name('admin.')
+// Organizer group: middleware(['auth','role:organizer']) + prefix('organizer') + name('organizer.')
 
         return $next($request);
     }

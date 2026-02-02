@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -24,6 +25,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class TicketType extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'event_id',
         'name',
@@ -34,9 +37,10 @@ class TicketType extends Model
         'sale_end',
     ];
 
-    protected $casts = [
+        protected $casts = [
         'sale_start' => 'datetime',
         'sale_end' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function event()

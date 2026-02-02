@@ -2,12 +2,17 @@
 
 namespace App\Enums;
 
-//Ticket status enum
+/**
+ * TicketStatus: Biletin durumunu temsil eden enum.
+ * - ACTIVE: Satın alındı, kullanılabilir.
+ * - CHECKED_IN: Etkinlik girişinde kullanıldı.
+ * - CANCELLED: İptal edildi.
+ * - REFUNDED: İade edildi.
+ */
 enum TicketStatus: string
 {
-    case PENDING = 'pending';
-    case PAID = 'paid';
+    case ACTIVE = 'active';
+    case CHECKED_IN = 'checked_in';
     case CANCELLED = 'cancelled';
-    case USED = 'used'; 
     case REFUNDED = 'refunded';
 }

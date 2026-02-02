@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\TicketType;
 
 // Event: Etkinlik modelidir. Etkinliklerin temel bilgilerini ve ilişkilerini tutar.
 // - organizer() ile etkinliği oluşturan kullanıcıya erişim sağlar.
 // - scopeVisibleTo() ile kullanıcının görebileceği etkinlikleri filtreler.
 // - fillable ve casts ile güvenli veri atama ve tip dönüşümü yapılır.
 class Event extends Model
-{   
+{
+    use HasFactory;
+
     // Etkinliği oluşturan kullanıcı (organizer) ile ilişki.
     public function organizer(): BelongsTo
     {
@@ -60,5 +64,13 @@ class Event extends Model
             'end_time'   => 'datetime',
             'status'     => EventStatus::class,
         ];
+    }
+
+    /**
+     * Event'in sahip olduğu ticket type'lar (hasMany)
+     */
+    public function ticketTypes()
+    {
+        return $this->hasMany(TicketType::class);
     }
 }

@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Health check route
@@ -10,23 +9,43 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
-Route::get('/', function () {
-    return view('welcome');
+
+
+// Admin route group
+Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group(function () {
+    Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('tickets', \App\Http\Controllers\Admin\TicketController::class);
+    Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+    // Diğer admin resource route'ları (ticketTypes, orders) burada eklenebilir
 });
 
+use App\Enums\UserRole;
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::get('/', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+    $user = auth()->user();
+    $role = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
+    if ($role === UserRole::ADMIN->value) {
+        return redirect()->route('admin.events.index');
+    } elseif ($role === UserRole::ORGANIZER->value) {
+        return redirect()->route('organizer.events.index');
+    } else {
+        return view('welcome');
+    }
+})->name('home');
 
-// Profile routes (sadece admin ve organizer erişebilir)
-Route::middleware(['role:admin,organizer'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // EVENTS (CRUD) - sadece admin ve organizer erişebilir
-    Route::resource('events', EventController::class);
+// Organizer route group
+Route::prefix('organizer')->name('organizer.')->middleware(['auth','role:admin,organizer'])->group(function () {
+    Route::resource('events', \App\Http\Controllers\Organizer\EventController::class);
+    // Check-in route'ları (event.owner middleware ile)
+    Route::middleware('event.owner')->group(function () {
+        Route::get('events/{event}/checkin', [\App\Http\Controllers\Organizer\CheckInController::class, 'showForm'])->name('events.checkin.form');
+        Route::post('events/{event}/checkin', [\App\Http\Controllers\Organizer\CheckInController::class, 'check'])->name('events.checkin.check');
+    });
 });
 
 // Auth routes

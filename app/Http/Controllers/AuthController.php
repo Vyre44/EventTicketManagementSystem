@@ -23,21 +23,29 @@ class AuthController extends Controller
     }
 
     // Kullanıcı giriş işlemi. Bilgiler doğruysa oturum açılır, yanlışsa hata döner.
-    public function login(Request $request) //giriş işlemi
-    { 
-        $credentials = $request->validate([//giriş bilgilerini doğrula
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
         $remember = $request->boolean('remember');
 
-        if (Auth::attempt($credentials, $remember)) {//giriş bilgileri doğruysa oturumu yenile 
-            $request->session()->regenerate(); 
-            return redirect()->intended('/'); //ana sayfaya yönlendir
+        if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+            $role = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
+            if ($role === \App\Enums\UserRole::ADMIN->value) {
+                return redirect()->intended(route('admin.events.index'));
+            } elseif ($role === \App\Enums\UserRole::ORGANIZER->value) {
+                return redirect()->intended(route('organizer.events.index'));
+            } else {
+                return redirect()->intended(route('home'));
+            }
         }
 
-        return back()->withErrors([// yanlışsa hata mesajı göster
+        return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ]);
     }
@@ -49,7 +57,7 @@ class AuthController extends Controller
     }
 
     // Kullanıcı kayıt işlemi. Yeni kullanıcı oluşturur ve attendee rolü atar.
-    public function register(Request $request)// kayıt işlemi
+    public function register(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -57,15 +65,15 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user = User::create([// kullanıcı oluştur
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => UserRole::ATTENDEE->value,
         ]);
 
-        Auth::login($user);// kullanıcıyı oturum açtır
-        return redirect('/');
+        Auth::login($user);
+        return redirect()->route('home');
     }
 
     // Kullanıcı çıkış işlemi. Oturumu kapatır ve tokeni sıfırlar.
@@ -74,7 +82,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect('/');
     }
 
     // Şifre sıfırlama formunu gösterir.

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\OrderStatus;
 
 // Order: Bir kullanıcının bir etkinlik için yaptığı bilet satın alma işlemini temsil eder.
 // - Her order bir kullanıcıya ve bir etkinliğe bağlıdır.
@@ -26,6 +27,7 @@ class Order extends Model
     // paid_at alanı otomatik olarak datetime olarak cast edilir.
     protected $casts = [
         'paid_at' => 'datetime',
+        'status' => OrderStatus::class,
     ];
 
     // Siparişi yapan kullanıcı ile ilişki.

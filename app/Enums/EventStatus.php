@@ -2,7 +2,11 @@
 
 namespace App\Enums;
 
-//Event status enum
+/**
+ * EventStatus: Etkinliğin yayın durumunu temsil eden enum.
+ * - PUBLISHED: Yayında.
+ * - DRAFT: Taslak.
+ */
 enum EventStatus: string
 {
     case PUBLISHED = 'published';

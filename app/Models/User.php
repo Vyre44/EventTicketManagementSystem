@@ -19,6 +19,10 @@ use Illuminate\Notifications\Notifiable;
  *
  * İlişkiler:
  * - events(): Organizer rolündeki kullanıcının sahip olduğu etkinlikler
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $email
  */
 class User extends Authenticatable
 {
@@ -62,6 +66,14 @@ class User extends Authenticatable
          * Organizer rolündeki kullanıcının sahip olduğu etkinlikler
          */
         return $this->hasMany(Event::class, 'organizer_id');
+    }
+
+    /**
+     * Kullanıcının admin olup olmadığını kontrol et
+     */
+    public function isAdmin(): bool
+    {
+        return ($this->role instanceof \BackedEnum ? $this->role->value : (string) $this->role) === UserRole::ADMIN->value;
     }
 
 }

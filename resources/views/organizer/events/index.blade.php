@@ -1,0 +1,23 @@
+<h1>Etkinliklerim</h1>
+<a href="{{ route('organizer.events.create') }}">Yeni Etkinlik</a>
+<table>
+    <tr>
+        <th>ID</th><th>Başlık</th><th>Durum</th><th>İşlem</th>
+    </tr>
+    @foreach($events as $event)
+    <tr>
+        <td>{{ $event->id }}</td>
+        <td>{{ $event->title }}</td>
+        <td>{{ $event->status->value ?? $event->status }}</td>
+        <td>
+            <a href="{{ route('organizer.events.show', $event) }}">Görüntüle</a>
+            <a href="{{ route('organizer.events.edit', $event) }}">Düzenle</a>
+            <form method="POST" action="{{ route('organizer.events.destroy', $event) }}" style="display:inline">
+                @csrf @method('DELETE')
+                <button type="submit">Sil</button>
+            </form>
+        </td>
+    </tr>
+    @endforeach
+</table>
+{{ $events->links() }}

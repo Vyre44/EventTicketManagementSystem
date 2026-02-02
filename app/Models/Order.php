@@ -6,11 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\OrderStatus;
 
-// Order: Bir kullanıcının bir etkinlik için yaptığı bilet satın alma işlemini temsil eder.
-// - Her order bir kullanıcıya ve bir etkinliğe bağlıdır.
-// - Bir order'ın birden fazla bileti (ticket) olabilir.
-// - Status: pending, paid, cancelled, failed, expired, refunded
-// - paid_at: ödemenin yapıldığı zamanı tutar.
+/**
+ * Order: Bir kullanıcının bir etkinlik için yaptığı bilet satın alma işlemini temsil eder.
+ * - Her order bir kullanıcıya ve bir etkinliğe bağlıdır.
+ * - Bir order'ın birden fazla bileti (ticket) olabilir.
+ * - Status: pending, paid, cancelled, refunded
+ * - paid_at: ödemenin yapıldığı zamanı tutar.
+ *
+ * @property int $id
+ * @property string $status
+ * @property \Illuminate\Support\Carbon|null $paid_at
+ */
 class Order extends Model
 {
     use HasFactory;
@@ -20,7 +26,7 @@ class Order extends Model
         'user_id',
         'event_id',
         'total_amount',
-        'status', // pending, paid, cancelled, failed, expired, refunded
+        'status', // pending, paid, cancelled, refunded
         'paid_at',
     ];
 

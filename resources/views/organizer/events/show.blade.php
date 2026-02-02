@@ -1,0 +1,11 @@
+<h1>{{ $event->title }}</h1>
+<p>{{ $event->description }}</p>
+<p>Başlangıç: {{ $event->start_time }}</p>
+<p>Bitiş: {{ $event->end_time }}</p>
+<p>Durum: {{ $event->status->value ?? $event->status }}</p>
+@if($event->cover_path)
+    <img src="{{ asset('storage/' . $event->cover_path) }}" alt="Kapak" style="max-width:300px;">
+@endif
+
+<a href="{{ route('organizer.events.edit', $event) }}">Düzenle</a>
+<a href="{{ route('organizer.events.index') }}">Listeye Dön</a>

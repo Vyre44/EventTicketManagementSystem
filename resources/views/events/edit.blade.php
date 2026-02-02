@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>Etkinliği Düzenle</h1>
-    <form method="POST" action="{{ route('events.update', $event) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <label>Başlık: <input type="text" name="title" value="{{ $event->title }}" required></label><br>

@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>Yeni Etkinlik Oluştur</h1>
-    <form method="POST" action="{{ route('events.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data">
         @csrf
         <label>Başlık: <input type="text" name="title" required></label><br>
         <label>Açıklama: <textarea name="description"></textarea></label><br>

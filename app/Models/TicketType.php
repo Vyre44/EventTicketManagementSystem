@@ -22,6 +22,10 @@ use Illuminate\Database\Eloquent\Model;
  * İlişkiler:
  * - event(): TicketType -> Event
  * - tickets(): TicketType -> Ticket (çoklu)
+ *
+ * @property int $id
+ * @property int $event_id
+ * @property string $name
  */
 class TicketType extends Model
 {

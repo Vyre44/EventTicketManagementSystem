@@ -1,0 +1,116 @@
+<?php
+
+namespace App\Http\Controllers\Organizer;
+
+use App\Enums\TicketStatus;
+use App\Http\Controllers\Controller;
+use App\Models\Ticket;
+use Illuminate\Database\Eloquent\Builder;
+
+/**
+ * TicketController (Organizer)
+ *
+ * Organizer kendi event'lerine ait tickets'ları görebilir ve yönetebilir.
+ * Admin tüm tickets'ları görebilir.
+ */
+class TicketController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin,organizer']);
+    }
+
+    /**
+     * Organizer/Admin için tickets listesi
+     *
+     * GET /organizer/tickets
+     */
+    public function index()
+    {
+        $user = auth()->user();
+
+        // Admin tüm tickets'ları görebilir, organizer sadece kendi event'lerininkini
+        $tickets = Ticket::with(['ticketType.event:id,title,organizer_id', 'order.user:id,name,email'])
+            ->when(!$user->isAdmin(), function (Builder $query) use ($user) {
+                $query->whereHas('ticketType.event', function (Builder $subquery) use ($user) {
+                    $subquery->where('organizer_id', $user->id);
+                });
+            })
+            ->latest()
+            ->paginate(20);
+
+        return view('organizer.tickets.index', compact('tickets'));
+    }
+
+    /**
+     * Organizer/Admin için ticket detayı
+     *
+     * GET /organizer/tickets/{ticket}
+     */
+    public function show(Ticket $ticket)
+    {
+        $user = auth()->user();
+
+        // Ownership kontrolü (Admin bypass yapabilir)
+        if (!$user->isAdmin() && $ticket->ticketType->event->organizer_id !== $user->id) {
+            abort(403, 'Bu bilet bilgisini görüntüleme yetkiniz yok.');
+        }
+
+        $ticket->load(['ticketType.event', 'order.user:id,name,email']);
+
+        return view('organizer.tickets.show', compact('ticket'));
+    }
+
+    /**
+     * Check-in'i geri al (CHECKED_IN → ACTIVE)
+     *
+     * POST /organizer/tickets/{ticket}/checkin-undo
+     */
+    public function checkinUndo(Ticket $ticket)
+    {
+        $user = auth()->user();
+
+        // Ownership kontrolü (Admin bypass yapabilir)
+        if (!$user->isAdmin() && $ticket->ticketType->event->organizer_id !== $user->id) {
+            return back()->with('error', 'Bu bilet üzerinde işlem yapma yetkiniz yok.');
+        }
+
+        // Sadece CHECKED_IN durumundaki biletler geri alınabilir
+        if ($ticket->status !== TicketStatus::CHECKED_IN) {
+            return back()->with('error', 'Bu bilet check-in geri alınamaz. Sadece kullanılan biletler geri alınabilir.');
+        }
+
+        // Check-in'i geri al
+        $ticket->update([
+            'status' => TicketStatus::ACTIVE,
+            'checked_in_at' => null,
+        ]);
+
+        return back()->with('success', 'Bilet check-in\'i başarıyla geri alındı.');
+    }
+
+    /**
+     * Bileti iptal et (ACTIVE → CANCELLED)
+     *
+     * POST /organizer/tickets/{ticket}/cancel
+     */
+    public function cancel(Ticket $ticket)
+    {
+        $user = auth()->user();
+
+        // Ownership kontrolü (Admin bypass yapabilir)
+        if (!$user->isAdmin() && $ticket->ticketType->event->organizer_id !== $user->id) {
+            return back()->with('error', 'Bu bilet üzerinde işlem yapma yetkiniz yok.');
+        }
+
+        // Sadece ACTIVE durumundaki biletler iptal edilebilir
+        if ($ticket->status !== TicketStatus::ACTIVE) {
+            return back()->with('error', 'Bu bilet iptal edilemez. Sadece aktif biletler iptal edilebilir.');
+        }
+
+        // Bileti iptal et
+        $ticket->update(['status' => TicketStatus::CANCELLED]);
+
+        return back()->with('success', 'Bilet başarıyla iptal edildi.');
+    }
+}

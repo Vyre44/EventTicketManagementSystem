@@ -9,5 +9,5 @@
     @if($event->cover_path)
         <img src="{{ asset('storage/' . $event->cover_path) }}" alt="Kapak Görseli" style="max-width:300px;">
     @endif
-    <a href="{{ route('events.edit', $event) }}">Düzenle</a>
+    <a href="{{ route('admin.events.edit', $event) }}">Düzenle</a>
 @endsection

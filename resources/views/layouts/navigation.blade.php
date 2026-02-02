@@ -5,7 +5,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('home') }}">
                         <!-- Logo component kaldırıldı -->
                     </a>
                 </div>
@@ -13,7 +13,7 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <!-- Dashboard link (nav-link component kaldırıldı) -->
-                    <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-gray-900">{{ __('Dashboard') }}</a>
+                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-gray-900">{{ __('Home') }}</a>
                 </div>
             </div>
 
@@ -52,7 +52,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <!-- Dashboard link (responsive-nav-link component kaldırıldı) -->
-            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">{{ __('Dashboard') }}</a>
+            <a href="{{ route('home') }}" class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">{{ __('Home') }}</a>
         </div>
 
         <!-- Responsive Settings Options -->

@@ -2,11 +2,11 @@
 
 @section('content')
     <h1>Etkinlikler</h1>
-    <a href="{{ route('events.create') }}">Yeni Etkinlik</a>
+    <a href="{{ route('admin.events.create') }}">Yeni Etkinlik</a>
     <ul>
         @foreach($events as $event)
             <li>
-                <a href="{{ route('events.show', $event) }}">{{ $event->title }}</a>
+                <a href="{{ route('admin.events.show', $event) }}">{{ $event->title }}</a>
                 ({{ $event->status->value }})
             </li>
         @endforeach

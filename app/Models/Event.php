@@ -11,10 +11,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\TicketType;
 
-// Event: Etkinlik modelidir. Etkinliklerin temel bilgilerini ve ilişkilerini tutar.
-// - organizer() ile etkinliği oluşturan kullanıcıya erişim sağlar.
-// - scopeVisibleTo() ile kullanıcının görebileceği etkinlikleri filtreler.
-// - fillable ve casts ile güvenli veri atama ve tip dönüşümü yapılır.
+/**
+ * Event: Etkinlik modelidir. Etkinliklerin temel bilgilerini ve ilişkilerini tutar.
+ *
+ * @property int $id
+ * @property string $title
+ * @property \Illuminate\Support\Carbon|null $start_time
+ * @property \Illuminate\Support\Carbon|null $end_time
+ */
 class Event extends Model
 {
     use HasFactory;
@@ -33,11 +37,13 @@ class Event extends Model
      */
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
-        if ($user->role === UserRole::ADMIN) {
+        $role = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
+
+        if ($role === UserRole::ADMIN->value) {
             return $query;
         }
 
-        if ($user->role === UserRole::ORGANIZER) {
+        if ($role === UserRole::ORGANIZER->value) {
             return $query->where('organizer_id', $user->id);
         }
 

@@ -11,4 +11,5 @@ enum EventStatus: string
 {
     case PUBLISHED = 'published';
     case DRAFT = 'draft';
+    case ENDED = 'ended';
 }

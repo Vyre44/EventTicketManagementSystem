@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();  // hangi etkinlik
 
             $table->decimal('total_amount', 10, 2);
-            $table->string('status')->default('pending'); // pending, paid, cancelled, failed, expired, refunded
+            $table->string('status')->default('pending'); // pending, paid, cancelled, refunded
 
             $table->timestamp('paid_at')->nullable();
 

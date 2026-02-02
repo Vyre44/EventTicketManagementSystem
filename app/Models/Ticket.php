@@ -6,10 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\TicketStatus;
 
-// Ticket: Satın alınan bir bileti temsil eder.
-// - Her ticket bir order ve bir ticket_type ile ilişkilidir.
-// - Status: active, checked_in, cancelled, refunded
-// - checked_in_at: biletin check-in yapıldığı zamanı tutar.
+/**
+ * Ticket: Satın alınan bir bileti temsil eder.
+ * - Her ticket bir order ve bir ticket_type ile ilişkilidir.
+ * - Status: active, checked_in, cancelled, refunded
+ * - checked_in_at: biletin check-in yapıldığı zamanı tutar.
+ *
+ * @property int $id
+ * @property string $status
+ * @property \Illuminate\Support\Carbon|null $checked_in_at
+ */
 class Ticket extends Model
 {
     use HasFactory;

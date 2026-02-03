@@ -9,6 +9,14 @@ use App\Models\Ticket;
 use App\Enums\TicketStatus;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Organizer CheckIn Controller - QR/Barcode kontrolü
+ * 
+ * DB::transaction(): Atomik check-in işlemleri
+ * lockForUpdate(): Çifte check-in'i engellemek için kilitleme
+ * event.owner middleware: EventOwnerMiddleware ile yetkilendirme
+ * JSON/HTML response: AJAX ve form submit desteği
+ */
 class CheckInController extends Controller
 {
     public function showForm(Event $event)

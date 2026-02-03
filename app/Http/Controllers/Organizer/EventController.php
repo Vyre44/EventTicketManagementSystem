@@ -8,6 +8,14 @@ use App\Http\Requests\Organizer\StoreEventRequest;
 use App\Http\Requests\Organizer\UpdateEventRequest;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Organizer Etkinlik Controller - Kendi Etkinlikleriyle Sınırlı
+ * 
+ * Sorgu scope: where('organizer_id', auth()->id())
+ * Otomatik atama: organizer_id create sırasında auth()->id()
+ * Dosya yükleme: cover_image için Storage facade
+ * Yetki: Sadece kendi etkinlikleri (edit/update/destroy EventOwnerMiddleware ile)
+ */
 class EventController extends Controller
 {
     // Organizer: Sadece kendi eventlerini listeler

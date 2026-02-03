@@ -8,6 +8,14 @@ use App\Http\Requests\Admin\StoreEventRequest;
 use App\Http\Requests\Admin\UpdateEventRequest;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Admin Etkinlik Controller - Dosya Yüklemeli Resource CRUD
+ * 
+ * Storage facade: store() ile dosya yükleme (public disk)
+ * Form Request'ler: StoreEventRequest, UpdateEventRequest
+ * Dosya temizliği: update/destroy'da eski cover_image silinir
+ * Admin yetkisi: Tüm etkinlikleri yönetebilir
+ */
 class EventController extends Controller
 {
     // Admin: Tüm eventleri listeler

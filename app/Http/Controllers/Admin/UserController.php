@@ -8,6 +8,14 @@ use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Admin Kullanıcı Controller - Resource CRUD
+ * 
+ * Form Request'ler: StoreUserRequest, UpdateUserRequest (validation)
+ * Query Builder: when() ile koşullu filtreleme
+ * Hash facade: bcrypt parola hashleme
+ * Koruma: Admin'in kendini silmesini/rol düşürmesini engeller
+ */
 class UserController extends Controller
 {
     public function index()

@@ -11,45 +11,31 @@ use Illuminate\Notifications\Notifiable;
 
 /**
  * User Model
- *
- * Sistemdeki kullanıcıları temsil eder. Kullanıcılar attendee, organizer veya admin rolünde olabilir.
- *
- * Alanlar:
- * - name, email, password, role
- *
- * İlişkiler:
- * - events(): Organizer rolündeki kullanıcının sahip olduğu etkinlikler
- *
- * @property int $id
- * @property string $name
- * @property string $email
+ * 
+ * Authenticatable base class ile Laravel auth sistemi entegrasyonu
+ * UserRole enum casting ile tip güvenli rol yönetimi
+ * HasMany relationship: events (organizer_id foreign key)
  */
 class User extends Authenticatable
 {
+    // HasFactory: Testing için factory pattern
+    // Notifiable: Laravel notification system integration
     use HasFactory, Notifiable;
 
-    protected $fillable = [
-        // Kullanıcıya toplu atama yapılabilen alanlar
-        'name',
-        'email',
-        'password',
-        'role',
-    ];
+    // Mass assignment protection
+    protected $fillable = ['name', 'email', 'password', 'role'];
 
-    protected $hidden = [
-        // Dışarıya gösterilmeyecek alanlar
-        'password',
-        'remember_token',
-    ];
+    // JSON serialization'da gizlenen alanlar
+    protected $hidden = ['password', 'remember_token'];
 
     /**
-     * @return array<string, mixed>
+     * Attribute casting - Laravel'in otomatik tip dönüşümü
+     * datetime: Carbon instance
+     * hashed: Bcrypt ile otomatik hashing
+     * UserRole::class: Backed enum casting (PHP 8.1)
      */
     protected function casts(): array
     {
-        /**
-         * Alanların otomatik dönüşüm kuralları
-         */
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
@@ -58,22 +44,85 @@ class User extends Authenticatable
     }
 
     /**
-     * Kullanıcının sahip olduğu etkinlikler (organizer_id üzerinden)
+     * ============================================================
+     * İLİŞKİLER (RELATIONSHIPS)
+     * ============================================================
+     */
+
+    /**
+     * BİR-ÇOKLU İLİŞKİ: Kullanıcının Etkinlikleri
+     * 
+     * Açıklama:
+     * - Bir kullanıcı (organizer) birçok etkinliği sahip olabilir
+     * - Etkinlik'in 'organizer_id' sütunu User'ın 'id'si ile eşleşir
+     * 
+     * @return HasMany
+     * 
+     * KULLANIM:
+     * $user = User::find(1);
+     * $events = $user->events; // Tüm etkinlikleri al
+     * $events = $user->events()->where('status', 'published')->get();
+     * 
+     * SADECE ORGANIZER'LER İÇİN ANLAM:
+     * - Admin: Tüm etkinlikleri yönetiyor olsa da, 'organizer_id' kendilerine ait değildir
+     * - Attendee: Hiç etkinlik oluşturmaz
      */
     public function events(): HasMany
     {
         /**
-         * Organizer rolündeki kullanıcının sahip olduğu etkinlikler
+         * hasMany($relatedModel, $foreignKey, $localKey)
+         * 
+         * - Event modeli: İlişkili model
+         * - 'organizer_id': Event'te hangi sütun eşleştiriyor
+         * - (Varsayılan) 'id': User'ın hangi sütunu eşleştiriyor
+         * 
+         * SQL Equivalent:
+         * SELECT * FROM events WHERE organizer_id = {$this->id}
          */
         return $this->hasMany(Event::class, 'organizer_id');
     }
 
     /**
-     * Kullanıcının admin olup olmadığını kontrol et
+     * ============================================================
+     * HELPER METHODS - YARDIMCI METODLAR
+     * ============================================================
+     */
+
+    /**
+     * Kullanıcı Admin mi?
+     * 
+     * AMAC:
+     * Kolay kontrol için yardımcı method
+     * 
+     * @return bool True eğer admin ise, false değilse
+     * 
+     * KULLANIM:
+     * if ($user->isAdmin()) {
+     *     // Admin işlemi yap
+     * }
+     * 
+     * NEDEN HELPER?
+     * - Daha okunabilir kod
+     * - Enum dönüşümü otomatik
+     * - DRY prensibi (tekrar işlemleri azalt)
      */
     public function isAdmin(): bool
     {
+        /**
+         * Role kontrolü
+         * 
+         * $this->role:
+         * - UserRole enum instance
+         * - Örnek: UserRole::ADMIN
+         * 
+         * UserRole::ADMIN->value:
+         * - Enum'ın string değeri
+         * - Örnek: 'admin'
+         * 
+         * Kıyasla:
+         * if ($user->role === UserRole::ADMIN) { ... }
+         * // Aynı sonuç ama bu biraz daha kolay
+         */
         return ($this->role instanceof \BackedEnum ? $this->role->value : (string) $this->role) === UserRole::ADMIN->value;
     }
-
 }

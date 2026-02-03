@@ -7,6 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
+/**
+ * Admin Sipariş Controller - Salt Okuma Görünümleri
+ * 
+ * Eager loading: with(['user', 'event']), withCount('tickets')
+ * Filtreler: status (enum), q (ID veya kullanıcı e-postası araması)
+ * whereHas(): İlişkili tablo filtreleme
+ * Sayfalama: withQueryString() ile filtreleri korur
+ */
 class OrderController extends Controller
 {
     public function index(Request $request)

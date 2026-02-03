@@ -8,6 +8,14 @@ use App\Http\Requests\Admin\UpdateTicketTypeRequest;
 use App\Models\TicketType;
 use App\Models\Event;
 
+/**
+ * Admin TicketType Controller - Resource CRUD
+ * 
+ * Form Request'ler: StoreTicketTypeRequest, UpdateTicketTypeRequest
+ * Filtreler: event_id, isim araması (when() helper)
+ * Eager loading: with('event') ile N+1 önleme
+ * Stok yönetimi: total_quantity, remaining_quantity
+ */
 class TicketTypeController extends Controller
 {
     public function index()

@@ -7,6 +7,14 @@ use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * EventOwner Middleware - Kaynak Bazlı Yetkilendirme
+ * 
+ * Route model binding: $request->route('event') Event modelini alır
+ * Admin bypass: Tüm etkinliklere erişim
+ * Organizer kontrolü: organizer_id == auth()->id()
+ * 403 Forbidden: Yetkisiz erişim engellenir
+ */
 class EventOwnerMiddleware
 {
     public function handle(Request $request, Closure $next)

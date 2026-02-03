@@ -19,6 +19,7 @@
         <td>
             <a href="{{ route('organizer.events.show', $event) }}">Görüntüle</a>
             <a href="{{ route('organizer.events.edit', $event) }}">Düzenle</a>
+            <a href="{{ route('organizer.reports.events.tickets', $event) }}">📊 Rapor</a>
             <form method="POST" action="{{ route('organizer.events.destroy', $event) }}" style="display:inline">
                 @csrf @method('DELETE')
                 <button type="submit">Sil</button>

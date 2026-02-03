@@ -37,7 +37,7 @@ class AuthController extends Controller
             $user = Auth::user();
             $role = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
             if ($role === UserRole::ADMIN->value) {
-                return redirect()->intended(route('admin.events.index'));
+                return redirect()->intended(route('admin.dashboard'));
             } elseif ($role === UserRole::ORGANIZER->value) {
                 return redirect()->intended(route('organizer.events.index'));
             } else {

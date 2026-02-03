@@ -34,6 +34,7 @@
                         <td class="p-3">
                             <a href="{{ route('admin.events.show', $event) }}" class="text-blue-600">Görüntüle</a>
                             <a href="{{ route('admin.events.edit', $event) }}" class="text-yellow-600 ml-3">Düzenle</a>
+                            <a href="{{ route('admin.reports.events.tickets', $event) }}" class="text-green-600 ml-3">📊 Rapor</a>
                             <form method="POST" action="{{ route('admin.events.destroy', $event) }}" class="inline">
                                 @csrf
                                 @method('DELETE')

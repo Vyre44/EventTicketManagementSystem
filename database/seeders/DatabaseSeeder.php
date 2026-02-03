@@ -16,56 +16,82 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         // Admin
-        $admin = User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'role' => UserRole::ADMIN->value,
-            'password' => bcrypt('admin123'),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'role' => UserRole::ADMIN->value,
+                'password' => bcrypt('admin123'),
+            ]
+        );
 
         // Organizer
-        $organizer = User::factory()->create([
-            'name' => 'Organizer User',
-            'email' => 'organizer@example.com',
-            'role' => UserRole::ORGANIZER->value,
-            'password' => bcrypt('organizer123'),
-        ]);
+        $organizer = User::firstOrCreate(
+            ['email' => 'organizer@example.com'],
+            [
+                'name' => 'Organizer User',
+                'role' => UserRole::ORGANIZER->value,
+                'password' => bcrypt('organizer123'),
+            ]
+        );
 
         // Attendee
-        $attendee = User::factory()->create([
-            'name' => 'Attendee User',
-            'email' => 'attendee@example.com',
-            'role' => UserRole::ATTENDEE->value,
-            'password' => bcrypt('attendee123'),
-        ]);
+        $attendee = User::firstOrCreate(
+            ['email' => 'attendee@example.com'],
+            [
+                'name' => 'Attendee User',
+                'role' => UserRole::ATTENDEE->value,
+                'password' => bcrypt('attendee123'),
+            ]
+        );
 
-        // Organizer'a ait bir event ve ilişkili ticketType, order, ticket zincirleme oluştur
-        $event = \App\Models\Event::factory()
-            ->has(
-                \App\Models\TicketType::factory()
-                    ->count(2)
-                    ->has(
-                        \App\Models\Ticket::factory()
-                            ->count(5)
-                            ->state(function (array $attributes, \App\Models\TicketType $ticketType) use ($attendee) {
-                                // Her ticket için attendee'ya ait bir order oluştur
-                                $order = \App\Models\Order::factory()->create([
-                                    'user_id' => $attendee->id,
-                                    'event_id' => $ticketType->event_id,
-                                    'status' => \App\Enums\OrderStatus::PAID,
-                                ]);
-                                return [
-                                    'order_id' => $order->id,
-                                    'ticket_type_id' => $ticketType->id,
-                                ];
-                            })
-                    , 'tickets')
-            , 'ticketTypes')
-            ->create([
+        // Basit event oluştur
+        $event = \App\Models\Event::firstOrCreate(
+            ['title' => 'Test Etkinlik'],
+            [
                 'organizer_id' => $organizer->id,
-            ]);
+                'description' => 'Bu bir test etkinliğidir',
+                'start_time' => now()->addDays(7),
+                'end_time' => now()->addDays(7)->addHours(4),
+                'status' => \App\Enums\EventStatus::PUBLISHED->value,
+            ]
+        );
+
+        // Ticket type oluştur
+        $ticketType = \App\Models\TicketType::firstOrCreate(
+            [
+                'event_id' => $event->id,
+                'name' => 'Standart Bilet'
+            ],
+            [
+                'price' => 100.00,
+                'total_quantity' => 50,
+                'remaining_quantity' => 50,
+            ]
+        );
+
+        // Order ve ticket oluştur
+        $order = \App\Models\Order::firstOrCreate(
+            [
+                'user_id' => $attendee->id,
+                'event_id' => $event->id,
+            ],
+            [
+                'total_price' => 100.00,
+                'status' => \App\Enums\OrderStatus::PAID->value,
+            ]
+        );
+
+        \App\Models\Ticket::firstOrCreate(
+            [
+                'order_id' => $order->id,
+                'ticket_type_id' => $ticketType->id,
+            ],
+            [
+                'code' => 'TICKET-' . strtoupper(\Illuminate\Support\Str::random(8)),
+                'status' => \App\Enums\TicketStatus::ACTIVE->value,
+            ]
+        );
     }
 }

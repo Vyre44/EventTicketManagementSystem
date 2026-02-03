@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -14,12 +15,20 @@ Route::get('/health', function () {
 
 // Admin route group
 Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('users', UserController::class);
     Route::resource('ticket-types', \App\Http\Controllers\Admin\TicketTypeController::class);
     Route::resource('tickets', \App\Http\Controllers\Admin\TicketController::class);
     Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+
+    Route::post('tickets/{ticket}/checkin', [\App\Http\Controllers\Admin\TicketController::class, 'checkin'])->name('tickets.checkin');
+    Route::post('tickets/{ticket}/checkin-undo', [\App\Http\Controllers\Admin\TicketController::class, 'checkinUndo'])->name('tickets.checkinUndo');
+    Route::post('tickets/{ticket}/cancel-ticket', [\App\Http\Controllers\Admin\TicketController::class, 'cancelTicket'])->name('tickets.cancelTicket');
+
+    Route::get('reports/events/{event}/tickets', [\App\Http\Controllers\Admin\ReportController::class, 'eventTickets'])->name('reports.events.tickets');
+    Route::get('reports/events/{event}/tickets/export', [\App\Http\Controllers\Admin\ReportController::class, 'exportEventTickets'])->name('reports.events.tickets.export');
     // Diğer admin resource route'ları (ticketTypes, orders) burada eklenebilir
 });
 
@@ -32,7 +41,7 @@ Route::get('/', function () {
     $user = auth()->user();
     $role = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
     if ($role === UserRole::ADMIN->value) {
-        return redirect()->route('admin.events.index');
+        return redirect()->route('admin.dashboard');
     } elseif ($role === UserRole::ORGANIZER->value) {
         return redirect()->route('organizer.events.index');
     } else {
@@ -54,6 +63,9 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth','role:admin,o
         Route::get('events/{event}/checkin', [\App\Http\Controllers\Organizer\CheckInController::class, 'showForm'])->name('events.checkin.form');
         Route::post('events/{event}/checkin', [\App\Http\Controllers\Organizer\CheckInController::class, 'check'])->name('events.checkin.check');
     });
+
+    Route::get('reports/events/{event}/tickets', [\App\Http\Controllers\Organizer\ReportController::class, 'eventTickets'])->name('reports.events.tickets');
+    Route::get('reports/events/{event}/tickets/export', [\App\Http\Controllers\Organizer\ReportController::class, 'exportEventTickets'])->name('reports.events.tickets.export');
 });
 
 // Auth routes

@@ -18,18 +18,11 @@
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            <!-- Alert Container (AJAX) -->
+            <div id="ajax-alert-container" class="fixed top-4 right-4 z-50 w-96 max-w-full"></div>
 
             <!-- Page Content -->
             <main>
-
                 @yield('content')
             </main>
         </div>

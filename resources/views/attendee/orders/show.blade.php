@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+{{-- AJAX Alert Container --}}
+<x-ajax-alert />
+
 <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="mb-6">
         <a href="{{ route('attendee.orders.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
@@ -24,7 +27,7 @@
             </div>
 
             <!-- Status Badge -->
-            <div>
+            <div id="order-status-badge">
                 @if($order->status->value === 'pending')
                     <span class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-semibold">
                         ⏳ Ödeme Bekliyor
@@ -121,22 +124,86 @@
     @endif
 
     <!-- İşlem Butonları -->
-    <div class="mt-6 flex gap-3">
+    <div id="order-actions" class="mt-6 flex gap-3">
         @if($order->status->value === 'pending')
-            <form action="{{ route('attendee.orders.cancel', $order) }}" method="POST" onsubmit="return confirm('Bu siparişi iptal etmek istediğinizden emin misiniz?');">
-                @csrf
-                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">
-                    ❌ İptal Et
-                </button>
-            </form>
+            <button onclick="handleCancelOrder()" id="cancel-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50">
+                ❌ İptal Et
+            </button>
         @elseif($order->status->value === 'paid')
-            <form action="{{ route('attendee.orders.refund', $order) }}" method="POST" onsubmit="return confirm('Bu siparişin iadesini talep etmek istediğinizden emin misiniz?');">
-                @csrf
-                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">
-                    🔄 İade Et
-                </button>
-            </form>
+            <button onclick="handleRefundOrder()" id="refund-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50">
+                🔄 İade Et
+            </button>
         @endif
     </div>
 </div>
+
+<script>
+const ORDER_ID = {{ $order->id }};
+
+async function handleCancelOrder() {
+    if (!confirm('Bu siparişi iptal etmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    const btn = document.getElementById('cancel-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ İptal ediliyor...';
+    clearAlerts();
+
+    try {
+        const data = await ajaxRequest(`/orders/${ORDER_ID}/cancel`, 'POST');
+        showAlert('success', data.message);
+        
+        // Status badge'i güncelle
+        updateStatusBadge('cancelled');
+        
+        // Butonu kaldır
+        document.getElementById('order-actions').innerHTML = '';
+        
+    } catch (error) {
+        showAlert('error', error.message);
+        btn.disabled = false;
+        btn.textContent = '❌ İptal Et';
+    }
+}
+
+async function handleRefundOrder() {
+    if (!confirm('Bu siparişin iadesini talep etmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    const btn = document.getElementById('refund-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ İade ediliyor...';
+    clearAlerts();
+
+    try {
+        const data = await ajaxRequest(`/orders/${ORDER_ID}/refund`, 'POST');
+        showAlert('success', data.message);
+        
+        // Status badge'i güncelle
+        updateStatusBadge('refunded');
+        
+        // Butonu kaldır
+        document.getElementById('order-actions').innerHTML = '';
+        
+        // Sayfayı yenile (ticket status'leri güncellensin)
+        setTimeout(() => location.reload(), 2000);
+        
+    } catch (error) {
+        showAlert('error', error.message);
+        btn.disabled = false;
+        btn.textContent = '🔄 İade Et';
+    }
+}
+
+function updateStatusBadge(status) {
+    const badges = {
+        'cancelled': '<span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold">❌ İptal Edildi</span>',
+        'refunded': '<span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full font-semibold">🔄 İade Edildi</span>'
+    };
+    
+    document.getElementById('order-status-badge').innerHTML = badges[status] || '';
+}
+</script>
 @endsection

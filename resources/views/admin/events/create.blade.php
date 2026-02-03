@@ -4,7 +4,7 @@
 <div class="container mx-auto px-4 py-8 max-w-2xl">
     <h1 class="text-2xl font-bold mb-6">Yeni Etkinlik (Admin)</h1>
 
-    <form method="POST" action="{{ route('admin.events.store') }}">
+    <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-4">
@@ -15,6 +15,12 @@
         <div class="mb-4">
             <label class="block font-semibold mb-1">Açıklama</label>
             <textarea name="description" class="w-full border rounded px-3 py-2" rows="4">{{ old('description') }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Kapak Görseli</label>
+            <input type="file" name="cover_image" accept="image/jpeg,image/jpg,image/png" class="w-full border rounded px-3 py-2">
+            <p class="text-sm text-gray-600 mt-1">JPG, PNG formatında, maksimum 2MB</p>
         </div>
 
         <div class="mb-4">

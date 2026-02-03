@@ -2,6 +2,9 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Alert Container (AJAX) -->
+    <div id="ajax-alert-container"></div>
+
     <div class="mb-6">
         <a href="{{ route('organizer.tickets.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
             ← Tüm Biletler
@@ -9,20 +12,8 @@
         <h1 class="text-3xl font-bold mb-2">Bilet Detayı</h1>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <p class="text-green-800">✅ {{ session('success') }}</p>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p class="text-red-800">❌ {{ session('error') }}</p>
-        </div>
-    @endif
-
     <!-- Bilet Bilgileri -->
-    <div class="bg-white border rounded-lg p-6 mb-6">
+    <div class="bg-white border rounded-lg p-6 mb-6" data-ticket-id="{{ $ticket->id }}" data-ticket-status="{{ $ticket->status->value }}">
         <div class="flex justify-between items-start mb-4">
             <div>
                 <h2 class="text-2xl font-bold font-mono">{{ $ticket->code }}</h2>
@@ -36,28 +27,30 @@
 
             <!-- Status Badge -->
             <div>
-                @if($ticket->status->value === 'active')
-                    <span class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
-                        Aktif
-                    </span>
-                @elseif($ticket->status->value === 'checked_in')
-                    <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold">
-                        ✅ Kullanıldı
-                    </span>
-                    @if($ticket->checked_in_at)
-                        <div class="text-xs text-gray-600 mt-2">
-                            Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
-                        </div>
+                <span class="ticket-status-badge">
+                    @if($ticket->status->value === 'active')
+                        <span class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
+                            Aktif
+                        </span>
+                    @elseif($ticket->status->value === 'checked_in')
+                        <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold">
+                            ✅ Kullanıldı
+                        </span>
+                        @if($ticket->checked_in_at)
+                            <div class="text-xs text-gray-600 mt-2">
+                                Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
+                            </div>
+                        @endif
+                    @elseif($ticket->status->value === 'cancelled')
+                        <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold">
+                            ❌ İptal
+                        </span>
+                    @elseif($ticket->status->value === 'refunded')
+                        <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full font-semibold">
+                            🔄 İade
+                        </span>
                     @endif
-                @elseif($ticket->status->value === 'cancelled')
-                    <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold">
-                        ❌ İptal
-                    </span>
-                @elseif($ticket->status->value === 'refunded')
-                    <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full font-semibold">
-                        🔄 İade
-                    </span>
-                @endif
+                </span>
             </div>
         </div>
 
@@ -95,24 +88,30 @@
     </div>
 
     <!-- İşlem Butonları -->
-    <div class="flex gap-3 flex-wrap">
-        @if($ticket->status->value === 'checked_in')
-            <form action="{{ route('organizer.tickets.checkinUndo', $ticket) }}" method="POST" onsubmit="return confirm('Bu bilet\'in check-in\'ini geri almak istediğinizden emin misiniz?');">
-                @csrf
-                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">
-                    ↩️ Check-in'i Geri Al
-                </button>
-            </form>
-        @endif
-
+    <div class="flex gap-3 flex-wrap ticket-actions">
         @if($ticket->status->value === 'active')
-            <form action="{{ route('organizer.tickets.cancel', $ticket) }}" method="POST" onsubmit="return confirm('Bu bileti iptal etmek istediğinizden emin misiniz?');">
-                @csrf
-                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">
-                    ❌ İptal Et
-                </button>
-            </form>
+            <button class="ticket-action-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg" data-action="checkin">
+                ✅ Check-in Yap
+            </button>
+            <button class="ticket-action-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg" data-action="cancel">
+                ❌ İptal Et
+            </button>
+        @elseif($ticket->status->value === 'checked_in')
+            <button class="ticket-action-btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg" data-action="undo">
+                ↩️ Check-in'i Geri Al
+            </button>
+        @else
+            <span class="text-gray-600 text-sm font-medium italic">Bu bilet için işlem yapılamaz.</span>
         @endif
     </div>
 </div>
+
+<script>
+    // Route'ları Blade'den al
+    const routeNameMap = {
+        'checkin': '{{ route("organizer.tickets.checkin", ["ticket" => $ticket->id]) }}',
+        'undo': '{{ route("organizer.tickets.checkinUndo", ["ticket" => $ticket->id]) }}',
+        'cancel': '{{ route("organizer.tickets.cancel", ["ticket" => $ticket->id]) }}'
+    };
+</script>
 @endsection

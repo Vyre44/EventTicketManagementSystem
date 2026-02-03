@@ -72,12 +72,28 @@ class TicketController extends Controller
 
         // Ownership kontrolü (Admin bypass yapabilir)
         if (!$user->isAdmin() && $ticket->ticketType->event->organizer_id !== $user->id) {
-            return back()->with('error', 'Bu bilet üzerinde işlem yapma yetkiniz yok.');
+            $message = 'Bu bilet üzerinde işlem yapma yetkiniz yok.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'data' => null
+                ], 403);
+            }
+            return back()->with('error', $message);
         }
 
         // Sadece CHECKED_IN durumundaki biletler geri alınabilir
         if ($ticket->status !== TicketStatus::CHECKED_IN) {
-            return back()->with('error', 'Bu bilet check-in geri alınamaz. Sadece kullanılan biletler geri alınabilir.');
+            $message = 'Bu bilet check-in geri alınamaz. Sadece kullanılan biletler geri alınabilir.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'data' => null
+                ], 422);
+            }
+            return back()->with('error', $message);
         }
 
         // Check-in'i geri al
@@ -85,6 +101,14 @@ class TicketController extends Controller
             'status' => TicketStatus::ACTIVE,
             'checked_in_at' => null,
         ]);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Bilet check-in\'i başarıyla geri alındı.',
+                'data' => ['ticket' => $ticket]
+            ]);
+        }
 
         return back()->with('success', 'Bilet check-in\'i başarıyla geri alındı.');
     }
@@ -100,17 +124,100 @@ class TicketController extends Controller
 
         // Ownership kontrolü (Admin bypass yapabilir)
         if (!$user->isAdmin() && $ticket->ticketType->event->organizer_id !== $user->id) {
-            return back()->with('error', 'Bu bilet üzerinde işlem yapma yetkiniz yok.');
+            $message = 'Bu bilet üzerinde işlem yapma yetkiniz yok.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'data' => null
+                ], 403);
+            }
+            return back()->with('error', $message);
         }
 
         // Sadece ACTIVE durumundaki biletler iptal edilebilir
         if ($ticket->status !== TicketStatus::ACTIVE) {
-            return back()->with('error', 'Bu bilet iptal edilemez. Sadece aktif biletler iptal edilebilir.');
+            $message = 'Bu bilet iptal edilemez. Sadece aktif biletler iptal edilebilir.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'data' => null
+                ], 422);
+            }
+            return back()->with('error', $message);
         }
 
         // Bileti iptal et
         $ticket->update(['status' => TicketStatus::CANCELLED]);
 
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Bilet başarıyla iptal edildi.',
+                'data' => ['ticket' => $ticket]
+            ]);
+        }
+
         return back()->with('success', 'Bilet başarıyla iptal edildi.');
+    }
+
+    /**
+     * Check-in yap (ACTIVE → CHECKED_IN)
+     *
+     * POST /organizer/tickets/{ticket}/checkin
+     */
+    public function checkin(Ticket $ticket)
+    {
+        $user = auth()->user();
+
+        // Ownership kontrolü (Admin bypass yapabilir)
+        if (!$user->isAdmin() && $ticket->ticketType->event->organizer_id !== $user->id) {
+            $message = 'Bu bilet üzerinde işlem yapma yetkiniz yok.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'data' => null
+                ], 403);
+            }
+            return back()->with('error', $message);
+        }
+
+        // Sadece ACTIVE durumundaki biletler check-in yapılabilir
+        if ($ticket->status !== TicketStatus::ACTIVE) {
+            $message = 'Bu bilet check-in yapılamaz. Sadece aktif biletlere check-in yapılabilir.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'data' => null
+                ], 422);
+            }
+            return back()->with('error', $message);
+        }
+
+        // Check-in yap
+        if (!$ticket->checkIn()) {
+            $message = 'Check-in başarısız oldu.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'data' => null
+                ], 422);
+            }
+            return back()->with('error', $message);
+        }
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Bilet başarıyla check-in yapıldı.',
+                'data' => ['ticket' => $ticket]
+            ]);
+        }
+
+        return back()->with('success', 'Bilet başarıyla check-in yapıldı.');
     }
 }

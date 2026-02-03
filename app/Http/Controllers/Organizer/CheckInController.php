@@ -31,29 +31,30 @@ class CheckInController extends Controller
                 ->lockForUpdate()
                 ->first();
             if (!$ticket) {
-                return ['type' => 'error', 'message' => 'Bilet bulunamadı.'];
+                return ['success' => false, 'message' => 'Bilet bulunamadı.'];
             }
             $ticketEventId = optional($ticket->ticketType)->event_id;
             if ((int)$ticketEventId !== (int)$event->id) {
-                return ['type' => 'error', 'message' => 'Bu bilet bu etkinliğe ait değil.'];
+                return ['success' => false, 'message' => 'Bu bilet bu etkinliğe ait değil.'];
             }
             if (!$ticket->checkIn()) {
                 if ($ticket->status === TicketStatus::CHECKED_IN) {
                     $time = $ticket->checked_in_at?->format('d.m.Y H:i');
-                    return ['type' => 'warning', 'message' => 'Bu bilet daha önce kullanılmış.' . ($time ? " (".$time.")" : '')];
+                    return ['success' => false, 'message' => 'Bu bilet daha önce kullanılmış.' . ($time ? " (".$time.")" : ''), 'warning' => true];
                 }
-                return ['type' => 'error', 'message' => 'Bu biletin durumu check-in için uygun değil: ' . $ticket->status->value];
+                return ['success' => false, 'message' => 'Bu biletin durumu check-in için uygun değil: ' . $ticket->status->value];
             }
-            return ['type' => 'success', 'message' => 'Check-in başarılı!'];
+            return ['success' => true, 'message' => 'Check-in başarılı!'];
         });
 
         if ($request->expectsJson() || $request->ajax()) {
-            $status = $result['type'] === 'success' ? 200 : ($result['type'] === 'warning' ? 409 : 422);
+            $status = $result['success'] ? 200 : (isset($result['warning']) ? 409 : 422);
             return response()->json([
-                'type' => $result['type'],
+                'success' => $result['success'],
                 'message' => $result['message'],
+                'data' => null
             ], $status);
         }
-        return back()->with($result['type'], $result['message']);
+        return back()->with($result['success'] ? 'success' : 'error', $result['message']);
     }
 }

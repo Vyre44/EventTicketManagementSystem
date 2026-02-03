@@ -21,6 +21,7 @@ class StoreEventRequest extends FormRequest
             'start_time' => ['required', 'date'],
             'end_time' => ['nullable', 'date', 'after_or_equal:start_time'],
             'description' => ['nullable', 'string'],
+            'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             // organizer_id asla request'ten alınmaz
         ];
     }

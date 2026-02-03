@@ -36,9 +36,9 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
             $role = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
-            if ($role === \App\Enums\UserRole::ADMIN->value) {
+            if ($role === UserRole::ADMIN->value) {
                 return redirect()->intended(route('admin.events.index'));
-            } elseif ($role === \App\Enums\UserRole::ORGANIZER->value) {
+            } elseif ($role === UserRole::ORGANIZER->value) {
                 return redirect()->intended(route('organizer.events.index'));
             } else {
                 return redirect()->intended(route('home'));

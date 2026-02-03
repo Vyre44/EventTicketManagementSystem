@@ -41,8 +41,8 @@
             <p class="text-gray-500">Bu etkinlik için henüz bilet tipi eklenmemiş.</p>
         @else
             @auth
-                <form method="POST" action="{{ route('attendee.events.buy', $event) }}">
-                    @csrf
+                <div id="alert-container"></div>
+                <div id="buy-form">
                     <div class="space-y-4">
                         @foreach($event->ticketTypes as $ticketType)
                             <div class="border rounded-lg p-4 flex justify-between items-center">
@@ -61,7 +61,8 @@
                                     @if($ticketType->remaining_quantity > 0)
                                         <input 
                                             type="number" 
-                                            name="ticket_types[{{ $ticketType->id }}]" 
+                                            class="ticket-input"
+                                            data-ticket-type="{{ $ticketType->id }}"
                                             min="0" 
                                             max="{{ min($ticketType->remaining_quantity, 10) }}"
                                             value="0"
@@ -76,19 +77,81 @@
                         @endforeach
                     </div>
 
-                    @error('ticket_types')
-                        <div class="text-red-600 mt-2">{{ $message }}</div>
-                    @enderror
-
                     <div class="mt-6 flex justify-end">
                         <button 
-                            type="submit" 
+                            id="buy-btn"
+                            type="button" 
                             class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 text-lg"
                         >
                             🎟️ Satın Al
                         </button>
                     </div>
-                </form>
+                </div>
+
+                <script>
+                    document.getElementById('buy-btn').addEventListener('click', async function() {
+                        const ticketData = {};
+                        let hasSelection = false;
+
+                        document.querySelectorAll('.ticket-input').forEach(input => {
+                            const qty = parseInt(input.value);
+                            if (qty > 0) {
+                                ticketData['ticket_types[' + input.dataset.ticketType + ']'] = qty;
+                                hasSelection = true;
+                            }
+                        });
+
+                        if (!hasSelection) {
+                            showAlert('error', 'Lütfen en az bir bilet türü seçiniz');
+                            return;
+                        }
+
+                        const btn = this;
+                        btn.disabled = true;
+                        btn.textContent = '⏳ Yükleniyor...';
+
+                        try {
+                            const response = await fetch('{{ route("attendee.events.buy", $event) }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify(ticketData)
+                            });
+
+                            if (response.status === 401 || response.status === 302) {
+                                window.location.href = '{{ route("login") }}';
+                                return;
+                            }
+
+                            const data = await response.json();
+
+                            if (response.ok) {
+                                if (data.redirect_url) {
+                                    window.location.href = data.redirect_url;
+                                } else {
+                                    showAlert('success', data.message || 'Siparişiniz oluşturuldu!');
+                                    document.getElementById('buy-form').style.display = 'none';
+                                    setTimeout(() => window.location.reload(), 2000);
+                                }
+                            } else {
+                                showAlert('error', data.message || 'Bir hata oluştu');
+                                btn.disabled = false;
+                                btn.textContent = '🎟️ Satın Al';
+                            }
+                        } catch (error) {
+                            showAlert('error', 'İşlem başarısız oldu: ' + error.message);
+                            btn.disabled = false;
+                            btn.textContent = '🎟️ Satın Al';
+                        }
+                    });
+
+                    function showAlert(type, message) {
+                        const container = document.getElementById('alert-container');
+                        container.innerHTML = '<div class="bg-' + (type === 'success' ? 'green' : 'red') + '-100 border border-' + (type === 'success' ? 'green' : 'red') + '-400 text-' + (type === 'success' ? 'green' : 'red') + '-700 px-4 py-3 rounded mb-4">' + message + '</div>';
+                    }
+                </script>
             @else
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
                     <p class="text-yellow-800">

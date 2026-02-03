@@ -12,8 +12,6 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
-
-
 // Admin route group
 Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group(function () {
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
@@ -47,6 +45,7 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth','role:admin,o
     Route::resource('events', \App\Http\Controllers\Organizer\EventController::class);
     Route::resource('orders', \App\Http\Controllers\Organizer\OrderController::class, ['only' => ['index', 'show']]);
     Route::resource('tickets', \App\Http\Controllers\Organizer\TicketController::class, ['only' => ['index', 'show']]);
+    Route::post('tickets/{ticket}/checkin', [\App\Http\Controllers\Organizer\TicketController::class, 'checkin'])->name('tickets.checkin');
     Route::post('tickets/{ticket}/checkin-undo', [\App\Http\Controllers\Organizer\TicketController::class, 'checkinUndo'])->name('tickets.checkinUndo');
     Route::post('tickets/{ticket}/cancel', [\App\Http\Controllers\Organizer\TicketController::class, 'cancel'])->name('tickets.cancel');
     

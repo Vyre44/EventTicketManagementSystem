@@ -18,10 +18,10 @@
         @if($event->description)
             <div><strong>Açıklama:</strong> {{ $event->description }}</div>
         @endif
-        @if($event->cover_path)
+        @if($event->cover_image_url)
             <div>
                 <strong>Kapak:</strong><br>
-                <img src="{{ asset('storage/' . $event->cover_path) }}" alt="Kapak" class="max-w-md">
+                <img src="{{ $event->cover_image_url }}" alt="Kapak" class="max-w-md">
             </div>
         @endif
     </div>

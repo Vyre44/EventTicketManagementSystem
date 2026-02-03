@@ -38,6 +38,12 @@ class OrderController extends Controller
     {
         // Etkinlik yayınlanmış mı?
         if ($event->status !== EventStatus::PUBLISHED) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bu etkinlik için bilet satışı yapılmamaktadır.'
+                ], 422);
+            }
             return back()->withErrors(['event' => 'Bu etkinlik için bilet satışı yapılmamaktadır.']);
         }
 
@@ -50,14 +56,25 @@ class OrderController extends Controller
 
             // Bilet tipi bu etkinliğe ait mi?
             if ($ticketType->event_id !== $event->id) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Geçersiz bilet tipi.'
+                    ], 422);
+                }
                 return back()->withErrors(['ticket_types' => 'Geçersiz bilet tipi.']);
             }
 
             // Yeterli kota var mı?
             if ($ticketType->remaining_quantity < $quantity) {
-                return back()->withErrors([
-                    'ticket_types' => "{$ticketType->name} için yeterli kota yok. Mevcut: {$ticketType->remaining_quantity}"
-                ]);
+                $message = "{$ticketType->name} için yeterli kota yok. Mevcut: {$ticketType->remaining_quantity}";
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message
+                    ], 422);
+                }
+                return back()->withErrors(['ticket_types' => $message]);
             }
 
             $totalAmount += $ticketType->price * $quantity;
@@ -75,6 +92,17 @@ class OrderController extends Controller
         session([
             "order_{$order->id}_ticket_types" => $ticketTypeQuantities,
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Siparişiniz oluşturuldu. Lütfen ödemeyi tamamlayın.',
+                'data' => [
+                    'order_id' => $order->id,
+                    'redirect_url' => route('attendee.orders.show', $order)
+                ]
+            ]);
+        }
 
         return redirect()->route('attendee.orders.show', $order)
             ->with('success', 'Siparişiniz oluşturuldu. Lütfen ödemeyi tamamlayın.');
@@ -127,21 +155,41 @@ class OrderController extends Controller
     {
         // Kullanıcı kendi siparişini ödeyebilir
         if ($order->user_id !== auth()->id()) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bu siparişi ödeme yetkiniz yok.'
+                ], 403);
+            }
             abort(403, 'Bu siparişi ödeme yetkiniz yok.');
         }
 
         // Sipariş zaten PAID mi?
         if ($order->status !== OrderStatus::PENDING) {
+            $message = 'Bu sipariş zaten işlenmiş.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
             return redirect()->route('attendee.orders.show', $order)
-                ->withErrors(['order' => 'Bu sipariş zaten işlenmiş.']);
+                ->withErrors(['order' => $message]);
         }
 
         $ticketTypeQuantities = session("order_{$order->id}_ticket_types", []);
 
         // Session'da veri yoksa hata
         if (empty($ticketTypeQuantities)) {
+            $message = 'Sipariş bilgisi bulunamadı.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
             return redirect()->route('attendee.orders.index')
-                ->withErrors(['order' => 'Sipariş bilgisi bulunamadı.']);
+                ->withErrors(['order' => $message]);
         }
 
         try {
@@ -178,10 +226,26 @@ class OrderController extends Controller
             // Session temizle
             session()->forget("order_{$order->id}_ticket_types");
 
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Ödeme başarılı! Biletleriniz hazır.',
+                    'data' => [
+                        'order' => $order->load('tickets.ticketType')
+                    ]
+                ]);
+            }
+
             return redirect()->route('attendee.orders.show', $order)
                 ->with('success', 'Ödeme başarılı! Biletleriniz hazır.');
 
         } catch (\Exception $e) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 422);
+            }
             return back()->withErrors(['payment' => $e->getMessage()]);
         }
     }
@@ -211,16 +275,38 @@ class OrderController extends Controller
     {
         // Kullanıcı kendi siparişini iptal edebilir
         if ($order->user_id !== auth()->id()) {
-            return back()->with('error', 'Bu siparişi iptal etme yetkiniz yok.');
+            $message = 'Bu siparişi iptal etme yetkiniz yok.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 403);
+            }
+            return back()->with('error', $message);
         }
 
         // Sadece PENDING siparişler iptal edilebilir
         if ($order->status !== OrderStatus::PENDING) {
-            return back()->with('error', 'Bu sipariş iptal edilemez. Sadece bekleyen siparişler iptal edilebilir.');
+            $message = 'Bu sipariş iptal edilemez. Sadece bekleyen siparişler iptal edilebilir.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
+            return back()->with('error', $message);
         }
 
         // Order'ı iptal et
         $order->update(['status' => OrderStatus::CANCELLED]);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sipariş başarıyla iptal edildi.',
+                'data' => ['order' => $order]
+            ]);
+        }
 
         return redirect()->route('attendee.orders.index')
             ->with('success', 'Sipariş başarıyla iptal edildi.');
@@ -236,12 +322,26 @@ class OrderController extends Controller
     {
         // Kullanıcı kendi siparişini geri alabilir
         if ($order->user_id !== auth()->id()) {
-            return back()->with('error', 'Bu siparişi geri alma yetkiniz yok.');
+            $message = 'Bu siparişi geri alma yetkiniz yok.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 403);
+            }
+            return back()->with('error', $message);
         }
 
         // Sadece PAID siparişler geri alınabilir
         if ($order->status !== OrderStatus::PAID) {
-            return back()->with('error', 'Bu sipariş geri alınamaz. Sadece ödenmemiş siparişler geri alınabilir.');
+            $message = 'Bu sipariş geri alınamaz. Sadece ödenmiş siparişler geri alınabilir.';
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
+            return back()->with('error', $message);
         }
 
         try {
@@ -266,11 +366,26 @@ class OrderController extends Controller
                 ]);
             });
 
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sipariş başarıyla geri alındı. Ödemeniz iade edilecektir.',
+                    'data' => ['order' => $order->load('tickets.ticketType')]
+                ]);
+            }
+
             return redirect()->route('attendee.orders.show', $order)
                 ->with('success', 'Sipariş başarıyla geri alındı. Ödemeniz iade edilecektir.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'İade işlemi sırasında hata oluştu: ' . $e->getMessage());
+            $message = 'İade işlemi sırasında hata oluştu: ' . $e->getMessage();
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
+            return back()->with('error', $message);
         }
     }
 

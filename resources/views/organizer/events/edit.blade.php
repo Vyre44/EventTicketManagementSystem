@@ -25,10 +25,11 @@
     </div>
     <div>
         <label>Kapak Görseli</label>
-        <input type="file" name="cover_path">
-        @if($event->cover_path)
-            <div><img src="{{ asset('storage/' . $event->cover_path) }}" style="max-width:200px"></div>
+        <input type="file" name="cover_image" accept="image/jpeg,image/jpg,image/png">
+        @if($event->cover_image_url)
+            <div style="margin-top:0.5rem;"><img src="{{ $event->cover_image_url }}" alt="Kapak" style="max-width:200px;border-radius:0.375rem;"></div>
         @endif
+        <p style="font-size:0.875rem;color:#666;margin-top:0.5rem;">JPG, PNG formatında, maksimum 2MB</p>
     </div>
     <div>
         <label>Durum</label>

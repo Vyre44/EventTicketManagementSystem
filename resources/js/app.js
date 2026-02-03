@@ -1,4 +1,6 @@
 import './bootstrap';
+import './ajax-helper';
+import './organizer-tickets';
 
 import Alpine from 'alpinejs';
 

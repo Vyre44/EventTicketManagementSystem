@@ -59,6 +59,7 @@ class Event extends Model
         'start_time',
         'end_time',
         'cover_path',
+        'cover_image_path',
         'status',
     ];
 
@@ -78,5 +79,15 @@ class Event extends Model
     public function ticketTypes()
     {
         return $this->hasMany(TicketType::class);
+    }
+
+    /**
+         * Cover image URL accessor
+     */
+    public function getCoverImageUrlAttribute(): ?string
+    {
+        return $this->cover_image_path 
+            ? asset('storage/' . $this->cover_image_path)
+            : null;
     }
 }

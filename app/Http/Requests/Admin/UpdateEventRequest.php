@@ -22,6 +22,7 @@ class UpdateEventRequest extends FormRequest
             'end_time' => ['nullable', 'date', 'after_or_equal:start_time'],
             'description' => ['nullable', 'string'],
             'organizer_id' => ['nullable', 'exists:users,id'],
+            'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 }

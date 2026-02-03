@@ -12,6 +12,7 @@
             <thead>
                 <tr class="bg-gray-100 text-left">
                     <th class="p-3">Başlık</th>
+                    <th class="p-3">Kapak</th>
                     <th class="p-3">Başlangıç</th>
                     <th class="p-3">Durum</th>
                     <th class="p-3">İşlemler</th>
@@ -21,6 +22,13 @@
                 @foreach($events as $event)
                     <tr class="border-b">
                         <td class="p-3">{{ $event->title }}</td>
+                        <td class="p-3">
+                            @if($event->cover_image_url)
+                                <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-16 h-16 object-cover rounded">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
                         <td class="p-3">{{ $event->start_time?->format('d.m.Y H:i') }}</td>
                         <td class="p-3">{{ $event->status?->value ?? $event->status }}</td>
                         <td class="p-3">

@@ -42,3 +42,8 @@
     <button type="submit">Güncelle</button>
     <a href="{{ route('organizer.events.index') }}">İptal</a>
 </form>
+
+<form method="POST" action="{{ route('organizer.events.destroy', $event) }}" onsubmit="return confirm('Bu etkinliği silmek istediğine emin misin?');" style="margin-top:1rem;">
+    @csrf @method('DELETE')
+    <button type="submit">Sil</button>
+</form>

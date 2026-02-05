@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Organizer;
 use App\Enums\TicketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\TicketType;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * TicketController (Organizer)
@@ -148,14 +150,29 @@ class TicketController extends Controller
             return back()->with('error', $message);
         }
 
-        // Bileti iptal et
-        $ticket->update(['status' => TicketStatus::CANCELLED]);
+        // Bileti iptal et + stok iadesi (idempotent + concurrency safe)
+        DB::transaction(function () use (&$ticket) {
+            // Ticket'i lock ile çek ve status kontrol et (idempotency guard)
+            $ticket = Ticket::lockForUpdate()->findOrFail($ticket->id);
+            
+            // Zaten CANCELLED veya REFUNDED ise tekrar işlem yapma
+            if (in_array($ticket->status, [TicketStatus::CANCELLED, TicketStatus::REFUNDED], true)) {
+                return;
+            }
+            
+            // Status'u CANCELLED yap
+            $ticket->update(['status' => TicketStatus::CANCELLED]);
+            
+            // Stok iade et
+            $ticketType = TicketType::lockForUpdate()->findOrFail($ticket->ticket_type_id);
+            $ticketType->increment('remaining_quantity');
+        });
 
         if (request()->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Bilet başarıyla iptal edildi.',
-                'data' => ['ticket' => $ticket]
+                'data' => ['ticket' => $ticket->fresh()]
             ]);
         }
 

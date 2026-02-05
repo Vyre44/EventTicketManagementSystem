@@ -36,6 +36,14 @@
                     <a href="{{ route('attendee.orders.index') }}" class="text-gray-700 hover:text-blue-600 transition">
                         Siparişlerim
                     </a>
+
+                    <!-- Visible Logout Button -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="px-3 py-2 text-sm font-medium text-red-600 hover:text-red-800 transition">
+                            Çıkış
+                        </button>
+                    </form>
                     
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">
@@ -49,12 +57,6 @@
                             <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                 Profil
                             </a>
-                            <form method="POST" action="{{ route('logout') }}" class="block">
-                                @csrf
-                                <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                    Çıkış Yap
-                                </button>
-                            </form>
                         </div>
                     </div>
                 </div>

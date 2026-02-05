@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Attendee\BuyTicketRequest;
 use App\Models\Event;
 use App\Models\Order;
+use App\Models\Ticket;
 use App\Models\TicketType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -283,20 +284,42 @@ class OrderController extends Controller
         }
 
         // Order'ı iptal et ve biletleri CANCELLED statüsüne çek (audit trail korunur)
-        DB::transaction(function () use ($order) {
+        $cancelled = false;
+        DB::transaction(function () use (&$order, &$cancelled) {
+            // Order'ı lock ile çek ve status kontrol et (idempotency guard)
+            $order = Order::lockForUpdate()->findOrFail($order->id);
+            
+            // Zaten CANCELLED veya REFUNDED ise tekrar işlem yapma
+            if (in_array($order->status, [OrderStatus::CANCELLED, OrderStatus::REFUNDED], true)) {
+                $cancelled = false;
+                return;
+            }
+            
             $tickets = $order->tickets()->with('ticketType')->get();
 
             foreach ($tickets as $ticket) {
+                // Ticket'i lock ile çek (concurrency protection)
+                $ticketLocked = Ticket::lockForUpdate()->findOrFail($ticket->id);
+                
+                // Zaten CANCELLED veya REFUNDED ise skip (idempotency guard)
+                if (in_array($ticketLocked->status, [TicketStatus::CANCELLED, TicketStatus::REFUNDED], true)) {
+                    continue;
+                }
+                
                 // Ticket status'unu CANCELLED'a çek (DELETE etme - audit trail korunmalı)
-                $ticket->update(['status' => TicketStatus::CANCELLED]);
+                $ticketLocked->update(['status' => TicketStatus::CANCELLED]);
 
                 // Stock iadesi yap
-                $ticketType = TicketType::lockForUpdate()->findOrFail($ticket->ticket_type_id);
+                $ticketType = TicketType::lockForUpdate()->findOrFail($ticketLocked->ticket_type_id);
                 $ticketType->increment('remaining_quantity');
             }
 
             $order->update(['status' => OrderStatus::CANCELLED]);
+            $cancelled = true;
         });
+
+        // Refresh order model to get updated status
+        $order->refresh();
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -343,17 +366,33 @@ class OrderController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($order) {
+            DB::transaction(function () use (&$order) {
+                // Order'ı lock ile çek ve status kontrol et (idempotency guard)
+                $order = Order::lockForUpdate()->findOrFail($order->id);
+                
+                // Zaten REFUNDED veya CANCELLED ise tekrar işlem yapma
+                if (in_array($order->status, [OrderStatus::REFUNDED, OrderStatus::CANCELLED], true)) {
+                    return;
+                }
+                
                 // Order'a bağlı tickets'i yükle
                 $tickets = $order->tickets()->with('ticketType')->get();
 
                 // Her ticket için status'u refunded yap ve remaining_quantity'yi geri artır
                 foreach ($tickets as $ticket) {
+                    // Ticket'i lock ile çek (concurrency protection)
+                    $ticketLocked = Ticket::lockForUpdate()->findOrFail($ticket->id);
+                    
+                    // Zaten REFUNDED veya CANCELLED ise skip (idempotency guard)
+                    if (in_array($ticketLocked->status, [TicketStatus::REFUNDED, TicketStatus::CANCELLED], true)) {
+                        continue;
+                    }
+                    
                     // Ticket status'unu refund'a çek
-                    $ticket->update(['status' => TicketStatus::REFUNDED]);
+                    $ticketLocked->update(['status' => TicketStatus::REFUNDED]);
 
                     // TicketType'ın remaining_quantity'sini kilitle ve artır
-                    $ticketType = TicketType::lockForUpdate()->findOrFail($ticket->ticket_type_id);
+                    $ticketType = TicketType::lockForUpdate()->findOrFail($ticketLocked->ticket_type_id);
                     $ticketType->increment('remaining_quantity');
                 }
 

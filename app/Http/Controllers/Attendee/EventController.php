@@ -55,10 +55,11 @@ class EventController extends Controller
             abort(404, 'Etkinlik bulunamadı veya henüz yayınlanmadı.');
         }
 
+        // TÜM ticket type'ları yükle (stok bitmiş olanlar dahil)
+        // View'da remaining_quantity kontrolü yapılacak
         $event->load([
             'ticketTypes' => function($query) {
-                $query->where('remaining_quantity', '>', 0)
-                      ->orderBy('price');
+                $query->orderBy('price');
             },
             'organizer:id,name,email'
         ]);

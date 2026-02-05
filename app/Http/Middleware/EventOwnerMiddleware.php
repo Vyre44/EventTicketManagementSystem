@@ -23,11 +23,11 @@ class EventOwnerMiddleware
         if (!$user) {
             abort(403);
         }
-        $role = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
-        if ($role === UserRole::ADMIN->value) {
+        $role = $user->role;
+        if ($role === UserRole::ADMIN) {
             return $next($request);
         }
-        if ($role === UserRole::ORGANIZER->value) {
+        if ($role === UserRole::ORGANIZER) {
             $event = $request->route('event');
             if (is_object($event) && method_exists($event, 'getAttribute')) {
                 $organizerId = $event->getAttribute('organizer_id');

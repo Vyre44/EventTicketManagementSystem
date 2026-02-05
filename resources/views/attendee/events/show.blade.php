@@ -40,9 +40,16 @@
     @endif
 
     <!-- Ticket Selection -->
+    @php
+        $totalRemaining = $event->ticketTypes->sum('remaining_quantity');
+    @endphp
     @if($event->ticketTypes->isEmpty())
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
             <p class="text-yellow-800 text-lg">Bu etkinlik için henüz bilet satılmamaktadır.</p>
+        </div>
+    @elseif($totalRemaining <= 0)
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <p class="text-red-800 text-lg">Biletler tükendi. Lütfen daha sonra tekrar deneyiniz.</p>
         </div>
     @else
         <div class="bg-white border rounded-lg p-6">

@@ -49,19 +49,19 @@
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="ticket-status-badge">
-                                    @if($ticket->status->value === 'active')
+                                    @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                         <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
                                             Aktif
                                         </span>
-                                    @elseif($ticket->status->value === 'checked_in')
+                                    @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
                                         <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
                                             ✅ Kullanıldı
                                         </span>
-                                    @elseif($ticket->status->value === 'cancelled')
+                                    @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
                                         <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">
                                             ❌ İptal
                                         </span>
-                                    @elseif($ticket->status->value === 'refunded')
+                                    @elseif($ticket->status === \App\Enums\TicketStatus::REFUNDED)
                                         <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">
                                             🔄 İade
                                         </span>
@@ -70,14 +70,14 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex gap-2 justify-center items-center ticket-actions">
-                                    @if($ticket->status->value === 'active')
+                                    @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                         <button class="ticket-action-btn text-green-600 hover:text-green-800 text-sm font-medium" data-action="checkin" title="Check-in">
                                             ✅ Check-in
                                         </button>
                                         <button class="ticket-action-btn text-red-600 hover:text-red-800 text-sm font-medium" data-action="cancel" title="İptal Et">
                                             ❌ İptal
                                         </button>
-                                    @elseif($ticket->status->value === 'checked_in')
+                                    @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
                                         <button class="ticket-action-btn text-orange-600 hover:text-orange-800 text-sm font-medium" data-action="undo" title="Check-in'i Geri Al">
                                             ↩️ Geri Al
                                         </button>

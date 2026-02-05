@@ -8,4 +8,6 @@
 @endif
 
 <a href="{{ route('organizer.events.edit', $event) }}">Düzenle</a>
+<a href="{{ route('organizer.events.ticket-types.index', $event) }}">Bilet Tipleri</a>
+<a href="{{ route('organizer.events.checkin.form', $event) }}">Check-in</a>
 <a href="{{ route('organizer.events.index') }}">Listeye Dön</a>

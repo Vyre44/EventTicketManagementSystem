@@ -10,6 +10,7 @@ use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Admin Ticket Controller - Resource Controller
@@ -408,33 +409,73 @@ class TicketController extends Controller
      */
     public function destroy(Ticket $ticket)
     {
-        /**
-         * ADIM 1: İLİŞKİLİ BİLET TÜRÜNü AL
-         */
-        $ticketType = $ticket->ticketType;
-        
-        /**
-         * ADIM 2: BİLETİ İPTAL ET (Delete değil, Status değişir)
-         */
-        $ticket->update(['status' => TicketStatus::CANCELLED->value]);
+        // Idempotency + concurrency protection
+        DB::transaction(function () use (&$ticket) {
+            // Ticket'i lock ile çek ve status kontrol et (idempotency guard)
+            $ticket = Ticket::lockForUpdate()->findOrFail($ticket->id);
+            
+            // Zaten CANCELLED veya REFUNDED ise tekrar işlem yapma
+            if (in_array($ticket->status, [TicketStatus::CANCELLED, TicketStatus::REFUNDED], true)) {
+                return;
+            }
+            
+            /**
+             * BİLETİ İPTAL ET (Delete değil, Status değişir)
+             */
+            $ticket->update(['status' => TicketStatus::CANCELLED]);
+
+            /**
+             * QUOTA İADE ET
+             * 
+             * increment('remaining_quantity', 1)
+             * - SQL: UPDATE ... SET remaining_quantity = remaining_quantity + 1
+             * 
+             * NEDEN?
+             * - Bilet silindi (iptal)
+             * - Capacity'ye geri döndü
+             * - Kalan quota: +1 (başka bilet satılabilir)
+             */
+            $ticketType = TicketType::lockForUpdate()->findOrFail($ticket->ticket_type_id);
+            $ticketType->increment('remaining_quantity');
+        });
 
         /**
-         * ADIM 3: QUOTA İADE ET
-         * 
-         * increment('remaining_quantity', 1)
-         * - SQL: UPDATE ... SET remaining_quantity = remaining_quantity + 1
-         * 
-         * NEDEN?
-         * - Bilet silindi (iptal)
-         * - Capacity'ye geri döndü
-         * - Kalan quota: +1 (başka bilet satılabilir)
-         */
-        $ticketType->increment('remaining_quantity');
-
-        /**
-         * ADIM 4: BAŞARI MESAJI VE REDIRECT
+         * BAŞARI MESAJI VE REDIRECT
          */
         return redirect()->route('admin.tickets.index')
             ->with('success', 'Bilet iptal edildi.');
+    }
+
+    /**
+     * AJAX: Bileti iptal et (ACTIVE → CANCELLED) + stok iade
+     * 
+     * POST /admin/tickets/{ticket}/cancel-ticket
+     * JSON response, idempotent (status guard + lockForUpdate)
+     */
+    public function cancelTicket(Ticket $ticket)
+    {
+        // Idempotency + concurrency protection
+        DB::transaction(function () use (&$ticket) {
+            // Ticket'i lock ile çek ve status kontrol et (idempotency guard)
+            $ticket = Ticket::lockForUpdate()->findOrFail($ticket->id);
+            
+            // Zaten CANCELLED veya REFUNDED ise tekrar işlem yapma
+            if (in_array($ticket->status, [TicketStatus::CANCELLED, TicketStatus::REFUNDED], true)) {
+                return;
+            }
+            
+            // Status'u CANCELLED yap
+            $ticket->update(['status' => TicketStatus::CANCELLED]);
+            
+            // Stok iade et
+            $ticketType = TicketType::lockForUpdate()->findOrFail($ticket->ticket_type_id);
+            $ticketType->increment('remaining_quantity');
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bilet başarıyla iptal edildi.',
+            'data' => ['ticket' => $ticket->fresh()]
+        ]);
     }
 }

@@ -17,10 +17,10 @@
                 <label class="block text-sm font-semibold mb-2">Durum</label>
                 <select name="status" class="w-full border rounded-lg px-3 py-2">
                     <option value="">Tümü</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
-                    <option value="checked_in" {{ request('status') === 'checked_in' ? 'selected' : '' }}>Kullanıldı</option>
-                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>İptal</option>
-                    <option value="refunded" {{ request('status') === 'refunded' ? 'selected' : '' }}>İade</option>
+                    <option value="{{ \App\Enums\TicketStatus::ACTIVE->value }}" {{ request('status') === \App\Enums\TicketStatus::ACTIVE->value ? 'selected' : '' }}>Aktif</option>
+                    <option value="{{ \App\Enums\TicketStatus::CHECKED_IN->value }}" {{ request('status') === \App\Enums\TicketStatus::CHECKED_IN->value ? 'selected' : '' }}>Kullanıldı</option>
+                    <option value="{{ \App\Enums\TicketStatus::CANCELLED->value }}" {{ request('status') === \App\Enums\TicketStatus::CANCELLED->value ? 'selected' : '' }}>İptal</option>
+                    <option value="{{ \App\Enums\TicketStatus::REFUNDED->value }}" {{ request('status') === \App\Enums\TicketStatus::REFUNDED->value ? 'selected' : '' }}>İade</option>
                 </select>
             </div>
             <div>
@@ -39,7 +39,7 @@
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex-1">
                     Filtrele
                 </button>
-                <a href="{{ route('organizer.reports.events.tickets.export', [$event->id]) }}?{{ request()->query() }}" 
+                <a href="{{ route('organizer.reports.events.tickets.export', [$event->id]) }}?{{ http_build_query(request()->query()) }}" 
                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
                     📥 CSV
                 </a>
@@ -79,13 +79,13 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm">
-                                @if($ticket->status->value === 'active')
+                                @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                     <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">Aktif</span>
-                                @elseif($ticket->status->value === 'checked_in')
+                                @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
                                     <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">✅ Kullanıldı</span>
-                                @elseif($ticket->status->value === 'cancelled')
+                                @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
                                     <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">❌ İptal</span>
-                                @elseif($ticket->status->value === 'refunded')
+                                @elseif($ticket->status === \App\Enums\TicketStatus::REFUNDED)
                                     <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">🔄 İade</span>
                                 @endif
                             </td>
@@ -98,13 +98,13 @@
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 @if($ticket->order)
-                                    @if($ticket->order->status->value === 'pending')
+                                    @if($ticket->order->status === \App\Enums\OrderStatus::PENDING)
                                         <span class="text-yellow-600 text-xs font-semibold">⏳ Bekliyor</span>
-                                    @elseif($ticket->order->status->value === 'paid')
+                                    @elseif($ticket->order->status === \App\Enums\OrderStatus::PAID)
                                         <span class="text-green-600 text-xs font-semibold">✅ Ödendi</span>
-                                    @elseif($ticket->order->status->value === 'cancelled')
+                                    @elseif($ticket->order->status === \App\Enums\OrderStatus::CANCELLED)
                                         <span class="text-red-600 text-xs font-semibold">❌ İptal</span>
-                                    @elseif($ticket->order->status->value === 'refunded')
+                                    @elseif($ticket->order->status === \App\Enums\OrderStatus::REFUNDED)
                                         <span class="text-gray-600 text-xs font-semibold">🔄 İade</span>
                                     @endif
                                 @else

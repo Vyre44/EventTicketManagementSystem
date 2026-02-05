@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\TicketType;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use App\Models\Ticket;
 
 /**
  * Event Model
@@ -86,6 +88,21 @@ class Event extends Model
     public function ticketTypes(): HasMany
     {
         return $this->hasMany(TicketType::class);
+    }
+
+    /**
+     * Etkinliğe Ait Biletler
+     *
+     * TicketType -> Ticket üzerinden hasManyThrough ilişkisi
+     */
+    public function tickets(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Ticket::class,
+            TicketType::class,
+            'event_id',
+            'ticket_type_id'
+        );
     }
 
     /**

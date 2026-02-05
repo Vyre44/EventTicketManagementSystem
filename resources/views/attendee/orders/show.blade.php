@@ -94,6 +94,7 @@
         @if($order->status === \App\Enums\OrderStatus::PENDING)
             <div class="flex flex-col md:flex-row gap-4">
                 <button 
+                    type="button"
                     id="order-pay-btn" 
                     data-order-id="{{ $order->id }}"
                     class="flex-1 bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -101,6 +102,7 @@
                     ✓ Ödemeyi Tamamla
                 </button>
                 <button 
+                    type="button"
                     id="order-cancel-btn" 
                     data-order-id="{{ $order->id }}"
                     class="flex-1 bg-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -110,6 +112,7 @@
             </div>
         @elseif($order->status === \App\Enums\OrderStatus::PAID)
             <button 
+                type="button"
                 id="order-refund-btn" 
                 data-order-id="{{ $order->id }}"
                 class="w-full bg-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -135,7 +138,4 @@
         </a>
     </div>
 </div>
-
-<!-- CSRF Token -->
-<input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
 @endsection

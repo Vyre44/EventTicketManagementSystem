@@ -46,11 +46,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group
     Route::get('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
 
     // AJAX Ticket Operations - JSON Response
-    Route::post('tickets/{ticket}/checkin', [\App\Http\Controllers\Admin\TicketController::class, 'checkin'])->name('tickets.checkin');
-    Route::post('tickets/{ticket}/checkin-undo', [\App\Http\Controllers\Admin\TicketController::class, 'checkinUndo'])->name('tickets.checkinUndo');
     Route::post('tickets/{ticket}/cancel-ticket', [\App\Http\Controllers\Admin\TicketController::class, 'cancelTicket'])->name('tickets.cancelTicket');
 
+    // Admin Check-in (SÜPER YETKİ - tüm events için)
+    Route::get('events/{event}/checkin', [\App\Http\Controllers\Admin\CheckInController::class, 'showForm'])->name('events.checkin.form');
+    Route::post('events/{event}/checkin', [\App\Http\Controllers\Admin\CheckInController::class, 'check'])->name('events.checkin.check');
+
     // Reports - CSV Export
+    Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/event-sales', [\App\Http\Controllers\Admin\ReportController::class, 'eventSales'])->name('reports.event-sales');
+    Route::get('reports/event-sales/data', [\App\Http\Controllers\Admin\ReportController::class, 'eventSalesData'])->name('reports.event-sales.data');
     Route::get('reports/events/{event}/tickets', [\App\Http\Controllers\Admin\ReportController::class, 'eventTickets'])->name('reports.events.tickets');
     Route::get('reports/events/{event}/tickets/export', [\App\Http\Controllers\Admin\ReportController::class, 'exportEventTickets'])->name('reports.events.tickets.export');
 });
@@ -95,6 +100,14 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth','role:admin,o
     Route::resource('events', \App\Http\Controllers\Organizer\EventController::class);
     Route::resource('orders', \App\Http\Controllers\Organizer\OrderController::class, ['only' => ['index', 'show']]);
     Route::resource('tickets', \App\Http\Controllers\Organizer\TicketController::class, ['only' => ['index', 'show']]);
+
+    // Organizer Ticket Type Management (Event scoped)
+    Route::get('events/{event}/ticket-types', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'index'])->name('events.ticket-types.index');
+    Route::get('events/{event}/ticket-types/create', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'create'])->name('events.ticket-types.create');
+    Route::post('events/{event}/ticket-types', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'store'])->name('events.ticket-types.store');
+    Route::get('events/{event}/ticket-types/{ticketType}/edit', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'edit'])->name('events.ticket-types.edit');
+    Route::put('events/{event}/ticket-types/{ticketType}', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'update'])->name('events.ticket-types.update');
+    Route::delete('events/{event}/ticket-types/{ticketType}', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'destroy'])->name('events.ticket-types.destroy');
     
     // AJAX Ticket Operations
     Route::post('tickets/{ticket}/checkin', [\App\Http\Controllers\Organizer\TicketController::class, 'checkin'])->name('tickets.checkin');

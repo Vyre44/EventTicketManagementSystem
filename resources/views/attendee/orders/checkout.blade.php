@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('attendee.layouts.app')
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-3xl">
@@ -66,18 +66,22 @@
     @endif
 
     <!-- Ödeme Butonu -->
-    <form method="POST" action="{{ route('attendee.orders.pay', $order) }}">
+    <form method="POST" action="{{ route('attendee.orders.pay', $order) }}" id="pay-form">
         @csrf
         <div class="flex gap-4">
-            <a 
-                href="{{ route('attendee.orders.index') }}" 
-                class="flex-1 bg-gray-300 text-gray-800 px-6 py-3 rounded-lg text-center hover:bg-gray-400 font-semibold"
-            >
-                İptal Et
-            </a>
             <button 
-                type="submit" 
-                class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold"
+                type="button"
+                id="order-cancel-btn"
+                data-order-id="{{ $order->id }}"
+                class="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg text-center hover:bg-red-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                ❌ İptal Et
+            </button>
+            <button 
+                type="button"
+                id="order-pay-btn"
+                data-order-id="{{ $order->id }}"
+                class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 ✅ Ödemeyi Tamamla
             </button>

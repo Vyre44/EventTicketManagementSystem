@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Enums\OrderStatus;
 use App\Models\Event;
+use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -50,6 +52,81 @@ class ReportController extends Controller
     }
 
     /**
+     * Admin Event Sales Report - View
+     *
+     * GET /admin/reports/event-sales
+     */
+    public function eventSales()
+    {
+        $events = Event::select('id', 'title')
+            ->orderBy('title')
+            ->get();
+
+        return view('admin.reports.event_sales', compact('events'));
+    }
+
+    /**
+     * Admin Event Sales Report - Data (AJAX JSON)
+     *
+     * GET /admin/reports/event-sales/data
+     */
+    public function eventSalesData(Request $request)
+    {
+        $eventId = (int) $request->input('event_id');
+
+        if (!$eventId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Etkinlik seçimi zorunludur.',
+                'data' => null
+            ], 422);
+        }
+
+        $event = Event::find($eventId);
+        if (!$event) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Etkinlik bulunamadı.',
+                'data' => null
+            ], 404);
+        }
+
+        $ordersQuery = Order::where('event_id', $event->id);
+        $data = [
+            'event' => [
+                'id' => $event->id,
+                'title' => $event->title,
+            ],
+            'paid_orders' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->count(),
+            'paid_revenue' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->sum('total_amount'),
+            'pending_count' => (clone $ordersQuery)->where('status', OrderStatus::PENDING)->count(),
+            'cancelled_count' => (clone $ordersQuery)->where('status', OrderStatus::CANCELLED)->count(),
+            'refunded_count' => (clone $ordersQuery)->where('status', OrderStatus::REFUNDED)->count(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rapor başarıyla getirildi.',
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * Rapor Ana Sayfası - Event Seçimi
+     * 
+     * GET /admin/reports
+     */
+    public function index()
+    {
+        $events = Event::with('organizer:id,name')
+            ->withCount(['orders', 'tickets'])
+            ->latest()
+            ->get();
+            
+        return view('admin.reports.index', compact('events'));
+    }
+
+    /**
      * ============================================================
      * ETKİNLİK BİLET RAPORU - HTML GÖRÜNÜMÜ
      * ============================================================
@@ -80,6 +157,28 @@ class ReportController extends Controller
      */
     public function eventTickets(Request $request, Event $event)
     {
+        $ordersQuery = Order::where('event_id', $event->id);
+        
+        // Paid ticket count: SADECE OrderStatus::PAID siparişlerdeki ACTIVE/CHECKED_IN biletler
+        $paidTicketCount = Ticket::whereHas('ticketType', function ($q) use ($event) {
+            $q->where('event_id', $event->id);
+        })
+        ->whereHas('order', function ($q) {
+            $q->where('status', OrderStatus::PAID);
+        })
+        ->whereIn('status', [TicketStatus::ACTIVE, TicketStatus::CHECKED_IN])
+        ->count();
+        
+        $summary = [
+            'paid_revenue' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->sum('total_amount'),
+            'paid_count' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->count(),
+            'paid_tickets' => $paidTicketCount,
+            'pending_count' => (clone $ordersQuery)->where('status', OrderStatus::PENDING)->count(),
+            'cancelled_count' => (clone $ordersQuery)->where('status', OrderStatus::CANCELLED)->count(),
+            'refunded_count' => (clone $ordersQuery)->where('status', OrderStatus::REFUNDED)->count(),
+            'total_orders' => (clone $ordersQuery)->count(),
+        ];
+
         /**
          * ADIM 1: QUERY BUILDER OLUŞTUR
          * 
@@ -227,7 +326,7 @@ class ReportController extends Controller
          *     {{ $ticket->id }}  // Bilet ID
          * @endforeach
          */
-        return view('admin.reports.event_tickets', compact('event', 'tickets'));
+        return view('admin.reports.event_tickets', compact('event', 'tickets', 'summary'));
     }
 
     /**

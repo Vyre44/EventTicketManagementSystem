@@ -129,15 +129,17 @@
         if (cancelBtn) {
             cancelBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 
                 if (!confirm('Siparişi iptal etmek istediğine emin misin?')) {
                     return;
                 }
                 
                 const orderId = this.dataset.orderId;
-                const originalText = this.textContent;
-                this.disabled = true;
-                this.textContent = '🔄 İptal ediliyor...';
+                const btn = this;
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = '🔄 İptal ediliyor...';
                 
                 fetch(`/orders/${orderId}/cancel`, {
                     method: 'POST',
@@ -147,7 +149,12 @@
                         'X-Requested-With': 'XMLHttpRequest',
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok && response.status !== 422) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         // Update status badge
@@ -167,14 +174,15 @@
                         showAlert('✓ Siparişiniz başarıyla iptal edildi.', 'success');
                     } else {
                         showAlert(data.message || 'İptal işlemi başarısız oldu.', 'error');
-                        this.disabled = false;
-                        this.textContent = originalText;
+                        btn.disabled = false;
+                        btn.textContent = originalText;
                     }
                 })
                 .catch(error => {
+                    console.error('Cancel error:', error);
                     showAlert('Bir hata oluştu: ' + error.message, 'error');
-                    this.disabled = false;
-                    this.textContent = originalText;
+                    btn.disabled = false;
+                    btn.textContent = originalText;
                 });
             });
         }
@@ -188,9 +196,10 @@
                 e.preventDefault();
                 
                 const orderId = this.dataset.orderId;
-                const originalText = this.textContent;
-                this.disabled = true;
-                this.textContent = '🔄 Ödeme işleniyor...';
+                const btn = this;
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = '🔄 Ödeme işleniyor...';
                 
                 fetch(`/orders/${orderId}/pay`, {
                     method: 'POST',
@@ -200,7 +209,13 @@
                         'X-Requested-With': 'XMLHttpRequest',
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    // Check response status
+                    if (!response.ok && response.status !== 422) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         // Update status badge
@@ -223,14 +238,15 @@
                         showAlert('✓ Ödeme başarılı! Biletleriniz hazır.', 'success');
                     } else {
                         showAlert(data.message || 'Ödeme işlemi başarısız oldu.', 'error');
-                        this.disabled = false;
-                        this.textContent = originalText;
+                        btn.disabled = false;
+                        btn.textContent = originalText;
                     }
                 })
                 .catch(error => {
+                    console.error('Pay error:', error);
                     showAlert('Bir hata oluştu: ' + error.message, 'error');
-                    this.disabled = false;
-                    this.textContent = originalText;
+                    btn.disabled = false;
+                    btn.textContent = originalText;
                 });
             });
         }
@@ -246,9 +262,10 @@
             }
             
             const orderId = this.dataset.orderId;
-            const originalText = this.textContent;
-            this.disabled = true;
-            this.textContent = '🔄 İade işleniyor...';
+            const btn = this;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '🔄 İade işleniyor...';
             
             fetch(`/orders/${orderId}/refund`, {
                 method: 'POST',
@@ -258,7 +275,13 @@
                     'X-Requested-With': 'XMLHttpRequest',
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                // Check response status
+                if (!response.ok && response.status !== 422) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Update status badge
@@ -278,14 +301,15 @@
                     showAlert('✓ İade işlemi başarılı. Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.', 'success');
                 } else {
                     showAlert(data.message || 'İade işlemi başarısız oldu.', 'error');
-                    this.disabled = false;
-                    this.textContent = originalText;
+                    btn.disabled = false;
+                    btn.textContent = originalText;
                 }
             })
             .catch(error => {
+                console.error('Refund error:', error);
                 showAlert('Bir hata oluştu: ' + error.message, 'error');
-                this.disabled = false;
-                this.textContent = originalText;
+                btn.disabled = false;
+                btn.textContent = originalText;
             });
         }
         

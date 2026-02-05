@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Enums\TicketStatus;
 use App\Enums\OrderStatus;
 

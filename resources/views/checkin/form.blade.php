@@ -1,27 +1,48 @@
-    <h1>{{ $event->title }} - Check-in</h1>
+@extends('layouts.app')
 
-@if(session('error'))
-    <div style="color:red">{{ session('error') }}</div>
-@endif
-@if(session('warning'))
-    <div style="color:orange">{{ session('warning') }}</div>
-@endif
-@if(session('success'))
-    <div style="color:green">{{ session('success') }}</div>
-@endif
+@section('content')
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">{{ $event->title }} - Check-in</h1>
+        <a href="{{ route('organizer.events.index') }}" class="btn btn-outline-secondary">Etkinliklere Dön</a>
+    </div>
 
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if(session('warning'))
+        <div class="alert alert-warning">{{ session('warning') }}</div>
+    @endif
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-<form id="checkin-form" method="POST" action="{{ route('organizer.events.checkin.check', $event) }}">
-    @csrf
-    <input type="text" name="code" placeholder="Bilet kodu" autofocus>
-    <button type="submit">Doğrula</button>
-</form>
+    <form id="checkin-form" method="POST" action="{{ route('organizer.events.checkin.check', $event) }}" class="card card-body mb-4">
+        @csrf
+        <div class="mb-3">
+            <label class="form-label">Bilet Kodu</label>
+            <input type="text" name="code" class="form-control" placeholder="Bilet kodu" autofocus>
+        </div>
+        <button type="submit" class="btn btn-primary">Doğrula</button>
+    </form>
+
+    @if(!empty($recent) && $recent->count())
+        <div class="card card-body">
+            <h3 class="h6">Son 10 Check-in</h3>
+            <ul class="mb-0">
+                @foreach($recent as $t)
+                    <li>{{ $t->code }} — {{ $t->checked_in_at?->format('d.m.Y H:i') }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+</div>
 
 <script>
-// CSRF token'ı formdaki _token input'undan al
-function getCsrfTokenFromForm(form) {
-    const input = form.querySelector('input[name="_token"]');
-    return input ? input.value : '';
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        || document.querySelector('input[name="_token"]')?.value
+        || '';
 }
 
 document.getElementById('checkin-form').addEventListener('submit', async function(e) {
@@ -29,26 +50,20 @@ document.getElementById('checkin-form').addEventListener('submit', async functio
     const form = e.target;
     const code = form.code.value;
     const url = form.action;
-    const csrf = getCsrfTokenFromForm(form);
+    const csrf = getCsrfToken();
     try {
         const res = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrf,
+                'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify({ code })
         });
-        let text = await res.text();
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            data = { message: text };
-        }
+        const data = await res.json();
         if (!res.ok) {
-            // 422, 409, 500 gibi durumlarda
             alert(data.message || 'Bir hata oluştu.');
         } else {
             alert(data.message || 'Bilinmeyen cevap');
@@ -58,12 +73,4 @@ document.getElementById('checkin-form').addEventListener('submit', async functio
     }
 });
 </script>
-
-@if(!empty($recent) && $recent->count())
-    <h3>Son 10 Check-in</h3>
-    <ul>
-        @foreach($recent as $t)
-            <li>{{ $t->code }} — {{ $t->checked_in_at?->format('d.m.Y H:i') }}</li>
-        @endforeach
-    </ul>
-@endif
+@endsection

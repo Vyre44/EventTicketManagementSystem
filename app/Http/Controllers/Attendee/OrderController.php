@@ -16,21 +16,21 @@ use Illuminate\Support\Str;
 /**
  * OrderController (Attendee)
  *
- * Satın alma akışı (Model 1A):
- * 1. POST /events/{event}/buy → Order(PENDING) oluştur
- * 2. GET  /orders/{order}      → Ödeme sayfası göster (status=PENDING ise)
- * 3. POST /orders/{order}/pay  → Order(PAID) + Ticket(ACTIVE) oluştur + quota düş
+ * Satın alma akışı:
+ * 1. POST /events/{event}/buy → Order(PENDING) + Ticket(ACTIVE) + quota düş
+ * 2. GET  /orders/{order}      → Ödeme sayfası (PENDING) / bilet listesi (diğerleri)
+ * 3. POST /orders/{order}/pay  → Order(PAID) işaretleme
  * 4. GET  /orders              → Kullanıcının siparişleri
  */
 class OrderController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth', 'role:attendee']);
     }
 
     /**
-     * STEP 1: "Satın Al" butonuna basınca Order(PENDING) oluştur
+    * STEP 1: "Satın Al" → Order(PENDING) + Ticket(ACTIVE) + kota düş
      *
      * POST /events/{event}/buy
      */
@@ -48,50 +48,66 @@ class OrderController extends Controller
         }
 
         $ticketTypeQuantities = $request->ticket_types; // ['ticket_type_id' => quantity]
-        $totalAmount = 0;
 
-        // Kota kontrolü + toplam tutar hesaplama
-        foreach ($ticketTypeQuantities as $ticketTypeId => $quantity) {
-            $ticketType = TicketType::lockForUpdate()->findOrFail($ticketTypeId);
+        try {
+            $order = DB::transaction(function () use ($event, $ticketTypeQuantities) {
+                $totalAmount = 0;
 
-            // Bilet tipi bu etkinliğe ait mi?
-            if ($ticketType->event_id !== $event->id) {
-                if ($request->expectsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Geçersiz bilet tipi.'
-                    ], 422);
+                // Kota kontrolü + toplam tutar hesaplama
+                foreach ($ticketTypeQuantities as $ticketTypeId => $quantity) {
+                    $ticketType = TicketType::lockForUpdate()->findOrFail($ticketTypeId);
+
+                    if ($ticketType->event_id !== $event->id) {
+                        throw new \InvalidArgumentException('Geçersiz bilet tipi.');
+                    }
+
+                    if ($ticketType->remaining_quantity < $quantity) {
+                        throw new \InvalidArgumentException("{$ticketType->name} için yeterli kota yok. Mevcut: {$ticketType->remaining_quantity}");
+                    }
+
+                    $totalAmount += $ticketType->price * $quantity;
                 }
-                return back()->withErrors(['ticket_types' => 'Geçersiz bilet tipi.']);
-            }
 
-            // Yeterli kota var mı?
-            if ($ticketType->remaining_quantity < $quantity) {
-                $message = "{$ticketType->name} için yeterli kota yok. Mevcut: {$ticketType->remaining_quantity}";
-                if ($request->expectsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $message
-                    ], 422);
+                $order = Order::create([
+                    'user_id' => auth()->id(),
+                    'event_id' => $event->id,
+                    'total_amount' => $totalAmount,
+                    'status' => OrderStatus::PENDING,
+                ]);
+
+                foreach ($ticketTypeQuantities as $ticketTypeId => $quantity) {
+                    $ticketType = TicketType::lockForUpdate()->findOrFail($ticketTypeId);
+
+                    for ($i = 0; $i < $quantity; $i++) {
+                        $order->tickets()->create([
+                            'ticket_type_id' => $ticketTypeId,
+                            'code' => $this->generateUniqueTicketCode(),
+                            'status' => TicketStatus::ACTIVE,
+                        ]);
+                    }
+
+                    $ticketType->decrement('remaining_quantity', $quantity);
                 }
-                return back()->withErrors(['ticket_types' => $message]);
-            }
 
-            $totalAmount += $ticketType->price * $quantity;
+                return $order;
+            });
+        } catch (\InvalidArgumentException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 422);
+            }
+            return back()->withErrors(['ticket_types' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'İşlem sırasında bir hata oluştu.'
+                ], 500);
+            }
+            return back()->withErrors(['order' => 'İşlem sırasında bir hata oluştu.']);
         }
-
-        // Order(PENDING) oluştur - henüz Ticket YOK
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'event_id' => $event->id,
-            'total_amount' => $totalAmount,
-            'status' => OrderStatus::PENDING,
-        ]);
-
-        // Session'a ticket_types kaydet (ödeme tamamlanınca kullanılacak)
-        session([
-            "order_{$order->id}_ticket_types" => $ticketTypeQuantities,
-        ]);
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -120,34 +136,32 @@ class OrderController extends Controller
             abort(403, 'Bu siparişi görüntüleme yetkiniz yok.');
         }
 
-        $order->load('event');
+        $order->load(['event', 'tickets.ticketType']);
 
         // Sipariş PENDING ise → Ödeme sayfası
         if ($order->status === OrderStatus::PENDING) {
-            $ticketTypeQuantities = session("order_{$order->id}_ticket_types", []);
-
-            // Session'da veri yoksa hata
-            if (empty($ticketTypeQuantities)) {
+            if ($order->tickets->isEmpty()) {
                 return redirect()->route('attendee.orders.index')
                     ->withErrors(['order' => 'Sipariş bilgisi bulunamadı.']);
             }
 
-            // Bilet tipi detaylarını çek
-            $ticketTypes = TicketType::whereIn('id', array_keys($ticketTypeQuantities))
-                ->get()
-                ->keyBy('id');
+            $ticketTypeQuantities = $order->tickets
+                ->groupBy('ticket_type_id')
+                ->map(fn($group) => $group->count())
+                ->all();
+
+            $ticketTypes = $order->tickets
+                ->mapWithKeys(fn($ticket) => [$ticket->ticket_type_id => $ticket->ticketType]);
 
             return view('attendee.orders.checkout', compact('order', 'ticketTypeQuantities', 'ticketTypes'));
         }
 
         // Sipariş PAID/CANCELLED/REFUNDED ise → Bilet listesi
-        $order->load('tickets.ticketType');
-
         return view('attendee.orders.show', compact('order'));
     }
 
     /**
-     * STEP 3: Ödemeyi tamamla → Order(PAID) + Ticket(ACTIVE) oluştur + quota düş
+    * STEP 3: Ödemeyi tamamla → Order(PAID) işaretleme
      *
      * POST /orders/{order}/pay
      */
@@ -177,11 +191,8 @@ class OrderController extends Controller
                 ->withErrors(['order' => $message]);
         }
 
-        $ticketTypeQuantities = session("order_{$order->id}_ticket_types", []);
-
-        // Session'da veri yoksa hata
-        if (empty($ticketTypeQuantities)) {
-            $message = 'Sipariş bilgisi bulunamadı.';
+        if ($order->tickets()->count() === 0) {
+            $message = 'Sipariş biletleri bulunamadı.';
             if (request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -193,38 +204,12 @@ class OrderController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($order, $ticketTypeQuantities) {
-                // Her bilet tipi için Ticket oluştur ve kotayı azalt
-                foreach ($ticketTypeQuantities as $ticketTypeId => $quantity) {
-                    $ticketType = TicketType::lockForUpdate()->findOrFail($ticketTypeId);
-
-                    // Son kontrol: Hala yeterli kota var mı?
-                    if ($ticketType->remaining_quantity < $quantity) {
-                        throw new \Exception("{$ticketType->name} için yeterli kota kalmadı. Mevcut: {$ticketType->remaining_quantity}");
-                    }
-
-                    // Ticket(ACTIVE) oluştur
-                    for ($i = 0; $i < $quantity; $i++) {
-                        $order->tickets()->create([
-                            'ticket_type_id' => $ticketTypeId,
-                            'code' => $this->generateUniqueTicketCode(),
-                            'status' => TicketStatus::ACTIVE,
-                        ]);
-                    }
-
-                    // Kotayı azalt
-                    $ticketType->decrement('remaining_quantity', $quantity);
-                }
-
-                // Order(PAID) yap
+            DB::transaction(function () use ($order) {
                 $order->update([
                     'status' => OrderStatus::PAID,
                     'paid_at' => now(),
                 ]);
             });
-
-            // Session temizle
-            session()->forget("order_{$order->id}_ticket_types");
 
             if (request()->expectsJson()) {
                 return response()->json([
@@ -297,8 +282,21 @@ class OrderController extends Controller
             return back()->with('error', $message);
         }
 
-        // Order'ı iptal et
-        $order->update(['status' => OrderStatus::CANCELLED]);
+        // Order'ı iptal et ve biletleri CANCELLED statüsüne çek (audit trail korunur)
+        DB::transaction(function () use ($order) {
+            $tickets = $order->tickets()->with('ticketType')->get();
+
+            foreach ($tickets as $ticket) {
+                // Ticket status'unu CANCELLED'a çek (DELETE etme - audit trail korunmalı)
+                $ticket->update(['status' => TicketStatus::CANCELLED]);
+
+                // Stock iadesi yap
+                $ticketType = TicketType::lockForUpdate()->findOrFail($ticket->ticket_type_id);
+                $ticketType->increment('remaining_quantity');
+            }
+
+            $order->update(['status' => OrderStatus::CANCELLED]);
+        });
 
         if (request()->expectsJson()) {
             return response()->json([

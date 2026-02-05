@@ -62,7 +62,7 @@ use App\Enums\UserRole;
  * Home - Role-Based Redirect
  * Admin: /admin/dashboard
  * Organizer: /organizer/events
- * Attendee: welcome.blade.php
+ * Attendee: /events
  * Guest: /login
  */
 Route::get('/', function () {
@@ -76,7 +76,7 @@ Route::get('/', function () {
     } elseif ($role === UserRole::ORGANIZER->value) {
         return redirect()->route('organizer.events.index');
     } else {
-        return view('welcome');
+        return redirect()->route('attendee.events.index');
     }
 })->name('home');
 

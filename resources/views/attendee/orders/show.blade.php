@@ -1,8 +1,6 @@
-@extends('layouts.app')
+@extends('attendee.layouts.app')
 
 @section('content')
-{{-- AJAX Alert Container --}}
-<x-ajax-alert />
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="mb-6">
@@ -28,23 +26,7 @@
 
             <!-- Status Badge -->
             <div id="order-status-badge">
-                @if($order->status->value === 'pending')
-                    <span class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-semibold">
-                        ⏳ Ödeme Bekliyor
-                    </span>
-                @elseif($order->status->value === 'paid')
-                    <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold">
-                        ✅ Ödendi
-                    </span>
-                @elseif($order->status->value === 'cancelled')
-                    <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold">
-                        ❌ İptal Edildi
-                    </span>
-                @elseif($order->status->value === 'refunded')
-                    <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full font-semibold">
-                        🔄 İade Edildi
-                    </span>
-                @endif
+                <x-attendee.status-badge :status="$order->status" />
             </div>
         </div>
 
@@ -90,24 +72,8 @@
                         </div>
 
                         <!-- Status Badge -->
-                        <div>
-                            @if($ticket->status->value === 'active')
-                                <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                    Aktif
-                                </span>
-                            @elseif($ticket->status->value === 'checked_in')
-                                <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                    Kullanıldı
-                                </span>
-                            @elseif($ticket->status->value === 'cancelled')
-                                <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                    İptal
-                                </span>
-                            @elseif($ticket->status->value === 'refunded')
-                                <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                    İade
-                                </span>
-                            @endif
+                        <div class="ticket-status-badge">
+                            <x-attendee.status-badge :status="$ticket->status" />
                         </div>
                     </div>
                 @endforeach
@@ -123,87 +89,53 @@
         </div>
     @endif
 
-    <!-- İşlem Butonları -->
-    <div id="order-actions" class="mt-6 flex gap-3">
-        @if($order->status->value === 'pending')
-            <button onclick="handleCancelOrder()" id="cancel-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50">
-                ❌ İptal Et
+    <!-- İşlem Butonları (State-based) -->
+    <div id="order-actions" class="mt-6">
+        @if($order->status === \App\Enums\OrderStatus::PENDING)
+            <div class="flex flex-col md:flex-row gap-4">
+                <button 
+                    id="order-pay-btn" 
+                    data-order-id="{{ $order->id }}"
+                    class="flex-1 bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    ✓ Ödemeyi Tamamla
+                </button>
+                <button 
+                    id="order-cancel-btn" 
+                    data-order-id="{{ $order->id }}"
+                    class="flex-1 bg-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    ❌ İptal Et
+                </button>
+            </div>
+        @elseif($order->status === \App\Enums\OrderStatus::PAID)
+            <button 
+                id="order-refund-btn" 
+                data-order-id="{{ $order->id }}"
+                class="w-full bg-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                ↩️ İade Talep Et
             </button>
-        @elseif($order->status->value === 'paid')
-            <button onclick="handleRefundOrder()" id="refund-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50">
-                🔄 İade Et
-            </button>
+        @elseif($order->status === \App\Enums\OrderStatus::CANCELLED)
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <p class="text-red-800 font-semibold">Bu sipariş iptal edilmiştir. Başka bir işlem yapılamaz.</p>
+            </div>
+        @elseif($order->status === \App\Enums\OrderStatus::REFUNDED)
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                <p class="text-gray-800 font-semibold">Bu sipariş için iade işlemi tamamlanmıştır.</p>
+                <p class="text-gray-600 text-sm mt-2">Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.</p>
+            </div>
         @endif
+    </div>
+
+    <!-- Back to Orders Button -->
+    <div class="mt-8 text-center">
+        <a href="{{ route('attendee.orders.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            ← Siparişlerime Dön
+        </a>
     </div>
 </div>
 
-<script>
-const ORDER_ID = {{ $order->id }};
-
-async function handleCancelOrder() {
-    if (!confirm('Bu siparişi iptal etmek istediğinizden emin misiniz?')) {
-        return;
-    }
-
-    const btn = document.getElementById('cancel-btn');
-    btn.disabled = true;
-    btn.textContent = '⏳ İptal ediliyor...';
-    clearAlerts();
-
-    try {
-        const data = await ajaxRequest(`/orders/${ORDER_ID}/cancel`, 'POST');
-        showAlert('success', data.message);
-        
-        // Status badge'i güncelle
-        updateStatusBadge('cancelled');
-        
-        // Butonu kaldır
-        document.getElementById('order-actions').innerHTML = '';
-        
-    } catch (error) {
-        showAlert('error', error.message);
-        btn.disabled = false;
-        btn.textContent = '❌ İptal Et';
-    }
-}
-
-async function handleRefundOrder() {
-    if (!confirm('Bu siparişin iadesini talep etmek istediğinizden emin misiniz?')) {
-        return;
-    }
-
-    const btn = document.getElementById('refund-btn');
-    btn.disabled = true;
-    btn.textContent = '⏳ İade ediliyor...';
-    clearAlerts();
-
-    try {
-        const data = await ajaxRequest(`/orders/${ORDER_ID}/refund`, 'POST');
-        showAlert('success', data.message);
-        
-        // Status badge'i güncelle
-        updateStatusBadge('refunded');
-        
-        // Butonu kaldır
-        document.getElementById('order-actions').innerHTML = '';
-        
-        // Sayfayı yenile (ticket status'leri güncellensin)
-        setTimeout(() => location.reload(), 2000);
-        
-    } catch (error) {
-        showAlert('error', error.message);
-        btn.disabled = false;
-        btn.textContent = '🔄 İade Et';
-    }
-}
-
-function updateStatusBadge(status) {
-    const badges = {
-        'cancelled': '<span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold">❌ İptal Edildi</span>',
-        'refunded': '<span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full font-semibold">🔄 İade Edildi</span>'
-    };
-    
-    document.getElementById('order-status-badge').innerHTML = badges[status] || '';
-}
-</script>
+<!-- CSRF Token -->
+<input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
 @endsection

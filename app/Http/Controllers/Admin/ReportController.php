@@ -327,7 +327,7 @@ class ReportController extends Controller
      * 
      * PARAMETRELER:
      * @param Event $event - Etkinlik bilgisi (dosya adında)
-     * @param Collection $tickets - Biletler
+     * @param \Illuminate\Support\Collection $tickets - Biletler
      * 
      * RETURN:
      * HTTP Response: CSV dosyası (indir)
@@ -340,7 +340,7 @@ class ReportController extends Controller
      * ALTERNATIF: League CSV veya Laravel Excel
      * Ancak bu proje için native PHP yeterli
      */
-    private function buildCsvResponse(Event $event, $tickets)
+    private function buildCsvResponse(Event $event, \Illuminate\Support\Collection $tickets)
     {
         /**
          * ADIM 1: DOSYA ADI OLUŞTUR

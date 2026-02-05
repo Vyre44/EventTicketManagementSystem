@@ -1,180 +1,127 @@
-@extends('layouts.app')
+@extends('attendee.layouts.app')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <!-- Etkinlik Başlığı -->
+    <!-- Back Button -->
     <div class="mb-6">
-        <a href="{{ route('attendee.events.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
-            ← Tüm Etkinlikler
+        <a href="{{ route('attendee.events.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center">
+            ← Etkinliklere Dön
         </a>
-        <h1 class="text-4xl font-bold mb-2">{{ $event->title }}</h1>
+    </div>
+
+    <!-- Event Header -->
+    <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-lg p-8 mb-8">
+        <h1 class="text-4xl font-bold mb-4">{{ $event->title }}</h1>
         
-        <div class="text-gray-600 space-y-1">
+        <div class="space-y-2 text-blue-100">
             <div class="flex items-center gap-2">
-                <span>📅</span>
-                <span>{{ $event->start_time->format('d.m.Y H:i') }}
-                    @if($event->end_time)
-                        - {{ $event->end_time->format('d.m.Y H:i') }}
-                    @endif
-                </span>
+                <span class="text-2xl">📅</span>
+                <span class="text-lg">{{ $event->start_time->format('d MMMM Y') }} • {{ $event->start_time->format('H:i') }}</span>
             </div>
+            @if($event->location)
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📍</span>
+                    <span class="text-lg">{{ $event->location }}</span>
+                </div>
+            @endif
             <div class="flex items-center gap-2">
-                <span>👤</span>
-                <span>Organizatör: {{ $event->organizer->name }}</span>
+                <span class="text-2xl">👤</span>
+                <span class="text-lg">Organize Eden: {{ $event->organizer->name }}</span>
             </div>
         </div>
     </div>
 
-    <!-- Etkinlik Açıklaması -->
+    <!-- Description -->
     @if($event->description)
-        <div class="bg-gray-50 p-6 rounded-lg mb-8">
-            <h2 class="text-xl font-bold mb-3">Açıklama</h2>
-            <p class="text-gray-700 whitespace-pre-line">{{ $event->description }}</p>
+        <div class="bg-white border rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4">📖 Açıklama</h2>
+            <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ $event->description }}</p>
         </div>
     @endif
 
-    <!-- Bilet Tipleri -->
-    <div class="bg-white border rounded-lg p-6">
-        <h2 class="text-2xl font-bold mb-4">Bilet Tipleri</h2>
+    <!-- Ticket Selection -->
+    @if($event->ticketTypes->isEmpty())
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            <p class="text-yellow-800 text-lg">Bu etkinlik için henüz bilet satılmamaktadır.</p>
+        </div>
+    @else
+        <div class="bg-white border rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-6">🎟️ Biletleri Seç</h2>
 
-        @if($event->ticketTypes->isEmpty())
-            <p class="text-gray-500">Bu etkinlik için henüz bilet tipi eklenmemiş.</p>
-        @else
             @auth
-                <div id="alert-container"></div>
-                <div id="buy-form">
-                    <div class="space-y-4">
+                <form id="buy-form" action="{{ route('attendee.events.buy', $event) }}" method="POST">
+                    @csrf
+                    
+                    <!-- Ticket Types -->
+                    <div class="space-y-4 mb-8">
                         @foreach($event->ticketTypes as $ticketType)
-                            <div class="border rounded-lg p-4 flex justify-between items-center">
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-lg">{{ $ticketType->name }}</h3>
-                                    @if($ticketType->description)
-                                        <p class="text-gray-600 text-sm">{{ $ticketType->description }}</p>
-                                    @endif
-                                    <div class="text-gray-600 text-sm mt-1">
-                                        <span class="font-semibold">{{ number_format($ticketType->price, 2) }} ₺</span>
-                                        <span class="ml-3">Mevcut Kota: {{ $ticketType->remaining_quantity }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="ml-4">
-                                    @if($ticketType->remaining_quantity > 0)
-                                        <input 
-                                            type="number" 
-                                            class="ticket-input"
-                                            data-ticket-type="{{ $ticketType->id }}"
-                                            min="0" 
-                                            max="{{ min($ticketType->remaining_quantity, 10) }}"
-                                            value="0"
-                                            class="border rounded px-3 py-2 w-20 text-center"
-                                            placeholder="0"
-                                        >
-                                    @else
-                                        <span class="text-red-600 font-semibold">TÜKENDİ</span>
-                                    @endif
-                                </div>
-                            </div>
+                            <x-attendee.ticket-card :ticket-type="$ticketType" />
                         @endforeach
                     </div>
 
-                    <div class="mt-6 flex justify-end">
-                        <button 
-                            id="buy-btn"
-                            type="button" 
-                            class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 text-lg"
-                        >
-                            🎟️ Satın Al
+                    <!-- Total Amount (Dynamic) -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-8">
+                        <div class="flex justify-between items-center text-lg">
+                            <span class="font-semibold text-gray-900">Toplam:</span>
+                            <span class="text-2xl font-bold text-blue-600" id="total-amount">₺0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-4 flex-col md:flex-row">
+                        <a href="{{ route('attendee.events.index') }}" class="flex-1 text-center bg-gray-300 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition">
+                            ❌ İptal
+                        </a>
+                        <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                            ✓ Satın Al
                         </button>
                     </div>
-                </div>
+                </form>
 
                 <script>
-                    document.getElementById('buy-btn').addEventListener('click', async function() {
-                        const ticketData = {};
-                        let hasSelection = false;
+                    // Total Price Calculator
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const ticketTypeMap = {
+                            @foreach($event->ticketTypes as $type)
+                                {{ $type->id }}: {{ $type->price }},
+                            @endforeach
+                        };
 
-                        document.querySelectorAll('.ticket-input').forEach(input => {
-                            const qty = parseInt(input.value);
-                            if (qty > 0) {
-                                ticketData['ticket_types[' + input.dataset.ticketType + ']'] = qty;
-                                hasSelection = true;
-                            }
-                        });
-
-                        if (!hasSelection) {
-                            showAlert('error', 'Lütfen en az bir bilet türü seçiniz');
-                            return;
-                        }
-
-                        const btn = this;
-                        btn.disabled = true;
-                        btn.textContent = '⏳ Yükleniyor...';
-
-                        try {
-                            const response = await fetch('{{ route("attendee.events.buy", $event) }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify(ticketData)
+                        function updateTotal() {
+                            let total = 0;
+                            document.querySelectorAll('.qty-input').forEach(input => {
+                                const qty = parseInt(input.value) || 0;
+                                const ticketTypeId = input.name.match(/\[(\d+)\]/)[1];
+                                total += qty * ticketTypeMap[ticketTypeId];
                             });
 
-                            if (response.status === 401 || response.status === 302) {
-                                window.location.href = '{{ route("login") }}';
-                                return;
-                            }
+                            document.getElementById('total-amount').textContent = 
+                                '₺' + total.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-                            const data = await response.json();
-
-                            if (response.ok) {
-                                if (data.redirect_url) {
-                                    window.location.href = data.redirect_url;
-                                } else {
-                                    showAlert('success', data.message || 'Siparişiniz oluşturuldu!');
-                                    document.getElementById('buy-form').style.display = 'none';
-                                    setTimeout(() => window.location.reload(), 2000);
-                                }
-                            } else {
-                                showAlert('error', data.message || 'Bir hata oluştu');
-                                btn.disabled = false;
-                                btn.textContent = '🎟️ Satın Al';
-                            }
-                        } catch (error) {
-                            showAlert('error', 'İşlem başarısız oldu: ' + error.message);
-                            btn.disabled = false;
-                            btn.textContent = '🎟️ Satın Al';
+                            // Disable submit if no tickets selected
+                            const submitBtn = document.querySelector('button[type="submit"]');
+                            submitBtn.disabled = total === 0;
                         }
-                    });
 
-                    function showAlert(type, message) {
-                        const container = document.getElementById('alert-container');
-                        container.innerHTML = '<div class="bg-' + (type === 'success' ? 'green' : 'red') + '-100 border border-' + (type === 'success' ? 'green' : 'red') + '-400 text-' + (type === 'success' ? 'green' : 'red') + '-700 px-4 py-3 rounded mb-4">' + message + '</div>';
-                    }
+                        // Listen to qty changes
+                        document.querySelectorAll('.qty-input').forEach(input => {
+                            input.addEventListener('change', updateTotal);
+                            input.addEventListener('input', updateTotal);
+                        });
+
+                        // Initial calc
+                        updateTotal();
+                    });
                 </script>
             @else
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
-                    <p class="text-yellow-800">
-                        Bilet satın almak için 
-                        <a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:text-blue-800">giriş yapmalısınız</a>.
-                    </p>
-                </div>
-
-                <div class="mt-4 space-y-2">
-                    @foreach($event->ticketTypes as $ticketType)
-                        <div class="border rounded-lg p-4 flex justify-between items-center">
-                            <div>
-                                <h3 class="font-bold">{{ $ticketType->name }}</h3>
-                                <div class="text-gray-600 text-sm">
-                                    <span class="font-semibold">{{ number_format($ticketType->price, 2) }} ₺</span>
-                                    <span class="ml-3">Mevcut Kota: {{ $ticketType->remaining_quantity }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                    <p class="text-blue-900 mb-4">Bilet satın almak için giriş yapmanız gerekir.</p>
+                    <a href="{{ route('login') }}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        🔐 Giriş Yap
+                    </a>
                 </div>
             @endauth
-        @endif
-    </div>
+        </div>
+    @endif
 </div>
 @endsection

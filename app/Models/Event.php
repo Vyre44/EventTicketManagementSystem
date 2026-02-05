@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\TicketType;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Event Model
@@ -50,7 +51,7 @@ class Event extends Model
      * - Sadece organizer ve admin etkinliği güncelleyebilir
      * - Attendee'ler sadece bilgi görebilir
      */
-    public function organizer(): BelongsTo
+    public function organizer(): BelongsTo 
     {
         /**
          * belongsTo($relatedModel, $foreignKey, $ownerKey)
@@ -82,7 +83,7 @@ class Event extends Model
      *     echo $type->name . " - " . $type->price;
      * }
      */
-    public function ticketTypes()
+    public function ticketTypes(): HasMany
     {
         return $this->hasMany(TicketType::class);
     }

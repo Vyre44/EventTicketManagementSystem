@@ -83,6 +83,25 @@ class User extends Authenticatable
     }
 
     /**
+     * BİR-ÇOKLU İLİŞKİ: Kullanıcının Siparişleri (Attendee)
+     * 
+     * Açıklama:
+     * - Bir kullanıcı (attendee) birçok sipariş oluşturabilir
+     * - Order'ın 'user_id' sütunu User'ın 'id'si ile eşleşir
+     * 
+     * @return HasMany
+     * 
+     * KULLANIM:
+     * $user = User::find(1);
+     * $orders = $user->orders; // Tüm siparişleri al
+     * $orders = $user->orders()->where('status', OrderStatus::PAID)->get();
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * ============================================================
      * HELPER METHODS - YARDIMCI METODLAR
      * ============================================================

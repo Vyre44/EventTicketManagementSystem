@@ -11,7 +11,7 @@
 
     @if($event->cover_image_url)
         <div class="mb-6">
-            <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-full h-64 object-cover rounded-lg">
+            <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-full rounded-lg" style="max-height:400px;object-fit:cover;">
         </div>
     @else
         <div class="mb-6 w-full h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-5xl rounded-lg">

@@ -4,7 +4,7 @@
 <p>Bitiş: {{ $event->end_time }}</p>
 <p>Durum: {{ $event->status->value ?? $event->status }}</p>
 @if($event->cover_image_url)
-    <img src="{{ $event->cover_image_url }}" alt="Kapak" style="max-width:300px;">
+    <img src="{{ $event->cover_image_url }}" alt="Kapak" style="max-width:600px;max-height:400px;object-fit:cover;border-radius:0.5rem;">
 @endif
 
 <a href="{{ route('organizer.events.edit', $event) }}">Düzenle</a>

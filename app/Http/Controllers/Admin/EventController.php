@@ -46,6 +46,10 @@ class EventController extends Controller
         
         // organizer_id nullable, admin isterse belirtebilir
         Event::create($validated);
+        
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Etkinlik başarıyla oluşturuldu.']);
+        }
         return redirect()->route('admin.events.index')->with('success', 'Etkinlik başarıyla oluşturuldu.');
     }
 
@@ -68,6 +72,10 @@ class EventController extends Controller
         }
         
         $event->update($validated);
+        
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Etkinlik başarıyla güncellendi.']);
+        }
         return redirect()->route('admin.events.index')->with('success', 'Etkinlik başarıyla güncellendi.');
     }
 

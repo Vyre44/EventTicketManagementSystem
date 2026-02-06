@@ -21,7 +21,7 @@
         @if($event->cover_image_url)
             <div>
                 <strong>Kapak:</strong><br>
-                <img src="{{ $event->cover_image_url }}" alt="Kapak" class="max-w-md">
+                <img src="{{ $event->cover_image_url }}" alt="Kapak" style="max-width:600px;max-height:400px;object-fit:cover;border-radius:0.5rem;">
             </div>
         @endif
     </div>

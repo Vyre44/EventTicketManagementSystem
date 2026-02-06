@@ -48,6 +48,10 @@ class EventController extends Controller
         Event::create($validated + ['organizer_id' => auth()->id()]);
         $message = 'Etkinlik başarıyla oluşturuldu.';
         $message .= $coverUploaded ? ' Kapak görseli yüklendi.' : ' Kapak görseli yüklenmedi.';
+        
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => $message]);
+        }
         return redirect()->route('organizer.events.index')->with('success', $message);
     }
 
@@ -73,6 +77,10 @@ class EventController extends Controller
         $event->update($validated);
         $message = 'Etkinlik başarıyla güncellendi.';
         $message .= $coverUploaded ? ' Kapak görseli güncellendi.' : ' Kapak görseli güncellenmedi.';
+        
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => $message]);
+        }
         return redirect()->route('organizer.events.index')->with('success', $message);
     }
 

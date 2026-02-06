@@ -25,4 +25,13 @@ class UpdateEventRequest extends FormRequest
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'cover_image.max' => 'Kapak görseli en fazla 2MB olabilir.',
+            'cover_image.image' => 'Kapak görseli geçerli bir resim dosyası olmalıdır.',
+            'cover_image.mimes' => 'Kapak görseli JPG, JPEG veya PNG formatında olmalıdır.',
+        ];
+    }
 }

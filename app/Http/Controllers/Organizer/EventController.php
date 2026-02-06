@@ -38,6 +38,7 @@ class EventController extends Controller
     public function store(StoreEventRequest $request)
     {
         $validated = $request->validated();
+        $coverUploaded = $request->hasFile('cover_image');
         
         // Cover image upload
         if ($request->hasFile('cover_image')) {
@@ -45,7 +46,9 @@ class EventController extends Controller
         }
         
         Event::create($validated + ['organizer_id' => auth()->id()]);
-        return redirect()->route('organizer.events.index')->with('success', 'Etkinlik başarıyla oluşturuldu.');
+        $message = 'Etkinlik başarıyla oluşturuldu.';
+        $message .= $coverUploaded ? ' Kapak görseli yüklendi.' : ' Kapak görseli yüklenmedi.';
+        return redirect()->route('organizer.events.index')->with('success', $message);
     }
 
     public function edit(Event $event)
@@ -56,6 +59,7 @@ class EventController extends Controller
     public function update(UpdateEventRequest $request, Event $event)
     {
         $validated = $request->validated();
+        $coverUploaded = $request->hasFile('cover_image');
         
         // Cover image upload
         if ($request->hasFile('cover_image')) {
@@ -67,7 +71,9 @@ class EventController extends Controller
         }
         
         $event->update($validated);
-        return redirect()->route('organizer.events.index')->with('success', 'Etkinlik başarıyla güncellendi.');
+        $message = 'Etkinlik başarıyla güncellendi.';
+        $message .= $coverUploaded ? ' Kapak görseli güncellendi.' : ' Kapak görseli güncellenmedi.';
+        return redirect()->route('organizer.events.index')->with('success', $message);
     }
 
     public function destroy(Event $event)

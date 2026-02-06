@@ -168,8 +168,11 @@
                             el.innerHTML = '<span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">❌ İptal Edildi</span>';
                         });
                         
-                        // Hide action buttons
-                        document.getElementById('order-actions').innerHTML = '<p class="text-gray-600">Sipariş iptal edilmiştir.</p>';
+                        // Hide action buttons (if element exists)
+                        const actionsContainer = document.getElementById('order-actions');
+                        if (actionsContainer) {
+                            actionsContainer.innerHTML = '<p class="text-gray-600">Sipariş iptal edilmiştir.</p>';
+                        }
                         
                         showAlert('✓ Siparişiniz başarıyla iptal edildi.', 'success');
                     } else {

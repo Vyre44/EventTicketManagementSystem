@@ -18,7 +18,6 @@ return new class extends Migration
     $table->dateTime('start_time');
     $table->dateTime('end_time')->nullable();
     $table->foreignId('organizer_id')->constrained('users')->cascadeOnDelete();
-    $table->string('cover_path')->nullable();
     $table->string('status')->default('draft');
     $table->timestamps();
 });

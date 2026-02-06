@@ -24,9 +24,9 @@
         <input type="datetime-local" name="end_time" value="{{ old('end_time') }}" required>
     </div>
     <div>
-        <label>Kapak Görseli</label>
+        <label>Kapak Görseli (Opsiyonel)</label>
         <input type="file" name="cover_image" accept="image/jpeg,image/jpg,image/png">
-        <p style="font-size:0.875rem;color:#666;margin-top:0.5rem;">JPG, PNG formatında, maksimum 2MB</p>
+        <p style="font-size:0.875rem;color:#666;margin-top:0.5rem;">Önerilen: 1200x630, JPG/PNG, max 2MB</p>
     </div>
     <div>
         <label>Durum</label>

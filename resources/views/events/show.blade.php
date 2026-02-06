@@ -6,8 +6,8 @@
     <p>Başlangıç: {{ $event->start_time }}</p>
     <p>Bitiş: {{ $event->end_time }}</p>
     <p>Durum: {{ $event->status->value }}</p>
-    @if($event->cover_path)
-        <img src="{{ asset('storage/' . $event->cover_path) }}" alt="Kapak Görseli" style="max-width:300px;">
+    @if($event->cover_image_url)
+        <img src="{{ $event->cover_image_url }}" alt="Kapak Görseli" style="max-width:300px;">
     @endif
     <a href="{{ route('admin.events.edit', $event) }}">Düzenle</a>
 @endsection

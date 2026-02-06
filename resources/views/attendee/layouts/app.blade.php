@@ -29,7 +29,7 @@
                 </div>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-6">
+                <div class="flex items-center space-x-6">
                     <a href="{{ route('attendee.events.index') }}" class="text-gray-700 hover:text-blue-600 transition">
                         Etkinlikler
                     </a>
@@ -37,7 +37,7 @@
                         Siparişlerim
                     </a>
 
-                    <!-- Visible Logout Button -->
+                    <!-- Logout Button -->
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="px-3 py-2 text-sm font-medium text-red-600 hover:text-red-800 transition">
@@ -60,13 +60,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden text-gray-700" x-data="{ open: false }" @click="open = !open">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
             </div>
         </div>
     </nav>

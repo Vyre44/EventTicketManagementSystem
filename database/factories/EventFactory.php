@@ -19,7 +19,6 @@ class EventFactory extends Factory
             'end_time' => $this->faker->dateTimeBetween('+2 days', '+3 days'),
             // Seeder'da organizer_id elle atanacak, burada factory zincirleme için null bırakıyoruz
             'organizer_id' => null,
-            'cover_path' => null,
             'status' => EventStatus::PUBLISHED->value,
         ];
     }

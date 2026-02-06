@@ -1,10 +1,14 @@
 @props(['event'])
 
 <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
-    <!-- Event Image Placeholder -->
-    <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-4xl">
-        🎪
-    </div>
+    <!-- Event Image -->
+    @if($event->cover_image_url)
+        <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-full h-48 object-cover">
+    @else
+        <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-4xl">
+            🎪
+        </div>
+    @endif
 
     <!-- Card Content -->
     <div class="p-4">

@@ -115,7 +115,7 @@
                 type="button"
                 id="order-refund-btn" 
                 data-order-id="{{ $order->id }}"
-                class="w-full bg-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full bg-orange-600 text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 ↩️ İade Talep Et
             </button>

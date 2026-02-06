@@ -8,7 +8,7 @@
         <label>Açıklama: <textarea name="description"></textarea></label><br>
         <label>Başlangıç: <input type="datetime-local" name="start_time" required></label><br>
         <label>Bitiş: <input type="datetime-local" name="end_time"></label><br>
-        <label>Kapak Görseli: <input type="file" name="cover"></label><br>
+        <label>Kapak Görseli: <input type="file" name="cover_image"></label><br>
         <button type="submit">Kaydet</button>
     </form>
 @endsection

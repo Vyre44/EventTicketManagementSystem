@@ -9,6 +9,16 @@
         </a>
     </div>
 
+    @if($event->cover_image_url)
+        <div class="mb-6">
+            <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-full h-64 object-cover rounded-lg">
+        </div>
+    @else
+        <div class="mb-6 w-full h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-5xl rounded-lg">
+            🎪
+        </div>
+    @endif
+
     <!-- Event Header -->
     <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-lg p-8 mb-8">
         <h1 class="text-4xl font-bold mb-4">{{ $event->title }}</h1>

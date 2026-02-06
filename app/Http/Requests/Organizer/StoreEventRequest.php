@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Organizer;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Enums\EventStatus;
 
 /**
  * StoreEventRequest: Organizer için etkinlik oluşturma isteği validasyonu.
@@ -22,6 +24,7 @@ class StoreEventRequest extends FormRequest
             'end_time' => ['nullable', 'date', 'after_or_equal:start_time'],
             'description' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'status' => ['nullable', Rule::enum(EventStatus::class)],
             // organizer_id asla request'ten alınmaz
         ];
     }

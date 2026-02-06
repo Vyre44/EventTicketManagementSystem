@@ -225,6 +225,46 @@ enum EventStatus: string
     case ENDED = 'ended';
 
     /**
+     * CANCELLED - İPTAL EDİLMİŞ
+     * 
+     * AÇIKLAMA:
+     * Etkinlik iptal edilmiş, bilet satışı durdurulmuş
+     * İadeler işleniyor/işlendi
+     * 
+     * NE OLUR?
+     * - Bilet satışı: KAPALI
+     * - Mevcut biletler: İade edilebilir
+     * - Etkinlik: Görünür ama "İPTAL" etiketi ile
+     * - Check-in: KAPALI
+     * 
+     * OPERASYON:
+     * 1. Admin/Organizatör: "Etkinliği İptal Et" tıkla
+     * 2. Event::find($id)->update(['status' => EventStatus::CANCELLED])
+     * 3. Status: PUBLISHED -> CANCELLED
+     * 4. cancelled_at: now()
+     * 5. Email: İptal bildirimi (alıcılara)
+     * 
+     * GÖRÜNÜRLÜK:
+     * - Event::visibleTo(Admin) -> Tümü görür
+     * - Event::visibleTo(Organizer) -> Kendi CANCELLED'ları
+     * - Event::visibleTo(Attendee) -> İhale edilenler görebilir
+     * 
+     * DATABASE:
+     * events.status = 'cancelled'
+     * events.cancelled_at = 2026-02-15 15:00:00
+     * 
+     * QUERY:
+     * $cancelled = Event::where('status', EventStatus::CANCELLED)->get();
+     * 
+     * RAPORLAMA:
+     * - Kaç etkinlik iptal edildi?
+     * - İptal nedenleri
+     * - İade tutarları
+     * - Müşteri memnuniyeti etkisi
+     */
+    case CANCELLED = 'cancelled';
+
+    /**
      * ============================================================
      * ETKİNLİK DURUMU AKIŞ TABLOSU
      * ============================================================

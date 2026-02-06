@@ -1,3 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Bootstrap 5 CSS kullanılıyor - attendee/layouts/app.blade.php'de CDN üzerinden import */
+/* Tailwind directive'leri kaldırıldı (Attendee layout Bootstrap 5'e çevrildi) */
+
+/* Custom overrides varsa buraya ekle */

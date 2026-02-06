@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Enums\UserRole;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +14,10 @@ use Illuminate\Support\Facades\Auth;
  * Route model binding: $request->route('event') Event modelini alır
  * Admin bypass: Tüm etkinliklere erişim
  * Organizer kontrolü: organizer_id == auth()->id()
- * 403 Forbidden: Yetkisiz erişim engellenir
+ * 
+ * Durum Kodu:
+ * - 403 Forbidden: Yetkisiz erişim (sahip değil)
+ * - 404 Not Found: Kaynak bulunamadı
  */
 class EventOwnerMiddleware
 {
@@ -23,23 +27,29 @@ class EventOwnerMiddleware
         if (!$user) {
             abort(403);
         }
-        $role = $user->role;
-        if ($role === UserRole::ADMIN) {
+
+        // Admin: Tüm etkinliklere erişim
+        if ($user->role === UserRole::ADMIN) {
             return $next($request);
         }
-        if ($role === UserRole::ORGANIZER) {
+
+        // Organizer: Sadece kendi etkinliklerine erişim
+        if ($user->role === UserRole::ORGANIZER) {
             $event = $request->route('event');
-            if (is_object($event) && method_exists($event, 'getAttribute')) {
-                $organizerId = $event->getAttribute('organizer_id');
-            } elseif (is_array($event) && isset($event['organizer_id'])) {
-                $organizerId = $event['organizer_id'];
-            } else {
-                $organizerId = $event->organizer_id ?? null;
+
+            // Event instance kontrolü - Route model binding başarısız ise 404
+            if (!($event instanceof Event)) {
+                abort(404);
             }
-            if ($organizerId == $user->id) {
-                return $next($request);
+
+            // Sahiplik kontrolü - Event başka organizer'a ait ise 403
+            if ($event->organizer_id !== $user->id) {
+                abort(403);
             }
+
+            return $next($request);
         }
+
         abort(403);
     }
 }

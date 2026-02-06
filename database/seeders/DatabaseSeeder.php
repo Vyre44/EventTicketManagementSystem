@@ -78,7 +78,7 @@ class DatabaseSeeder extends Seeder
                 'event_id' => $event->id,
             ],
             [
-                'total_price' => 100.00,
+                'total_amount' => 100.00,
                 'status' => \App\Enums\OrderStatus::PAID->value,
             ]
         );

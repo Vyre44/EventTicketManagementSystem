@@ -96,18 +96,31 @@ Route::get('/', function () {
  */
 
 Route::prefix('organizer')->name('organizer.')->middleware(['auth','role:admin,organizer'])->group(function () {
-    // Resource Routes
-    Route::resource('events', \App\Http\Controllers\Organizer\EventController::class);
+    // Resource Routes - index, create, store için sahiplik kontrolü gereksiz
+    Route::get('events', [\App\Http\Controllers\Organizer\EventController::class, 'index'])->name('events.index');
+    Route::get('events/create', [\App\Http\Controllers\Organizer\EventController::class, 'create'])->name('events.create');
+    Route::post('events', [\App\Http\Controllers\Organizer\EventController::class, 'store'])->name('events.store');
+    
+    // Resource Routes - show, edit, update, destroy için sahiplik kontrolü gerekli
+    Route::middleware('event.owner')->group(function () {
+        Route::get('events/{event}', [\App\Http\Controllers\Organizer\EventController::class, 'show'])->name('events.show');
+        Route::get('events/{event}/edit', [\App\Http\Controllers\Organizer\EventController::class, 'edit'])->name('events.edit');
+        Route::put('events/{event}', [\App\Http\Controllers\Organizer\EventController::class, 'update'])->name('events.update');
+        Route::delete('events/{event}', [\App\Http\Controllers\Organizer\EventController::class, 'destroy'])->name('events.destroy');
+    });
+    
     Route::resource('orders', \App\Http\Controllers\Organizer\OrderController::class, ['only' => ['index', 'show']]);
     Route::resource('tickets', \App\Http\Controllers\Organizer\TicketController::class, ['only' => ['index', 'show']]);
 
-    // Organizer Ticket Type Management (Event scoped)
-    Route::get('events/{event}/ticket-types', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'index'])->name('events.ticket-types.index');
-    Route::get('events/{event}/ticket-types/create', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'create'])->name('events.ticket-types.create');
-    Route::post('events/{event}/ticket-types', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'store'])->name('events.ticket-types.store');
-    Route::get('events/{event}/ticket-types/{ticketType}/edit', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'edit'])->name('events.ticket-types.edit');
-    Route::put('events/{event}/ticket-types/{ticketType}', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'update'])->name('events.ticket-types.update');
-    Route::delete('events/{event}/ticket-types/{ticketType}', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'destroy'])->name('events.ticket-types.destroy');
+    // Organizer Ticket Type Management (Event scoped - ownership verification)
+    Route::middleware('event.owner')->group(function () {
+        Route::get('events/{event}/ticket-types', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'index'])->name('events.ticket-types.index');
+        Route::get('events/{event}/ticket-types/create', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'create'])->name('events.ticket-types.create');
+        Route::post('events/{event}/ticket-types', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'store'])->name('events.ticket-types.store');
+        Route::get('events/{event}/ticket-types/{ticketType}/edit', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'edit'])->name('events.ticket-types.edit');
+        Route::put('events/{event}/ticket-types/{ticketType}', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'update'])->name('events.ticket-types.update');
+        Route::delete('events/{event}/ticket-types/{ticketType}', [\App\Http\Controllers\Organizer\TicketTypeController::class, 'destroy'])->name('events.ticket-types.destroy');
+    });
     
     // AJAX Ticket Operations
     Route::post('tickets/{ticket}/checkin', [\App\Http\Controllers\Organizer\TicketController::class, 'checkin'])->name('tickets.checkin');
@@ -120,9 +133,11 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth','role:admin,o
         Route::post('events/{event}/checkin', [\App\Http\Controllers\Organizer\CheckInController::class, 'check'])->name('events.checkin.check');
     });
 
-    // Reports & CSV Export
-    Route::get('reports/events/{event}/tickets', [\App\Http\Controllers\Organizer\ReportController::class, 'eventTickets'])->name('reports.events.tickets');
-    Route::get('reports/events/{event}/tickets/export', [\App\Http\Controllers\Organizer\ReportController::class, 'exportEventTickets'])->name('reports.events.tickets.export');
+    // Reports & CSV Export (event.owner middleware - ownership verification)
+    Route::middleware('event.owner')->group(function () {
+        Route::get('reports/events/{event}/tickets', [\App\Http\Controllers\Organizer\ReportController::class, 'eventTickets'])->name('reports.events.tickets');
+        Route::get('reports/events/{event}/tickets/export', [\App\Http\Controllers\Organizer\ReportController::class, 'exportEventTickets'])->name('reports.events.tickets.export');
+    });
 });
 
 

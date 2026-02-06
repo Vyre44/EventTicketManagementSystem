@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Orders tablosuna iade ve iptal timestamp'lerini ekle
+ * 
+ * refunded_at: Sipariş iade edildiğinde kaydedilir
+ * cancelled_at: Sipariş iptal edildiğinde kaydedilir
+ */
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('orders', function (Blueprint $table) {
+            $table->timestamp('refunded_at')->nullable()->after('paid_at');
+            $table->timestamp('cancelled_at')->nullable()->after('refunded_at');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn(['refunded_at', 'cancelled_at']);
+        });
+    }
+};

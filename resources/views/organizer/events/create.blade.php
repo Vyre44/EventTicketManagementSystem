@@ -45,9 +45,19 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Durum</label>
+                        @php
+                            $statusLabels = [
+                                'draft' => 'Taslak',
+                                'published' => 'Yayında',
+                                'ended' => 'Bitti',
+                                'cancelled' => 'İptal',
+                            ];
+                        @endphp
                         <select name="status" required class="form-select">
                             @foreach(\App\Enums\EventStatus::cases() as $status)
-                                <option value="{{ $status->value }}" @selected(old('status') == $status->value)>{{ $status->name }}</option>
+                                <option value="{{ $status->value }}" @selected(old('status') == $status->value)>
+                                    {{ $statusLabels[$status->value] ?? $status->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

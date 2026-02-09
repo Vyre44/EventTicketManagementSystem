@@ -1,102 +1,107 @@
 @extends('attendee.layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <!-- Back Button -->
-    <div class="mb-6">
-        <a href="{{ route('attendee.events.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center">
+<div class="container py-4">
+    <!-- Geri Dönüş Butonu -->
+    <div class="mb-3">
+        <a href="{{ route('attendee.events.index') }}" class="btn btn-outline-secondary btn-sm">
             ← Etkinliklere Dön
         </a>
     </div>
 
     @if($event->cover_image_url)
-        <div class="mb-6">
-            <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-full rounded-lg" style="max-height:400px;object-fit:cover;">
+        <div class="mb-4">
+            <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-100 rounded" style="max-height:400px;object-fit:cover;">
         </div>
     @else
-        <div class="mb-6 w-full h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-5xl rounded-lg">
+        <div class="mb-4 w-100 bg-primary text-white d-flex align-items-center justify-content-center rounded" style="height:250px;font-size:4rem;">
             🎪
         </div>
     @endif
 
-    <!-- Event Header -->
-    <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-lg p-8 mb-8">
-        <h1 class="text-4xl font-bold mb-4">{{ $event->title }}</h1>
-        
-        <div class="space-y-2 text-blue-100">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">📅</span>
-                <span class="text-lg">{{ $event->start_time->format('d MMMM Y') }} • {{ $event->start_time->format('H:i') }}</span>
+    <!-- Etkinlik Başlığı -->
+    <div class="card shadow-sm mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="card-body text-white p-4">
+            <h1 class="h2 fw-bold mb-3">{{ $event->title }}</h1>
+            
+            <div class="mb-2">
+                <span class="fs-5 me-2">📅</span>
+                <span class="fs-6">{{ $event->start_time->locale('tr')->translatedFormat('d F Y') }} • {{ $event->start_time->format('H:i') }}</span>
             </div>
             @if($event->location)
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">📍</span>
-                    <span class="text-lg">{{ $event->location }}</span>
+                <div class="mb-2">
+                    <span class="fs-5 me-2">📍</span>
+                    <span class="fs-6">{{ $event->location }}</span>
                 </div>
             @endif
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">👤</span>
-                <span class="text-lg">Organize Eden: {{ $event->organizer->name }}</span>
+            <div class="mb-0">
+                <span class="fs-5 me-2">👤</span>
+                <span class="fs-6">Organize Eden: {{ $event->organizer->name }}</span>
             </div>
         </div>
     </div>
 
-    <!-- Description -->
+    <!-- Açıklama -->
     @if($event->description)
-        <div class="bg-white border rounded-lg p-6 mb-8">
-            <h2 class="text-2xl font-bold mb-4">📖 Açıklama</h2>
-            <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ $event->description }}</p>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">📖 Açıklama</h2>
+                <p class="text-muted" style="white-space: pre-line;">{{ $event->description }}</p>
+            </div>
         </div>
     @endif
 
-    <!-- Ticket Selection -->
+    <!-- Bilet Seçimi -->
     @php
         $totalRemaining = $event->ticketTypes->sum('remaining_quantity');
     @endphp
     @if($event->ticketTypes->isEmpty())
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-            <p class="text-yellow-800 text-lg">Bu etkinlik için henüz bilet satılmamaktadır.</p>
+        <div class="alert alert-warning text-center" role="alert">
+            <p class="mb-0 fs-6">Bu etkinlik için henüz bilet satılmamaktadır.</p>
         </div>
     @elseif($totalRemaining <= 0)
-        <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <p class="text-red-800 text-lg">Biletler tükendi. Lütfen daha sonra tekrar deneyiniz.</p>
+        <div class="alert alert-danger text-center" role="alert">
+            <p class="mb-0 fs-6">Biletler tükendi. Lütfen daha sonra tekrar deneyiniz.</p>
         </div>
     @else
-        <div class="bg-white border rounded-lg p-6">
-            <h2 class="text-2xl font-bold mb-6">🎟️ Biletleri Seç</h2>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-4">🎟️ Biletleri Seç</h2>
 
             @auth
                 <form id="buy-form" action="{{ route('attendee.events.buy', $event) }}" method="POST">
                     @csrf
                     
-                    <!-- Ticket Types -->
-                    <div class="space-y-4 mb-8">
+                    <!-- Bilet Tipleri -->
+                    <div class="mb-4">
                         @foreach($event->ticketTypes as $ticketType)
-                            <x-attendee.ticket-card :ticket-type="$ticketType" />
+                            <div class="mb-3">
+                                <x-attendee.ticket-card :ticket-type="$ticketType" />
+                            </div>
                         @endforeach
                     </div>
 
-                    <!-- Total Amount (Dynamic) -->
-                    <div class="bg-gray-50 rounded-lg p-4 mb-8">
-                        <div class="flex justify-between items-center text-lg">
-                            <span class="font-semibold text-gray-900">Toplam:</span>
-                            <span class="text-2xl font-bold text-blue-600" id="total-amount">₺0,00</span>
+                    <!-- Toplam Tutar (Dinamik) -->
+                    <div class="bg-light rounded p-3 mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold fs-5">Toplam:</span>
+                            <span class="fs-3 fw-bold text-primary" id="total-amount">₺0,00</span>
                         </div>
                     </div>
 
-                    <!-- Buttons -->
-                    <div class="flex gap-4 flex-col md:flex-row">
-                        <a href="{{ route('attendee.events.index') }}" class="flex-1 text-center bg-gray-300 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition">
+                    <!-- Butonlar -->
+                    <div class="d-flex gap-3 flex-column flex-md-row">
+                        <a href="{{ route('attendee.events.index') }}" class="btn btn-outline-secondary btn-lg flex-fill">
                             ❌ İptal
                         </a>
-                        <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button type="submit" class="btn btn-primary btn-lg flex-fill">
                             ✓ Satın Al
                         </button>
                     </div>
                 </form>
 
                 <script>
-                    // Total Price Calculator
+                    // Toplam fiyat hesaplayıcı
                     document.addEventListener('DOMContentLoaded', function() {
                         const ticketTypeMap = {
                             @foreach($event->ticketTypes as $type)
@@ -115,29 +120,30 @@
                             document.getElementById('total-amount').textContent = 
                                 '₺' + total.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-                            // Disable submit if no tickets selected
+                            // Bilet seçilmediyse gönderimi kapat
                             const submitBtn = document.querySelector('button[type="submit"]');
                             submitBtn.disabled = total === 0;
                         }
 
-                        // Listen to qty changes
+                        // Adet değişimlerini dinle
                         document.querySelectorAll('.qty-input').forEach(input => {
                             input.addEventListener('change', updateTotal);
                             input.addEventListener('input', updateTotal);
                         });
 
-                        // Initial calc
+                        // İlk hesaplama
                         updateTotal();
                     });
                 </script>
             @else
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                    <p class="text-blue-900 mb-4">Bilet satın almak için giriş yapmanız gerekir.</p>
-                    <a href="{{ route('login') }}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                <div class="alert alert-info text-center" role="alert">
+                    <p class="mb-3">Bilet satın almak için giriş yapmanız gerekir.</p>
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-lg">
                         🔐 Giriş Yap
                     </a>
                 </div>
             @endauth
+            </div>
         </div>
     @endif
 </div>

@@ -64,7 +64,7 @@ function getCsrfToken() {
         || '';
 }
 
-function showAlert(message, type = 'success') {
+function showTicketTypeAlert(message, type = 'success') {
     const container = document.getElementById('ajax-alert-container');
     const alertClass = type === 'success' ? 'alert-success' : (type === 'warning' ? 'alert-warning' : 'alert-danger');
     container.innerHTML = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
@@ -110,17 +110,17 @@ document.getElementById('ticket-type-update-form').addEventListener('submit', as
             if (res.status === 422) {
                 showValidationErrors(data.errors || {});
             } else {
-                showAlert(data.message || 'Bir hata oluştu.', 'error');
+                showTicketTypeAlert(data.message || 'Bir hata oluştu.', 'error');
             }
             return;
         }
 
-        showAlert(data.message || 'Bilet tipi güncellendi.', 'success');
+        showTicketTypeAlert(data.message || 'Bilet tipi güncellendi.', 'success');
         if (data.data?.redirect_url) {
             window.location.href = data.data.redirect_url;
         }
     } catch (err) {
-        showAlert('Sunucu ile bağlantı hatası.', 'error');
+        showTicketTypeAlert('Sunucu ile bağlantı hatası.', 'error');
     }
 });
 
@@ -145,16 +145,16 @@ document.getElementById('ticket-type-delete-form').addEventListener('submit', as
         const data = await res.json();
 
         if (!res.ok) {
-            showAlert(data.message || 'Silme işlemi başarısız.', 'error');
+            showTicketTypeAlert(data.message || 'Silme işlemi başarısız.', 'error');
             return;
         }
 
-        showAlert(data.message || 'Bilet tipi silindi.', 'success');
+        showTicketTypeAlert(data.message || 'Bilet tipi silindi.', 'success');
         if (data.data?.redirect_url) {
             window.location.href = data.data.redirect_url;
         }
     } catch (err) {
-        showAlert('Sunucu ile bağlantı hatası.', 'error');
+        showTicketTypeAlert('Sunucu ile bağlantı hatası.', 'error');
     }
 });
 </script>

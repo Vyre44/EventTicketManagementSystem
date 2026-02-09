@@ -6,54 +6,67 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Etkinlik Biletleri')</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     
-    <!-- Alpine.js (AJAX için) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <style>
-        [x-cloak] { display: none; }
-    </style>
+    <!-- Scripts (Vite: Bootstrap 5 CSS+JS imported) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-light">
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm role-accent-attendee">
         <div class="container">
             <!-- Logo -->
             <a href="{{ route('attendee.events.index') }}" class="navbar-brand">
                 <span class="fs-4 fw-bold text-primary">🎫 EventTickets</span>
             </a>
 
-            <!-- Desktop Menu -->
-                <div class="d-flex gap-3">
-                    <a href="{{ route('attendee.events.index') }}" class="text-dark text-decoration-none">
-                        Etkinlikler
-                    </a>
-                    <a href="{{ route('attendee.orders.index') }}" class="text-dark text-decoration-none">
-                        Siparişlerim
-                    </a>
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#attendeeNav" aria-controls="attendeeNav" aria-expanded="false" aria-label="Menüyü Aç">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                    <!-- Logout Button -->
-                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-link text-danger">
-                            Çıkış
-                        </button>
-                    </form>
-                    
+            <!-- Collapsible Menu -->
+            <div class="collapse navbar-collapse" id="attendeeNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="{{ route('attendee.events.index') }}" class="nav-link">
+                            Etkinlikler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('attendee.orders.index') }}" class="nav-link">
+                            Siparişlerim
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Right Side: User Dropdown + Logout -->
+                <div class="d-flex align-items-center gap-2">
                     <!-- User Dropdown -->
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-link text-dark dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             👤 {{ Auth::user()->name }}
                         </button>
-                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger">Çıkış</button>
+                                </form>
+                            </li>
                         </ul>
                     </div>
                 </div>
+            </div>
         </div>
     </nav>
+
+    <!-- AJAX Alert Container (for dynamic alerts) -->
+    <div id="ajax-alert-container" class="position-fixed top-0 end-0 p-4" style="max-width: 420px; z-index: 1050;"></div>
 
     <!-- FLASH MESSAGES -->
     <div class="container py-4">
@@ -95,7 +108,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="container pb-5">
+    <main class="container py-4">
         @yield('content')
     </main>
 
@@ -127,7 +140,8 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    @include('attendee.js.ajax')
+
 </body>
 </html>
+

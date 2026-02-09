@@ -2,102 +2,120 @@
 
 @section('content')
 
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="mb-6">
-        <a href="{{ route('attendee.orders.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+<div class="container py-4">
+    <div class="mb-4">
+        <a href="{{ route('attendee.orders.index') }}" class="btn btn-outline-secondary btn-sm mb-3">
             ← Tüm Siparişler
         </a>
-        <h1 class="text-3xl font-bold mb-2">Sipariş Detayı</h1>
+        <h1 class="h4 fw-bold mb-0">Sipariş Detayı</h1>
     </div>
 
     <!-- Sipariş Bilgileri -->
-    <div class="bg-white border rounded-lg p-6 mb-6">
-        <div class="flex justify-between items-start mb-4">
-            <div>
-                <h2 class="text-2xl font-bold">{{ $order->event->title }}</h2>
-                <div class="text-gray-600 text-sm mt-2 space-y-1">
-                    <div>📅 {{ $order->event->start_time->format('d.m.Y H:i') }}</div>
-                    <div>🕒 Sipariş Tarihi: {{ $order->created_at->format('d.m.Y H:i') }}</div>
-                    @if($order->paid_at)
-                        <div>💳 Ödeme Tarihi: {{ $order->paid_at->format('d.m.Y H:i') }}</div>
-                    @endif
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-2">{{ $order->event->title }}</h2>
+                    <div class="text-muted small">
+                        <div class="mb-1">📅 {{ $order->event->start_time->format('d.m.Y H:i') }}</div>
+                        <div class="mb-1">🕒 Sipariş Tarihi: {{ $order->created_at->format('d.m.Y H:i') }}</div>
+                        @if($order->paid_at)
+                            <div class="mb-0">💳 Ödeme Tarihi: {{ $order->paid_at->format('d.m.Y H:i') }}</div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Status Badge -->
+                <div id="order-status-badge">
+                    <x-attendee.status-badge :status="$order->status" />
                 </div>
             </div>
 
-            <!-- Status Badge -->
-            <div id="order-status-badge">
-                <x-attendee.status-badge :status="$order->status" />
+            <hr>
+
+            <!-- Toplam Tutar -->
+            <div class="d-flex justify-content-between">
+                <span class="fw-bold">Toplam Tutar:</span>
+                <span class="fw-bold text-success fs-5">{{ number_format($order->total_amount, 2) }} ₺</span>
             </div>
-        </div>
-
-        <hr class="my-4">
-
-        <!-- Toplam Tutar -->
-        <div class="flex justify-between text-lg">
-            <span class="font-semibold">Toplam Tutar:</span>
-            <span class="font-bold text-green-600">{{ number_format($order->total_amount, 2) }} ₺</span>
         </div>
     </div>
 
     @if($errors->any())
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <ul class="text-red-800 text-sm space-y-1">
+        <div class="alert alert-danger" role="alert">
+            <ul class="mb-0 ps-3">
                 @foreach($errors->all() as $error)
-                    <li>❌ {{ $error }}</li>
+                    <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
     @endif
 
     @if(session('success'))
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <p class="text-green-800">✅ {{ session('success') }}</p>
+        <div class="alert alert-success" role="alert">
+            ✅ {{ session('success') }}
         </div>
     @endif
 
     <!-- Biletler -->
     @if($order->tickets->isNotEmpty())
-        <div class="bg-white border rounded-lg p-6">
-            <h2 class="text-xl font-bold mb-4">Biletleriniz ({{ $order->tickets->count() }} adet)</h2>
-            
-            <div class="space-y-3">
-                @foreach($order->tickets as $ticket)
-                    <div class="border rounded-lg p-4 flex justify-between items-center">
-                        <div>
-                            <div class="font-bold">{{ $ticket->ticketType->name }}</div>
-                            <div class="text-sm text-gray-600">Kod: {{ $ticket->code }}</div>
-                            @if($ticket->checked_in_at)
-                                <div class="text-sm text-green-600">✅ Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}</div>
-                            @endif
-                        </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Biletleriniz ({{ $order->tickets->count() }} adet)</h2>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Bilet Tipi</th>
+                                <th>Kod</th>
+                                <th>Durum</th>
+                                <th>Giriş</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($order->tickets as $ticket)
+                                <tr>
+                                    <td class="fw-semibold">{{ $ticket->ticketType->name }}</td>
+                                    <td class="font-monospace small">{{ $ticket->code }}</td>
+                                    <td>
+                                        <div class="ticket-status-badge">
+                                            <x-attendee.status-badge :status="$ticket->status" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($ticket->checked_in_at)
+                                            <span class="text-success small">✅ {{ $ticket->checked_in_at->format('d.m.Y H:i') }}</span>
+                                        @else
+                                            <span class="text-muted small">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                        <!-- Status Badge -->
-                        <div class="ticket-status-badge">
-                            <x-attendee.status-badge :status="$ticket->status" />
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- QR Kod Bilgisi -->
-            <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p class="text-blue-800 text-sm">
-                    💡 <strong>İpucu:</strong> Biletlerinizi etkinlik girişinde gösterin. 
-                    Bilet kodlarınızı not alın veya bu sayfayı kaydırın.
-                </p>
+                <!-- QR Kod Bilgisi -->
+                <div class="alert alert-info mt-3 mb-0" role="alert">
+                    <small>
+                        💡 <strong>İpucu:</strong> Biletlerinizi etkinlik girişinde gösterin. 
+                        Bilet kodlarınızı not alın veya bu sayfayı kaydırın.
+                    </small>
+                </div>
             </div>
         </div>
     @endif
 
-    <!-- İşlem Butonları (State-based) -->
-    <div id="order-actions" class="mt-6">
+    <!-- İşlem Butonları (Duruma Bağlı) -->
+    <div id="order-actions">
         @if($order->status === \App\Enums\OrderStatus::PENDING)
-            <div class="flex flex-col md:flex-row gap-4">
+            <div class="d-grid gap-3">
                 <button 
                     type="button"
                     id="order-pay-btn" 
                     data-order-id="{{ $order->id }}"
-                    class="flex-1 bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="btn btn-success btn-lg"
                 >
                     ✓ Ödemeyi Tamamla
                 </button>
@@ -105,7 +123,7 @@
                     type="button"
                     id="order-cancel-btn" 
                     data-order-id="{{ $order->id }}"
-                    class="flex-1 bg-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="btn btn-outline-danger btn-lg"
                 >
                     ❌ İptal Et
                 </button>
@@ -115,25 +133,25 @@
                 type="button"
                 id="order-refund-btn" 
                 data-order-id="{{ $order->id }}"
-                class="w-full bg-orange-600 text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn btn-warning btn-lg w-100"
             >
                 ↩️ İade Talep Et
             </button>
         @elseif($order->status === \App\Enums\OrderStatus::CANCELLED)
-            <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                <p class="text-red-800 font-semibold">Bu sipariş iptal edilmiştir. Başka bir işlem yapılamaz.</p>
+            <div class="alert alert-danger text-center" role="alert">
+                <p class="fw-semibold mb-0">Bu sipariş iptal edilmiştir. Başka bir işlem yapılamaz.</p>
             </div>
         @elseif($order->status === \App\Enums\OrderStatus::REFUNDED)
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-                <p class="text-gray-800 font-semibold">Bu sipariş için iade işlemi tamamlanmıştır.</p>
-                <p class="text-gray-600 text-sm mt-2">Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.</p>
+            <div class="alert alert-secondary text-center" role="alert">
+                <p class="fw-semibold mb-1">Bu sipariş için iade işlemi tamamlanmıştır.</p>
+                <p class="text-muted small mb-0">Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.</p>
             </div>
         @endif
     </div>
 
-    <!-- Back to Orders Button -->
-    <div class="mt-8 text-center">
-        <a href="{{ route('attendee.orders.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold">
+    <!-- Siparişlere Dönüş Butonu -->
+    <div class="mt-4 text-center">
+        <a href="{{ route('attendee.orders.index') }}" class="btn btn-outline-secondary">
             ← Siparişlerime Dön
         </a>
     </div>

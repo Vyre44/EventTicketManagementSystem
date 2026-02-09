@@ -30,6 +30,8 @@
                 
                 if (currentVal < Math.min(maxStock, 10)) {
                     input.value = currentVal + 1;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             });
         });
@@ -43,6 +45,8 @@
                 
                 if (currentVal > 0) {
                     input.value = currentVal - 1;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             });
         });

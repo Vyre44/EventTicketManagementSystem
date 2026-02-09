@@ -104,11 +104,18 @@
                                 <td class="text-end pe-3">
                                     <div class="d-inline-flex gap-2 align-items-center ticket-actions">
                                         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                                            <button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Check-in">
+                                                ✅ Check-in
+                                            </button>
                                             <button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="İptal">
-                                                İptal
+                                                ❌ İptal
+                                            </button>
+                                        @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
+                                            <button class="ticket-action-btn btn btn-outline-warning btn-sm" data-action="undo" title="Geri Al">
+                                                ↩️ Geri Al
                                             </button>
                                         @else
-                                            <span class="text-muted">-</span>
+                                            <span class="text-muted small">-</span>
                                         @endif
                                         <a href="{{ route('admin.tickets.show', $ticket) }}" class="btn btn-outline-primary btn-sm">Detay</a>
                                         <a href="{{ route('admin.tickets.edit', $ticket) }}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
@@ -128,8 +135,10 @@
 @endif
 
 <script>
-    // Routes mapping for admin (cancel only)
+    // Routes mapping for admin (check-in, undo, cancel)
     const routeNameMap = {
+        'checkin': '{{ route("admin.tickets.checkin", ["ticket" => "__TICKET_ID__"]) }}',
+        'undo': '{{ route("admin.tickets.checkinUndo", ["ticket" => "__TICKET_ID__"]) }}',
         'cancel': '{{ route("admin.tickets.cancelTicket", ["ticket" => "__TICKET_ID__"]) }}'
     };
 </script>

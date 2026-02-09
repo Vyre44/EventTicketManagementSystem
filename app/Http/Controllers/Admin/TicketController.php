@@ -447,6 +447,101 @@ class TicketController extends Controller
     }
 
     /**
+     * AJAX: Bileti check-in yap (ACTIVE → CHECKED_IN)
+     * 
+     * POST /admin/tickets/{ticket}/checkin
+     * JSON response, DB::transaction + lockForUpdate ile double check-in koruması
+     */
+    public function checkin(Ticket $ticket)
+    {
+        $result = DB::transaction(function () use ($ticket) {
+            // Ticket'i lock ile çek (double check-in koruması)
+            $freshTicket = Ticket::lockForUpdate()->findOrFail($ticket->id);
+            
+            // Sadece ACTIVE durumundaki biletler check-in yapılabilir
+            if ($freshTicket->status !== TicketStatus::ACTIVE) {
+                $message = 'Bu bilet check-in yapılamaz. Durumu: ' . $freshTicket->status->value;
+                if ($freshTicket->status === TicketStatus::CHECKED_IN) {
+                    $time = $freshTicket->checked_in_at?->format('d.m.Y H:i');
+                    $message = 'Bu bilet daha önce kullanılmış.' . ($time ? " (".$time.")" : '');
+                }
+                return [
+                    'success' => false,
+                    'message' => $message,
+                    'status' => 422
+                ];
+            }
+            
+            // Check-in yap
+            if (!$freshTicket->checkIn()) {
+                return [
+                    'success' => false,
+                    'message' => 'Check-in başarısız oldu.',
+                    'status' => 422
+                ];
+            }
+            
+            return [
+                'success' => true,
+                'message' => 'Bilet başarıyla check-in yapıldı.',
+                'status' => 200,
+                'ticket' => $freshTicket->fresh()
+            ];
+        });
+
+        return response()->json([
+            'success' => $result['success'],
+            'message' => $result['message'],
+            'data' => $result['ticket'] ?? null
+        ], $result['status']);
+    }
+
+    /**
+     * AJAX: Bilet check-in'i geri al (CHECKED_IN → ACTIVE)
+     * 
+     * POST /admin/tickets/{ticket}/checkin-undo
+     * JSON response, DB::transaction + lockForUpdate
+     */
+    public function checkinUndo(Ticket $ticket)
+    {
+        $result = DB::transaction(function () use ($ticket) {
+            // Ticket'i lock ile çek
+            $freshTicket = Ticket::lockForUpdate()->findOrFail($ticket->id);
+            
+            // Sadece CHECKED_IN durumundaki biletler geri alınabilir
+            if ($freshTicket->status !== TicketStatus::CHECKED_IN) {
+                return [
+                    'success' => false,
+                    'message' => 'Bu bilet check-in geri alınamaz. Sadece kullanılan biletler geri alınabilir.',
+                    'status' => 422
+                ];
+            }
+            
+            // Check-in'i geri al (CHECKED_IN → ACTIVE)
+            if (!$freshTicket->undoCheckIn()) {
+                return [
+                    'success' => false,
+                    'message' => 'Check-in geri alma başarısız oldu.',
+                    'status' => 422
+                ];
+            }
+            
+            return [
+                'success' => true,
+                'message' => 'Bilet check-in\'i başarıyla geri alındı.',
+                'status' => 200,
+                'ticket' => $freshTicket->fresh()
+            ];
+        });
+
+        return response()->json([
+            'success' => $result['success'],
+            'message' => $result['message'],
+            'data' => $result['ticket'] ?? null
+        ], $result['status']);
+    }
+
+    /**
      * AJAX: Bileti iptal et (ACTIVE → CANCELLED) + stok iade
      * 
      * POST /admin/tickets/{ticket}/cancel-ticket

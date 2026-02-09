@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Organizer;
 
+use App\Enums\EventStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Http\Requests\Organizer\StoreEventRequest;
 use App\Http\Requests\Organizer\UpdateEventRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Organizer Etkinlik Controller - Kendi Etkinlikleriyle Sınırlı
@@ -21,8 +23,29 @@ class EventController extends Controller
     // Organizer: Sadece kendi eventlerini listeler
     public function index()
     {
-        $events = Event::where('organizer_id', auth()->id())->latest()->paginate(10);
-        return view('organizer.events.index', compact('events'));
+        $query = Event::where('organizer_id', auth()->id());
+
+        // Filter by status
+        if (request()->filled('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Filter by search (title or location)
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function (Builder $q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                  ->orWhere('location', 'like', "%$search%");
+            });
+        }
+
+        $events = $query->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $statuses = EventStatus::cases();
+
+        return view('organizer.events.index', compact('events', 'statuses'));
     }
 
     public function show(Event $event)

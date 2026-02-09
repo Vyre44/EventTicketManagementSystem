@@ -46,6 +46,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group
     Route::get('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
 
     // AJAX Ticket Operations - JSON Response
+    Route::post('tickets/{ticket}/checkin', [\App\Http\Controllers\Admin\TicketController::class, 'checkin'])->name('tickets.checkin');
+    Route::post('tickets/{ticket}/checkin-undo', [\App\Http\Controllers\Admin\TicketController::class, 'checkinUndo'])->name('tickets.checkinUndo');
     Route::post('tickets/{ticket}/cancel-ticket', [\App\Http\Controllers\Admin\TicketController::class, 'cancelTicket'])->name('tickets.cancelTicket');
 
     // Admin Check-in (SÜPER YETKİ - tüm events için)

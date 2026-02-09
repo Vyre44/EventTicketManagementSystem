@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Organizer;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,18 +29,38 @@ class OrderController extends Controller
     {
         $user = auth()->user();
 
-        // Admin tüm orders'ları görebilir, organizer sadece kendi event'lerininkini
-        $orders = Order::with(['user:id,name,email', 'event:id,title,organizer_id'])
+        $query = Order::with(['user:id,name,email', 'event:id,title,organizer_id'])
             ->when(!$user->isAdmin(), function (Builder $query) use ($user) {
                 $query->whereHas('event', function (Builder $subquery) use ($user) {
                     $subquery->where('organizer_id', $user->id);
                 });
-            })
+            });
+
+        // Filter by status
+        if (request()->filled('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Filter by search (order ID or user email)
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function (Builder $q) use ($search) {
+                $q->where('id', $search)
+                  ->orWhereHas('user', function (Builder $subq) use ($search) {
+                      $subq->where('email', 'like', "%$search%");
+                  });
+            });
+        }
+
+        $orders = $query
             ->withCount('tickets')
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('organizer.orders.index', compact('orders'));
+        $statuses = OrderStatus::cases();
+
+        return view('organizer.orders.index', compact('orders', 'statuses'));
     }
 
     /**
@@ -56,7 +77,7 @@ class OrderController extends Controller
             abort(403, 'Bu sipariş bilgisini görüntüleme yetkiniz yok.');
         }
 
-        $order->load(['user:id,name,email,phone', 'event:id,title,organizer_id', 'tickets.ticketType']);
+        $order->load(['user:id,name,email', 'event:id,title,organizer_id', 'tickets.ticketType']);
 
         return view('organizer.orders.show', compact('order'));
     }

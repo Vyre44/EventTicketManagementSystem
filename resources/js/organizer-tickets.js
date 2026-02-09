@@ -12,8 +12,16 @@
  * 
  * DOMContentLoaded: HTML'in tamamı yüklendi (img/CSS bekleme yok)
  * Bu event'de DOM manipülasyonu güvenlidir
+ * 
+ * ÖNEMLİ: Sadece /organizer/tickets sayfasında çalış
+ * Admin sayfalarında admin-tickets.js yeterli
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // Guard: Sadece organizer tickets sayfalarında çalış
+    if (!window.location.pathname.includes('/organizer/tickets')) {
+        return;
+    }
+
     /**
      * EVENT DELEGATION: Document seviyesinde click listener
      * 
@@ -51,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!actionBtn) return;  // Eğer button değilse çık
 
         e.preventDefault();
+        e.stopImmediatePropagation();  // Diğer event listener'ları engelle (admin-tickets.js çalışmayacak)
 
         /**
          * ADIM 1: Bilet ID'sini Bul
@@ -294,7 +303,12 @@ function updateTicketUI(ticketId, action) {
     updateStatusBadge(row, newStatus);
 
     /**
-     * ADIM 5: Action Butonlarını Güncelle
+     * ADIM 5: Check-in Zamanını Güncelle
+     */
+    updateCheckinTime(row, action);
+
+    /**
+     * ADIM 6: Action Butonlarını Güncelle
      */
     updateActionButtons(row, newStatus);
 }
@@ -318,40 +332,59 @@ function updateTicketUI(ticketId, action) {
  * - REFUNDED: Gri (bg-gray-100)
  */
 function updateStatusBadge(container, status) {
-    /**
-     * ADIM 1: Badge Container'ını Bul
-     * 
-     * .ticket-status-badge sınıfındaki element
-     * Örnek:
-     * <span class="ticket-status-badge">Aktif</span>
-     */
     const badgeContainer = container.querySelector('.ticket-status-badge');
-    if (!badgeContainer) return;
+    if (!badgeContainer) {
+        console.warn('Badge container not found');
+        return;
+    }
 
     /**
      * ADIM 2: Status -> HTML Badge Mapping
-     * 
-     * Her status için Tailwind CSS styled HTML
-     * - px-3: Horizontal padding
-     * - py-1: Vertical padding
-     * - rounded-full: Yuvarlak köşeler
-     * - text-xs: Küçük font
-     * - font-semibold: Kalın yazı
+     * Bootstrap 5 badge class'ları kullanıyoruz
      */
     const badges = {
-        'active': '<span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">Aktif</span>',
-        'checked_in': '<span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">✅ Kullanıldı</span>',
-        'cancelled': '<span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">❌ İptal</span>',
-        'refunded': '<span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">🔄 İade</span>'
+        'active': '<span class="badge bg-primary">Aktif</span>',
+        'checked_in': '<span class="badge bg-success">✅ Kullanıldı</span>',
+        'cancelled': '<span class="badge bg-danger">❌ İptal</span>',
+        'refunded': '<span class="badge bg-secondary">🔄 İade</span>'
     };
 
     /**
      * ADIM 3: Badge HTML'ini Değiştir
-     * 
-     * badgeContainer.innerHTML = badges[status]
-     * Eski HTML silinir, yenisi yazılır
      */
     badgeContainer.innerHTML = badges[status] || badges['active'];
+}
+
+/**
+ * ============================================================
+ * CHECK-IN ZAMANINI GÜNCELLE
+ * ============================================================
+ */
+function updateCheckinTime(container, action) {
+    const cells = container.querySelectorAll('td');
+    const checkinCell = cells[6]; // 7. hücre (Check-in zamanı)
+    
+    if (!checkinCell) {
+        console.warn('Check-in time cell not found');
+        return;
+    }
+    
+    if (action === 'checkin') {
+        // Check-in yapıldı - şu anki zamanı göster
+        const now = new Date();
+        const formatted = now.toLocaleDateString('tr-TR', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        }) + ' ' + now.toLocaleTimeString('tr-TR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        checkinCell.textContent = formatted;
+    } else if (action === 'undo') {
+        // Undo yapıldı - boş göster
+        checkinCell.innerHTML = '<span class="text-muted">-</span>';
+    }
 }
 
 /**
@@ -384,50 +417,29 @@ function updateActionButtons(container, status) {
      * </div>
      */
     const actionsContainer = container.querySelector('.ticket-actions');
-    if (!actionsContainer) return;
+    if (!actionsContainer) {
+        console.warn('Actions container not found');
+        return;
+    }
 
     /**
      * ADIM 2: Eski Button'ları Kaldır
-     * 
-     * .ticket-action-btn sınıflı tüm butonlar silinir
-     * (Detay linki silinmez)
-     * 
-     * Neden? Güncellenmiş button'lar ekleyeceğiz
      */
     const buttons = actionsContainer.querySelectorAll('.ticket-action-btn');
     buttons.forEach(btn => btn.remove());
 
     /**
-     * ADIM 3: Yeni Button HTML'ini Al
-     * 
-     * getButtonsForStatus: Status'a göre button HTML'ini döner
+     * ADIM 3: Yeni Button'ları Ekle
      */
+    const detayLink = actionsContainer.querySelector('a[href*="organizer.tickets.show"]');
     const buttonHTML = getButtonsForStatus(status);
     
     if (buttonHTML) {
-        /**
-         * ADIM 4: Button'ları Ekle
-         * 
-         * Detay linki varsa: Ondan önce ekle
-         * Detay linki yoksa: Container'ın başına ekle
-         * 
-         * insertAdjacentHTML('beforebegin', ...):
-         * - Seçilen element'in BEFORE'ine ekle
-         * - Nested element değil, kardeş element
-         */
-        const detayLink = actionsContainer.querySelector('a[href*="organizer.tickets.show"]');
+        // Button'ları detay linkinden önce ekle
         if (detayLink) {
             detayLink.insertAdjacentHTML('beforebegin', buttonHTML);
         } else {
             actionsContainer.insertAdjacentHTML('afterbegin', buttonHTML);
-        }
-    } else {
-        /**
-         * Hiç button gösterilecek yoksa (CANCELLED, REFUNDED)
-         * Ancak detay linki de yoksa "-" yazı göster
-         */
-        if (!detayLink) {
-            actionsContainer.innerHTML = '<span class="text-gray-400 text-sm">-</span>';
         }
     }
 }
@@ -459,47 +471,19 @@ function updateActionButtons(container, status) {
 function getButtonsForStatus(status) {
     const buttons = {
         /**
-         * ACTIVE: İki button seçeneği sunula
-         * 
-         * Check-in Button:
-         * - Data: data-action="checkin"
-         * - Color: Green (text-green-600, hover:text-green-800)
-         * - Handler: ticket-action-btn sınıfı dinleniyor
-         * 
-         * Cancel Button:
-         * - Data: data-action="cancel"
-         * - Color: Red
-         * - Handler: ticket-action-btn sınıfı dinleniyor
+         * ACTIVE: İki button seçeneği
+         * Bootstrap 5 button class'ları
          */
-        'active': `
-            <button class="ticket-action-btn text-green-600 hover:text-green-800 text-sm font-medium" data-action="checkin" title="Check-in">
-                ✅ Check-in
-            </button>
-            <button class="ticket-action-btn text-red-600 hover:text-red-800 text-sm font-medium" data-action="cancel" title="İptal Et">
-                ❌ İptal
-            </button>
-        `,
+        'active': '<button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Check-in">✅ Check-in</button> ' +
+                  '<button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="İptal Et">❌ İptal</button> ',
         
         /**
          * CHECKED_IN: Sadece Undo button'u
-         * 
-         * Undo Button:
-         * - Data: data-action="undo"
-         * - Color: Orange (warning color)
-         * - Amacı: Hatalı check-in'i geri alma
          */
-        'checked_in': `
-            <button class="ticket-action-btn text-orange-600 hover:text-orange-800 text-sm font-medium" data-action="undo" title="Check-in'i Geri Al">
-                ↩️ Geri Al
-            </button>
-        `,
+        'checked_in': '<button class="ticket-action-btn btn btn-outline-warning btn-sm" data-action="undo" title="Check-in\'i Geri Al">↩️ Geri Al</button> ',
         
         /**
-         * CANCELLED / REFUNDED: Hiç button (boş string)
-         * 
-         * İptal veya iade edilmiş biletlere
-         * Artık işlem yapılamaz
-         * Sadece detay bilgisi gösterilebilir
+         * CANCELLED / REFUNDED: Hiç button
          */
         'cancelled': '',
         'refunded': ''

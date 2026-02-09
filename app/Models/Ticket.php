@@ -192,4 +192,49 @@ class Ticket extends Model
          */
         return true;
     }
+
+    /**
+     * Bilet check-in'ini geri al (CHECKED_IN → ACTIVE)
+     *
+     * KULLANIM:
+     * if ($ticket->undoCheckIn()) {
+     *     echo "Check-in geri alındı!";
+     * } else {
+     *     echo "Bu bilet check-in geri alınamıyor";
+     * }
+     */
+    public function undoCheckIn()
+    {
+        /**
+         * ADIM 1: Check-in geri alınabilir mi?
+         * 
+         * Sadece CHECKED_IN biletler geri alınabilir
+         * ACTIVE, CANCELLED, REFUNDED biletler geri alınamaz
+         */
+        if ($this->status !== TicketStatus::CHECKED_IN) {
+            return false;
+        }
+
+        /**
+         * ADIM 2: Status'u ACTIVE'e çevir
+         */
+        $this->status = TicketStatus::ACTIVE;
+        
+        /**
+         * ADIM 3: Check-in zamanını temizle
+         * 
+         * null: Zaman bilgisini sil (check-in yapılmamış gibi)
+         */
+        $this->checked_in_at = null;
+        
+        /**
+         * ADIM 4: Veritabanına kaydet
+         */
+        $this->save();
+        
+        /**
+         * ADIM 5: Başarı döner
+         */
+        return true;
+    }
 }

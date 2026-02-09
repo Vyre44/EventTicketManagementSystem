@@ -31,17 +31,36 @@ class TicketController extends Controller
     {
         $user = auth()->user();
 
-        // Admin tüm tickets'ları görebilir, organizer sadece kendi event'lerininkini
-        $tickets = Ticket::with(['ticketType.event:id,title,organizer_id', 'order.user:id,name,email'])
+        $query = Ticket::with(['ticketType.event:id,title,organizer_id', 'order.user:id,name,email'])
             ->when(!$user->isAdmin(), function (Builder $query) use ($user) {
                 $query->whereHas('ticketType.event', function (Builder $subquery) use ($user) {
                     $subquery->where('organizer_id', $user->id);
                 });
-            })
-            ->latest()
-            ->paginate(20);
+            });
 
-        return view('organizer.tickets.index', compact('tickets'));
+        // Filter by status
+        if (request()->filled('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Filter by code or email search
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function (Builder $q) use ($search) {
+                $q->where('code', 'like', "%$search%")
+                  ->orWhereHas('order.user', function (Builder $subq) use ($search) {
+                      $subq->where('email', 'like', "%$search%");
+                  });
+            });
+        }
+
+        $tickets = $query->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $statuses = TicketStatus::cases();
+
+        return view('organizer.tickets.index', compact('tickets', 'statuses'));
     }
 
     /**

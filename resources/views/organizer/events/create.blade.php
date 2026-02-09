@@ -1,43 +1,73 @@
-<h1>Yeni Etkinlik</h1>
-<div id="error-container" style="color:red;margin-bottom:1rem;display:none;"></div>
+@extends('layouts.app')
 
-<form id="event-form" method="POST" action="{{ route('organizer.events.store') }}" enctype="multipart/form-data">
-    @csrf
+@section('content')
+<div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <label>Başlık</label>
-        <input name="title" value="{{ old('title') }}" required>
+        <h1 class="h4 mb-0">Yeni Etkinlik</h1>
+        <div class="text-muted">Etkinlik bilgilerini doldurun</div>
     </div>
-    <div>
-        <label>Açıklama</label>
-        <textarea name="description" required>{{ old('description') }}</textarea>
+    <a href="{{ route('organizer.events.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div id="error-container" class="alert alert-danger d-none" role="alert"></div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form id="event-form" method="POST" action="{{ route('organizer.events.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Başlık</label>
+                        <input name="title" value="{{ old('title') }}" required class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Açıklama</label>
+                        <textarea name="description" required class="form-control" rows="4">{{ old('description') }}</textarea>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Başlangıç</label>
+                            <input type="datetime-local" name="start_time" value="{{ old('start_time') }}" required class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bitiş</label>
+                            <input type="datetime-local" name="end_time" value="{{ old('end_time') }}" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Kapak Görseli (Opsiyonel)</label>
+                        <input type="file" name="cover_image" accept="image/jpeg,image/jpg,image/png" class="form-control">
+                        @error('cover_image')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text">Önerilen: 1200x630, JPG/PNG, max 2MB</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Durum</label>
+                        <select name="status" required class="form-select">
+                            @foreach(\App\Enums\EventStatus::cases() as $status)
+                                <option value="{{ $status->value }}" @selected(old('status') == $status->value)>{{ $status->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" id="submit-btn" class="btn btn-primary">Kaydet</button>
+                        <a href="{{ route('organizer.events.index') }}" class="btn btn-outline-secondary">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div>
-        <label>Başlangıç</label>
-        <input type="datetime-local" name="start_time" value="{{ old('start_time') }}" required>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="fw-semibold mb-2">Yardım</div>
+                <div class="text-muted">Başlık, tarih ve durum bilgilerini doğru girin. Kapak görseli isteğe bağlıdır.</div>
+            </div>
+        </div>
     </div>
-    <div>
-        <label>Bitiş</label>
-        <input type="datetime-local" name="end_time" value="{{ old('end_time') }}" required>
-    </div>
-    <div>
-        <label>Kapak Görseli (Opsiyonel)</label>
-        <input type="file" name="cover_image" accept="image/jpeg,image/jpg,image/png">
-        @error('cover_image')
-            <p style="font-size:0.875rem;color:#dc2626;margin-top:0.25rem;">{{ $message }}</p>
-        @enderror
-        <p style="font-size:0.875rem;color:#666;margin-top:0.5rem;">Önerilen: 1200x630, JPG/PNG, max 2MB</p>
-    </div>
-    <div>
-        <label>Durum</label>
-        <select name="status" required>
-            @foreach(\App\Enums\EventStatus::cases() as $status)
-                <option value="{{ $status->value }}" @selected(old('status') == $status->value)>{{ $status->name }}</option>
-            @endforeach
-        </select>
-    </div>
-    <button type="submit" id="submit-btn">Kaydet</button>
-    <a href="{{ route('organizer.events.index') }}">İptal</a>
-</form>
+</div>
 
 <script>
 document.getElementById('event-form').addEventListener('submit', function(e) {
@@ -50,7 +80,7 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
     
     submitBtn.disabled = true;
     submitBtn.textContent = 'Kaydediliyor...';
-    errorContainer.style.display = 'none';
+    errorContainer.classList.add('d-none');
     errorContainer.innerHTML = '';
     
     const formData = new FormData(form);
@@ -86,16 +116,17 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
                 errorMsg = result.data.message || 'Bir hata oluştu.';
             }
             errorContainer.innerHTML = errorMsg;
-            errorContainer.style.display = 'block';
+            errorContainer.classList.remove('d-none');
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
         }
     })
     .catch(error => {
         errorContainer.innerHTML = error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
-        errorContainer.style.display = 'block';
+        errorContainer.classList.remove('d-none');
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
     });
 });
 </script>
+@endsection

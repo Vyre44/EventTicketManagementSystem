@@ -257,3 +257,14 @@ function clearAlerts() {
         alertContainer.innerHTML = '';
     }
 }
+
+/**
+ * Export functions to global scope (window)
+ * 
+ * ES6 module'ler varsayılan olarak local scope'ta çalışır.
+ * Diğer dosyalardan (admin-tickets.js, organizer-tickets.js) 
+ * bu fonksiyonları kullanabilmek için window nesnesine ekliyoruz.
+ */
+window.ajaxRequest = ajaxRequest;
+window.showAlert = showAlert;
+window.clearAlerts = clearAlerts;

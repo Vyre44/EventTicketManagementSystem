@@ -14,7 +14,7 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
         <div>
-            <label>Email</label>
+            <label>E-posta</label>
             <input type="email" name="email" required autofocus>
         </div>
         <div>

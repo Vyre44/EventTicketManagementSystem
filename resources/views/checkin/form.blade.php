@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 mb-0">{{ $event->title }} - Check-in</h1>
+        <h1 class="h4 mb-0">{{ $event->title }} - Giriş Kontrolü</h1>
         <a href="{{ route('organizer.events.index') }}" class="btn btn-outline-secondary">Etkinliklere Dön</a>
     </div>
 
@@ -28,7 +28,7 @@
 
     @if(!empty($recent) && $recent->count())
         <div class="card card-body">
-            <h3 class="h6">Son 10 Check-in</h3>
+            <h3 class="h6">Son 10 Giriş</h3>
             <ul class="mb-0">
                 @foreach($recent as $t)
                     <li>{{ $t->code }} — {{ $t->checked_in_at?->format('d.m.Y H:i') }}</li>

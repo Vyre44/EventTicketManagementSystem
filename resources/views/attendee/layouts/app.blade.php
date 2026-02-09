@@ -19,7 +19,7 @@
         <div class="container">
             <!-- Logo -->
             <a href="{{ route('attendee.events.index') }}" class="navbar-brand">
-                <span class="fs-4 fw-bold text-primary">🎫 EventTickets</span>
+                <span class="fs-4 fw-bold text-primary">🎫 Etkinlik Biletleri</span>
             </a>
 
             <!-- Mobile Toggle Button -->
@@ -117,7 +117,7 @@
         <div class="container">
             <div class="row mb-4">
                 <div class="col-md-4 mb-3">
-                    <h5 class="text-white fw-bold">EventTickets</h5>
+                    <h5 class="text-white fw-bold">Etkinlik Biletleri</h5>
                     <p class="small">Etkinlik biletlerini hızlı ve güvenli şekilde satın alın.</p>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -135,7 +135,7 @@
             </div>
             <hr class="bg-secondary">
             <div class="text-center small">
-                <p>&copy; 2026 EventTickets. Tüm hakları saklıdır.</p>
+                <p>&copy; 2026 Etkinlik Biletleri. Tüm hakları saklıdır.</p>
             </div>
         </div>
     </footer>

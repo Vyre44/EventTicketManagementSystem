@@ -22,7 +22,7 @@
             @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
                 <span class="badge bg-success">Kullanıldı</span>
                 @if($ticket->checked_in_at)
-                    <div class="text-muted small mt-2">Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}</div>
+                    <div class="text-muted small mt-2">Giriş: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}</div>
                 @endif
             @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
                 <span class="badge bg-danger">İptal</span>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="text-muted">Müşteri</div>
                     <div class="fw-semibold mb-2">{{ $ticket->order->user->name }}</div>
-                    <div class="text-muted">E-mail</div>
+                    <div class="text-muted">E-posta</div>
                     <div class="fw-semibold mb-2">{{ $ticket->order->user->email }}</div>
                     @if($ticket->order->user->phone)
                         <div class="text-muted">Telefon</div>

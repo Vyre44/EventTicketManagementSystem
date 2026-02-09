@@ -12,7 +12,7 @@
                 @if(auth()->user()->isAdmin())
                     Tüm biletleri yönetin
                 @else
-                    Kendi event'lerinizin biletlerini görüntüleyin ve yönetin
+                    Kendi etkinliklerinizin biletlerini görüntüleyin ve yönetin
                 @endif
             </p>
         </div>
@@ -23,8 +23,8 @@
         <div class="card-body">
             <form method="GET" action="" class="row g-3 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label">Bilet Kodu / Email Ara</label>
-                    <input type="text" name="search" class="form-control" placeholder="Bilet kodu veya email" value="{{ request('search') }}">
+                    <label class="form-label">Bilet Kodu / E-posta Ara</label>
+                    <input type="text" name="search" class="form-control" placeholder="Bilet kodu veya e-posta" value="{{ request('search') }}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Durum</label>
@@ -68,7 +68,7 @@
                             <th>Etkinlik</th>
                             <th>Bilet Tipi</th>
                             <th>Müşteri</th>
-                            <th>Status</th>
+                            <th>Durum</th>
                             <th class="text-center">İşlem</th>
                         </tr>
                     </thead>
@@ -102,14 +102,14 @@
                                 <td class="text-center">
                                     <div class="d-flex gap-2 justify-content-center align-items-center ticket-actions">
                                         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
-                                            <button class="ticket-action-btn btn btn-sm btn-outline-success" data-action="checkin" title="Check-in">
-                                                ✅ Check-in
+                                            <button class="ticket-action-btn btn btn-sm btn-outline-success" data-action="checkin" title="Giriş Kontrolü">
+                                                ✅ Giriş Onayla
                                             </button>
                                             <button class="ticket-action-btn btn btn-sm btn-outline-danger" data-action="cancel" title="İptal Et">
                                                 ❌ İptal
                                             </button>
                                         @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
-                                            <button class="ticket-action-btn btn btn-sm btn-outline-warning" data-action="undo" title="Check-in'i Geri Al">
+                                            <button class="ticket-action-btn btn btn-sm btn-outline-warning" data-action="undo" title="Giriş Onayını Geri Al">
                                                 ↩️ Geri Al
                                             </button>
                                         @else

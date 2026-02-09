@@ -37,7 +37,7 @@
                             <span class="badge bg-success">✅ Kullanıldı</span>
                             @if($ticket->checked_in_at)
                                 <div class="text-muted small mt-2">
-                                    Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
+                                    Giriş: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
                                 </div>
                             @endif
                         @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
@@ -62,7 +62,7 @@
                             </a>
                         </div>
                         <div class="mt-1">👤 <strong>Müşteri:</strong> {{ $ticket->order->user->name }}</div>
-                        <div class="mt-1">📧 <strong>E-mail:</strong> {{ $ticket->order->user->email }}</div>
+                        <div class="mt-1">📧 <strong>E-posta:</strong> {{ $ticket->order->user->email }}</div>
                         @if($ticket->order->user->phone)
                             <div class="mt-1">📱 <strong>Telefon:</strong> {{ $ticket->order->user->phone }}</div>
                         @endif
@@ -87,14 +87,14 @@
     <div class="d-flex gap-2 flex-wrap ticket-actions mb-4">
         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
             <button class="ticket-action-btn btn btn-success" data-action="checkin">
-                ✅ Check-in Yap
+                ✅ Giriş Onayla
             </button>
             <button class="ticket-action-btn btn btn-danger" data-action="cancel">
                 ❌ İptal Et
             </button>
         @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
             <button class="ticket-action-btn btn btn-warning" data-action="undo">
-                ↩️ Check-in'i Geri Al
+                ↩️ Giriş Onayını Geri Al
             </button>
         @else
             <span class="text-muted small fw-medium fst-italic">Bu bilet için işlem yapılamaz.</span>

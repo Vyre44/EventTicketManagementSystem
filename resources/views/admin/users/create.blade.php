@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">Yeni Kullanici</h1>
-    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Don</a>
+    <h1 class="h4 mb-0">Yeni Kullanıcı</h1>
+    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
 @if(session('success'))
@@ -28,8 +28,8 @@
                         <input name="name" placeholder="Ad" value="{{ old('name') }}" class="form-control">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input name="email" placeholder="Email" value="{{ old('email') }}" class="form-control">
+                        <label class="form-label">E-posta</label>
+                        <input name="email" placeholder="E-posta" value="{{ old('email') }}" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Rol</label>
@@ -40,16 +40,16 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Sifre</label>
-                        <input name="password" type="password" placeholder="Sifre" class="form-control">
+                        <label class="form-label">Şifre</label>
+                        <input name="password" type="password" placeholder="Şifre" class="form-control">
                     </div>
                     <div class="mb-4">
-                        <label class="form-label">Sifre Tekrar</label>
-                        <input name="password_confirmation" type="password" placeholder="Sifre Tekrar" class="form-control">
+                        <label class="form-label">Şifre Tekrar</label>
+                        <input name="password_confirmation" type="password" placeholder="Şifre Tekrar" class="form-control">
                     </div>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Kaydet</button>
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">Iptal</a>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">İptal</a>
                     </div>
                 </form>
             </div>
@@ -58,8 +58,8 @@
     <div class="col-lg-4">
         <div class="card shadow-sm">
             <div class="card-body">
-                <div class="fw-semibold mb-2">Yardim</div>
-                <div class="text-muted">Rol secimi, kullanicinin yetkilerini belirler.</div>
+                <div class="fw-semibold mb-2">Yardım</div>
+                <div class="text-muted">Rol seçimi, kullanıcının yetkilerini belirler.</div>
             </div>
         </div>
     </div>

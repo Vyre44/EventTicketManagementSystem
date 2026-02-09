@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">Etkinligi Duzenle</h1>
-    <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Don</a>
+    <h1 class="h4 mb-0">Etkinliği Düzenle</h1>
+    <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
 <div class="row g-3">
@@ -29,37 +29,37 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Kapak Gorseli</label>
+                        <label class="form-label">Kapak Görseli</label>
                         @if($event->cover_image_url)
                             <div class="mb-2">
-                                <img src="{{ $event->cover_image_url }}" alt="Cover" class="img-fluid rounded">
+                                <img src="{{ $event->cover_image_url }}" alt="Kapak" class="img-fluid rounded">
                             </div>
                         @endif
                         <input type="file" name="cover_image" accept="image/jpeg,image/jpg,image/png" class="form-control">
                         @error('cover_image')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">JPG, PNG formatinda, maksimum 2MB</div>
+                        <div class="form-text">JPG, PNG formatında, maksimum 2MB</div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Baslangic</label>
+                        <label class="form-label">Başlangıç</label>
                         <input type="datetime-local" name="start_time" value="{{ old('start_time', $event->start_time?->format('Y-m-d\TH:i')) }}" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Bitis</label>
+                        <label class="form-label">Bitiş</label>
                         <input type="datetime-local" name="end_time" value="{{ old('end_time', $event->end_time?->format('Y-m-d\TH:i')) }}" class="form-control">
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label">Organizator ID (Opsiyonel)</label>
+                        <label class="form-label">Organizatör No (Opsiyonel)</label>
                         <input type="number" name="organizer_id" value="{{ old('organizer_id', $event->organizer_id) }}" class="form-control">
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" id="submit-btn" class="btn btn-primary">Guncelle</button>
-                        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">Iptal</a>
+                        <button type="submit" id="submit-btn" class="btn btn-primary">Güncelle</button>
+                        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">İptal</a>
                     </div>
                 </form>
             </div>
@@ -69,7 +69,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="fw-semibold mb-2">Notlar</div>
-                <div class="text-muted">Mevcut kapak gorselini degistirmek icin yeni dosya yukleyin.</div>
+                <div class="text-muted">Mevcut kapak görselini değiştirmek için yeni dosya yükleyin.</div>
             </div>
         </div>
     </div>

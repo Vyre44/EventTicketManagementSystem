@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">TicketType Duzenle</h1>
-    <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Don</a>
+    <h1 class="h4 mb-0">Bilet Tipi Düzenle</h1>
+    <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
 @if($errors->any())
@@ -48,8 +48,8 @@
                         </select>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Guncelle</button>
-                        <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary">Iptal</a>
+                        <button type="submit" class="btn btn-primary">Güncelle</button>
+                        <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary">İptal</a>
                     </div>
                 </form>
             </div>
@@ -59,7 +59,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="fw-semibold mb-2">Not</div>
-                <div class="text-muted">Degisiklikler kaydedildiginde bilet tipleri guncellenir.</div>
+                <div class="text-muted">Değişiklikler kaydedildiğinde bilet tipleri güncellenir.</div>
             </div>
         </div>
     </div>

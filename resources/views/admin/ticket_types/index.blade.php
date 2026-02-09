@@ -3,7 +3,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">Bilet Tipleri</h1>
-    <a href="{{ route('admin.ticket-types.create') }}" class="btn btn-primary btn-sm">Yeni TicketType</a>
+    <a href="{{ route('admin.ticket-types.create') }}" class="btn btn-primary btn-sm">Yeni Bilet Tipi</a>
 </div>
 
 @if(session('success'))
@@ -46,8 +46,8 @@
             <table class="table table-striped table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">ID</th>
-                        <th>Event</th>
+                        <th class="ps-3">No</th>
+                        <th>Etkinlik</th>
                         <th>Ad</th>
                         <th>Fiyat</th>
                         <th>Kota</th>

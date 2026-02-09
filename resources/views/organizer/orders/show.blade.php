@@ -11,7 +11,7 @@
         <div>
             <div class="text-muted">Müşteri</div>
             <div class="fw-semibold">{{ $order->user->name }}</div>
-            <div class="text-muted mt-2">E-mail</div>
+            <div class="text-muted mt-2">E-posta</div>
             <div class="fw-semibold">{{ $order->user->email }}</div>
             <div class="text-muted mt-2">Oluşturulma</div>
             <div class="fw-semibold">{{ $order->created_at->format('d.m.Y H:i') }}</div>
@@ -82,7 +82,7 @@
                             <div class="fw-semibold">{{ $ticket->ticketType->name }}</div>
                             <div class="text-muted small">Kod: {{ $ticket->code }}</div>
                             @if($ticket->checked_in_at)
-                                <div class="text-success small">Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}</div>
+                                <div class="text-success small">Giriş: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}</div>
                             @endif
                         </div>
 

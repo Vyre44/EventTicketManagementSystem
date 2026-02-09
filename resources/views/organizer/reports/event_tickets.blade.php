@@ -27,8 +27,8 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Ara (ID/Email)</label>
-                    <input type="text" name="search" class="form-control" placeholder="Bilet ID veya email" value="{{ request('search') }}">
+                    <label class="form-label">Ara (No/E-posta)</label>
+                    <input type="text" name="search" class="form-control" placeholder="Bilet No veya e-posta" value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Sayfa Başına</label>
@@ -62,11 +62,11 @@
                 <table class="table table-striped table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Bilet ID</th>
+                            <th>Bilet No</th>
                             <th>Bilet Tipi</th>
-                            <th>Müşteri / Email</th>
+                            <th>Müşteri / E-posta</th>
                             <th>Durum</th>
-                            <th>Check-in Zamanı</th>
+                            <th>Giriş Zamanı</th>
                             <th>Sipariş Durumu</th>
                         </tr>
                     </thead>
@@ -80,7 +80,7 @@
                                         <div>{{ $ticket->order->user->name }}</div>
                                         <div class="text-muted small">{{ $ticket->order->user->email }}</div>
                                     @else
-                                        <span class="text-muted">N/A</span>
+                                        <span class="text-muted">Yok</span>
                                     @endif
                                 </td>
                                 <td>
@@ -113,7 +113,7 @@
                                             <span class="text-muted fw-semibold">🔄 İade</span>
                                         @endif
                                     @else
-                                        <span class="text-muted">N/A</span>
+                                        <span class="text-muted">Yok</span>
                                     @endif
                                 </td>
                             </tr>

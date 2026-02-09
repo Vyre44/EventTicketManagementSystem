@@ -76,7 +76,7 @@
 <div class="card shadow-sm">
     <div class="card-body d-flex flex-wrap gap-2">
         <a href="{{ route('organizer.events.ticket-types.index', $event) }}" class="btn btn-outline-info btn-sm">Bilet Tipleri</a>
-        <a href="{{ route('organizer.events.checkin.form', $event) }}" class="btn btn-outline-success btn-sm">Check-in</a>
+        <a href="{{ route('organizer.events.checkin.form', $event) }}" class="btn btn-outline-success btn-sm">Giriş Kontrolü</a>
         <a href="{{ route('organizer.reports.events.tickets', $event) }}" class="btn btn-outline-dark btn-sm">Rapor</a>
     </div>
 </div>

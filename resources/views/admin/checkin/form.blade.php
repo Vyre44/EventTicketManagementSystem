@@ -4,10 +4,10 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h4 mb-0">{{ $event->title }} - Check-in</h1>
-            <span class="badge bg-danger">ADMIN PANEL</span>
+            <h1 class="h4 mb-0">{{ $event->title }} - Giriş Kontrolü</h1>
+            <span class="badge bg-danger">YÖNETİCİ PANELİ</span>
         </div>
-        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">Admin Etkinlikler</a>
+        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">Yönetici Etkinlikleri</a>
     </div>
 
     @if(session('error'))
@@ -27,20 +27,20 @@
         <div class="mb-3">
             <label class="form-label fw-bold">Bilet Kodu</label>
             <input type="text" name="code" id="code-input" class="form-control form-control-lg" placeholder="Bilet kodunu girin veya tarayıcıyla okutun" autofocus>
-            <small class="text-muted">Admin yetkisi ile tüm event'lere check-in yapabilirsiniz</small>
+            <small class="text-muted">Yönetici yetkisi ile tüm etkinliklere giriş onayı yapabilirsiniz</small>
         </div>
-        <button type="submit" class="btn btn-primary btn-lg">🔍 Doğrula ve Check-in Yap</button>
+        <button type="submit" class="btn btn-primary btn-lg">🔍 Doğrula ve Giriş Onayla</button>
     </form>
 
     @if(!empty($recent) && $recent->count())
         <div class="card card-body">
-            <h3 class="h6 fw-bold mb-3">📋 Son 10 Check-in</h3>
+            <h3 class="h6 fw-bold mb-3">📋 Son 10 Giriş</h3>
             <div class="table-responsive">
                 <table class="table table-sm">
                     <thead>
                         <tr>
                             <th>Bilet Kodu</th>
-                            <th>Check-in Zamanı</th>
+                            <th>Giriş Zamanı</th>
                             <th>Bilet Tipi</th>
                         </tr>
                     </thead>
@@ -107,7 +107,7 @@ document.getElementById('checkin-form').addEventListener('submit', async functio
         const data = await res.json();
         
         if (res.ok) {
-            showAlert(data.message || 'Check-in başarılı!', 'success');
+            showAlert(data.message || 'Giriş onayı başarılı!', 'success');
             codeInput.value = '';
             codeInput.focus();
             

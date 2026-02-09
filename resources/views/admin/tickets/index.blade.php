@@ -13,8 +13,8 @@
     <div class="card-body">
         <form method="GET" action="" class="row g-2 align-items-end">
             <div class="col-md-3">
-                <label class="form-label">Kod veya ID</label>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Kod veya ID ara" class="form-control">
+                <label class="form-label">Kod veya No</label>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Kod veya No ara" class="form-control">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Durum</label>
@@ -42,8 +42,8 @@
                 <input type="text" name="user_email" value="{{ request('user_email') }}" placeholder="Kullanıcı e-posta" class="form-control">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Etkinlik ID</label>
-                <input type="text" name="event_id" value="{{ request('event_id') }}" placeholder="Etkinlik ID" class="form-control">
+                <label class="form-label">Etkinlik No</label>
+                <input type="text" name="event_id" value="{{ request('event_id') }}" placeholder="Etkinlik No" class="form-control">
             </div>
             <div class="col-md-1">
                 <button type="submit" class="btn btn-outline-primary w-100">Filtrele</button>
@@ -63,13 +63,13 @@
                 <table class="table table-striped table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-3">Bilet ID</th>
+                            <th class="ps-3">Bilet No</th>
                             <th>Kod</th>
                             <th>Durum</th>
                             <th>Bilet Tipi</th>
                             <th>Etkinlik</th>
                             <th>Kullanıcı</th>
-                            <th>Check-in</th>
+                            <th>Giriş</th>
                             <th class="text-end pe-3">İşlem</th>
                         </tr>
                     </thead>
@@ -104,8 +104,8 @@
                                 <td class="text-end pe-3">
                                     <div class="d-inline-flex gap-2 align-items-center ticket-actions">
                                         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
-                                            <button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Check-in">
-                                                ✅ Check-in
+                                            <button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Giriş Kontrolü">
+                                                ✅ Giriş Onayla
                                             </button>
                                             <button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="İptal">
                                                 ❌ İptal

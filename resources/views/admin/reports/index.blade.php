@@ -53,7 +53,7 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td>{{ $event->organizer->name ?? 'N/A' }}</td>
+                                <td>{{ $event->organizer->name ?? 'Yok' }}</td>
                                 <td>{{ $event->start_time?->format('d.m.Y H:i') ?? '-' }}</td>
                                 <td class="text-center">
                                     <span class="badge bg-primary">{{ $event->orders_count }} sipariş</span>

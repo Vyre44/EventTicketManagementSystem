@@ -3,7 +3,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">Yeni Etkinlik</h1>
-    <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Don</a>
+    <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
 <div class="row g-3">
@@ -28,32 +28,32 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Kapak Gorseli</label>
+                        <label class="form-label">Kapak Görseli</label>
                         <input type="file" name="cover_image" accept="image/jpeg,image/jpg,image/png" class="form-control">
                         @error('cover_image')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">JPG, PNG formatinda, maksimum 2MB</div>
+                        <div class="form-text">JPG, PNG formatında, maksimum 2MB</div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Baslangic</label>
+                        <label class="form-label">Başlangıç</label>
                         <input type="datetime-local" name="start_time" value="{{ old('start_time') }}" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Bitis</label>
+                        <label class="form-label">Bitiş</label>
                         <input type="datetime-local" name="end_time" value="{{ old('end_time') }}" class="form-control">
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label">Organizator ID (Opsiyonel)</label>
+                        <label class="form-label">Organizatör No (Opsiyonel)</label>
                         <input type="number" name="organizer_id" value="{{ old('organizer_id') }}" class="form-control">
                     </div>
 
                     <div class="d-flex gap-2">
                         <button type="submit" id="submit-btn" class="btn btn-primary">Kaydet</button>
-                        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">Iptal</a>
+                        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">İptal</a>
                     </div>
                 </form>
             </div>
@@ -62,8 +62,8 @@
     <div class="col-lg-4">
         <div class="card shadow-sm">
             <div class="card-body">
-                <div class="fw-semibold mb-2">Yardim</div>
-                <div class="text-muted">Baslik, tarih ve kapak bilgilerini doldurdugunuzdan emin olun.</div>
+                <div class="fw-semibold mb-2">Yardım</div>
+                <div class="text-muted">Başlık, tarih ve kapak bilgilerini doldurduğunuzdan emin olun.</div>
             </div>
         </div>
     </div>

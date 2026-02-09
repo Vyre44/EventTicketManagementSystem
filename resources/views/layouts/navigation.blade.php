@@ -30,7 +30,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 @auth
                     @if($userRole === \App\Enums\UserRole::ADMIN)
-                        <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link">Panel</a></li>
                         <li class="nav-item"><a href="{{ route('admin.events.index') }}" class="nav-link">Etkinlikler</a></li>
                         <li class="nav-item"><a href="{{ route('admin.orders.index') }}" class="nav-link">Siparişler</a></li>
                         <li class="nav-item"><a href="{{ route('admin.users.index') }}" class="nav-link">Kullanıcılar</a></li>

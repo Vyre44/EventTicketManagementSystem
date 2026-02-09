@@ -19,8 +19,8 @@
     <div class="card-body">
         <form method="GET" action="" class="row g-3 align-items-end">
             <div class="col-md-4">
-                <label class="form-label">Sipariş ID / Email Ara</label>
-                <input type="text" name="search" class="form-control" placeholder="Sipariş ID veya email" value="{{ request('search') }}">
+                <label class="form-label">Sipariş No / E-posta Ara</label>
+                <input type="text" name="search" class="form-control" placeholder="Sipariş No veya e-posta" value="{{ request('search') }}">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Durum</label>
@@ -61,7 +61,7 @@
                 <table class="table table-striped table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-3">Sipariş ID</th>
+                            <th class="ps-3">Sipariş No</th>
                             <th>Etkinlik</th>
                             <th>Müşteri</th>
                             <th>Tutar</th>

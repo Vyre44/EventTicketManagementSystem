@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">Kullaniciyi Duzenle</h1>
-    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Don</a>
+    <h1 class="h4 mb-0">Kullanıcıyı Düzenle</h1>
+    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
 @if(session('success'))
@@ -28,7 +28,7 @@
                         <input name="name" value="{{ old('name', $user->name) }}" class="form-control">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">E-posta</label>
                         <input name="email" value="{{ old('email', $user->email) }}" class="form-control">
                     </div>
                     <div class="mb-3">
@@ -40,16 +40,16 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Yeni Sifre (opsiyonel)</label>
-                        <input name="password" type="password" placeholder="Yeni Sifre" class="form-control">
+                        <label class="form-label">Yeni Şifre (opsiyonel)</label>
+                        <input name="password" type="password" placeholder="Yeni Şifre" class="form-control">
                     </div>
                     <div class="mb-4">
-                        <label class="form-label">Sifre Tekrar</label>
-                        <input name="password_confirmation" type="password" placeholder="Sifre Tekrar" class="form-control">
+                        <label class="form-label">Şifre Tekrar</label>
+                        <input name="password_confirmation" type="password" placeholder="Şifre Tekrar" class="form-control">
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Guncelle</button>
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">Iptal</a>
+                        <button type="submit" class="btn btn-primary">Güncelle</button>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">İptal</a>
                     </div>
                 </form>
             </div>
@@ -59,7 +59,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="fw-semibold mb-2">Not</div>
-                <div class="text-muted">Kendi rolunuzu degistiremezsiniz.</div>
+                <div class="text-muted">Kendi rolünüzü değiştiremezsiniz.</div>
             </div>
         </div>
     </div>

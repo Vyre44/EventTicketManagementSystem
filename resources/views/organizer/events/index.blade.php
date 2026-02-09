@@ -51,7 +51,7 @@
             <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">ID</th>
+                        <th class="ps-3">No</th>
                         <th>Başlık</th>
                         <th>Kapak</th>
                         <th>Durum</th>
@@ -94,7 +94,7 @@
                                 <a href="{{ route('organizer.events.show', $event) }}" class="btn btn-outline-primary btn-sm">Görüntüle</a>
                                 <a href="{{ route('organizer.events.edit', $event) }}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
                                 <a href="{{ route('organizer.events.ticket-types.index', $event) }}" class="btn btn-outline-info btn-sm">Bilet Tipleri</a>
-                                <a href="{{ route('organizer.events.checkin.form', $event) }}" class="btn btn-outline-success btn-sm">Check-in</a>
+                                <a href="{{ route('organizer.events.checkin.form', $event) }}" class="btn btn-outline-success btn-sm">Giriş Kontrolü</a>
                                 <a href="{{ route('organizer.reports.events.tickets', $event) }}" class="btn btn-outline-dark btn-sm">Rapor</a>
                                 <form method="POST" action="{{ route('organizer.events.destroy', $event) }}" class="d-inline">
                                     @csrf @method('DELETE')

@@ -3,7 +3,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h1 class="h4 mb-0">Admin Dashboard</h1>
+        <h1 class="h4 mb-0">Yönetici Paneli</h1>
         <div class="text-muted">Sistem istatistikleri ve özet</div>
     </div>
 </div>
@@ -57,7 +57,7 @@
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="text-muted">Toplam Gelir (PAID)</div>
+                    <div class="text-muted">Toplam Gelir (Ödendi)</div>
                     <div class="h4 text-success mb-0">{{ number_format($stats['total_revenue'] ?? 0, 2) }} ₺</div>
                 </div>
                 <div class="fs-3 text-success">💰</div>

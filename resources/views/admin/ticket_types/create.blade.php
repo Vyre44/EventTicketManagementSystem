@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">Yeni TicketType</h1>
-    <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Don</a>
+    <h1 class="h4 mb-0">Yeni Bilet Tipi</h1>
+    <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
 @if($errors->any())
@@ -49,7 +49,7 @@
                     </div>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Kaydet</button>
-                        <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary">Iptal</a>
+                        <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary">İptal</a>
                     </div>
                 </form>
             </div>
@@ -58,8 +58,8 @@
     <div class="col-lg-4">
         <div class="card shadow-sm">
             <div class="card-body">
-                <div class="fw-semibold mb-2">Yardim</div>
-                <div class="text-muted">Bilet tipini etkinlik ve kota bilgileriyle olusturun.</div>
+                <div class="fw-semibold mb-2">Yardım</div>
+                <div class="text-muted">Bilet tipini etkinlik ve kota bilgileriyle oluşturun.</div>
             </div>
         </div>
     </div>

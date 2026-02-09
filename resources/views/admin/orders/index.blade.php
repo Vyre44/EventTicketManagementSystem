@@ -33,8 +33,8 @@
                 </select>
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Sipariş ID veya Kullanıcı E-posta</label>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Sipariş ID veya kullanıcı e-posta" class="form-control">
+                <label class="form-label fw-semibold">Sipariş No veya Kullanıcı E-posta</label>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Sipariş No veya kullanıcı e-posta" class="form-control">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Filtrele</button>
@@ -49,7 +49,7 @@
             <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">Sipariş ID</th>
+                        <th class="ps-3">Sipariş No</th>
                         <th>Kullanıcı E-posta</th>
                         <th>Durum</th>
                         <th>Bilet Sayısı</th>

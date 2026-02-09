@@ -47,7 +47,7 @@
             <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">Bilet ID</th>
+                        <th class="ps-3">Bilet No</th>
                         <th>Durum</th>
                         <th>Bilet Tipi</th>
                         <th>Etkinlik</th>

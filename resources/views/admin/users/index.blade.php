@@ -21,8 +21,8 @@
     <div class="card-body">
         <form method="get" action="{{ route('admin.users.index') }}" class="row g-2 align-items-end">
             <div class="col-md-6">
-                <label class="form-label">Ara (ad/email)</label>
-                <input name="q" value="{{ $q ?? '' }}" placeholder="Ara (ad/email)" class="form-control">
+                <label class="form-label">Ara (ad/e-posta)</label>
+                <input name="q" value="{{ $q ?? '' }}" placeholder="Ara (ad/e-posta)" class="form-control">
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-outline-primary w-100">Ara</button>
@@ -37,9 +37,9 @@
             <table class="table table-striped table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">ID</th>
+                        <th class="ps-3">No</th>
                         <th>Ad</th>
-                        <th>Email</th>
+                        <th>E-posta</th>
                         <th>Rol</th>
                         <th class="text-end pe-3">İşlem</th>
                     </tr>
@@ -57,7 +57,7 @@
                                     $badgeClass = 'bg-secondary';
                                     
                                     if ($roleValue === 'admin') {
-                                        $roleLabel = 'Admin';
+                                        $roleLabel = 'Yönetici';
                                         $badgeClass = 'bg-danger';
                                     } elseif ($roleValue === 'organizer') {
                                         $roleLabel = 'Organizatör';

@@ -1,125 +1,131 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <!-- Alert Container (AJAX) -->
-    <div id="ajax-alert-container"></div>
-
-    <div class="mb-6 flex items-center justify-between">
-        <div>
-            <h1 class="text-3xl font-bold">Biletler</h1>
-            <p class="text-gray-600 mt-1">Tüm biletleri yönetin</p>
-        </div>
-        <a href="{{ route('admin.tickets.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Yeni Bilet
-        </a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h4 mb-0">Biletler</h1>
+        <div class="text-muted">Tüm biletleri yönetin</div>
     </div>
+    <a href="{{ route('admin.tickets.create') }}" class="btn btn-primary btn-sm">Yeni Bilet</a>
+</div>
 
-    <!-- Filters -->
-    <div class="bg-white border rounded-lg p-6 mb-6">
-        <form method="GET" action="" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Kod veya ID ara" class="w-full border rounded-lg px-3 py-2">
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" action="" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Kod veya ID</label>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Kod veya ID ara" class="form-control">
             </div>
-            <div>
-                <select name="status" class="w-full border rounded-lg px-3 py-2">
+            <div class="col-md-3">
+                <label class="form-label">Durum</label>
+                <select name="status" class="form-select">
                     <option value="">Tüm Durumlar</option>
                     @foreach($statuses as $status)
-                        <option value="{{ $status->value }}" @selected(request('status') == $status->value)>{{ $status->name }}</option>
+                        <option value="{{ $status->value }}" @selected(request('status') == $status->value)>
+                            @if($status->value === 'active')
+                                Aktif
+                            @elseif($status->value === 'checked_in')
+                                Kullanıldı
+                            @elseif($status->value === 'cancelled')
+                                İptal
+                            @elseif($status->value === 'refunded')
+                                İade
+                            @else
+                                {{ $status->name }}
+                            @endif
+                        </option>
                     @endforeach
                 </select>
             </div>
-            <div>
-                <input type="text" name="user_email" value="{{ request('user_email') }}" placeholder="Kullanıcı Email" class="w-full border rounded-lg px-3 py-2">
+            <div class="col-md-3">
+                <label class="form-label">Kullanıcı E-posta</label>
+                <input type="text" name="user_email" value="{{ request('user_email') }}" placeholder="Kullanıcı e-posta" class="form-control">
             </div>
-            <div>
-                <input type="text" name="event_id" value="{{ request('event_id') }}" placeholder="Event ID" class="w-full border rounded-lg px-3 py-2">
+            <div class="col-md-2">
+                <label class="form-label">Etkinlik ID</label>
+                <input type="text" name="event_id" value="{{ request('event_id') }}" placeholder="Etkinlik ID" class="form-control">
             </div>
-            <div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
-                    Filtrele
-                </button>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-outline-primary w-100">Filtrele</button>
             </div>
         </form>
     </div>
-
-    <!-- Table -->
-    @if($tickets->isEmpty())
-        <div class="bg-white border rounded-lg p-8 text-center">
-            <p class="text-gray-600">Bilet bulunamadı.</p>
-        </div>
-    @else
-        <div class="bg-white border rounded-lg overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-gray-100 border-b">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Bilet ID</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Kod</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Durum</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Bilet Tipi</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Etkinlik</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Kullanıcı</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Check-in</th>
-                        <th class="px-6 py-3 text-center text-sm font-semibold">İşlem</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($tickets as $ticket)
-                        <tr class="border-b hover:bg-gray-50" data-ticket-id="{{ $ticket->id }}" data-ticket-status="{{ $ticket->status->value }}">
-                            <td class="px-6 py-4 text-sm font-mono">{{ $ticket->id }}</td>
-                            <td class="px-6 py-4 text-sm font-mono">{{ $ticket->code }}</td>
-                            <td class="px-6 py-4 text-sm">
-                                <span class="ticket-status-badge">
-                                    @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
-                                        <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">Aktif</span>
-                                    @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
-                                        <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">✅ Kullanıldı</span>
-                                    @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
-                                        <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">❌ İptal</span>
-                                    @elseif($ticket->status === \App\Enums\TicketStatus::REFUNDED)
-                                        <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">🔄 İade</span>
-                                    @endif
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm">{{ $ticket->ticketType->name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm">{{ $ticket->ticketType->event->title ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm">{{ $ticket->order->user->email ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm">
-                                @if($ticket->checked_in_at)
-                                    {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
-                                @else
-                                    <span class="text-gray-500">-</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex gap-2 justify-center items-center ticket-actions">
-                                    @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
-                                        <button class="ticket-action-btn text-red-600 hover:text-red-800 text-sm font-medium" data-action="cancel" title="İptal">
-                                            ❌
-                                        </button>
-                                    @else
-                                        <span class="text-gray-400 text-sm">-</span>
-                                    @endif
-                                    <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                        Detay
-                                    </a>
-                                    <a href="{{ route('admin.tickets.edit', $ticket) }}" class="text-yellow-600 hover:text-yellow-800 text-sm font-medium">
-                                        Düzenle
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-6">
-            {{ $tickets->render() }}
-        </div>
-    @endif
 </div>
+
+@if($tickets->isEmpty())
+    <div class="card shadow-sm">
+        <div class="card-body text-center text-muted">Bilet bulunamadı.</div>
+    </div>
+@else
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Bilet ID</th>
+                            <th>Kod</th>
+                            <th>Durum</th>
+                            <th>Bilet Tipi</th>
+                            <th>Etkinlik</th>
+                            <th>Kullanıcı</th>
+                            <th>Check-in</th>
+                            <th class="text-end pe-3">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($tickets as $ticket)
+                            <tr data-ticket-id="{{ $ticket->id }}" data-ticket-status="{{ $ticket->status->value }}">
+                                <td class="ps-3 font-monospace">{{ $ticket->id }}</td>
+                                <td class="font-monospace">{{ $ticket->code }}</td>
+                                <td>
+                                    <span class="ticket-status-badge">
+                                        @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                                            <span class="badge bg-primary">Aktif</span>
+                                        @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
+                                            <span class="badge bg-success">Kullanıldı</span>
+                                        @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
+                                            <span class="badge bg-danger">İptal</span>
+                                        @elseif($ticket->status === \App\Enums\TicketStatus::REFUNDED)
+                                            <span class="badge bg-secondary">İade</span>
+                                        @endif
+                                    </span>
+                                </td>
+                                <td>{{ $ticket->ticketType->name ?? '-' }}</td>
+                                <td>{{ $ticket->ticketType->event->title ?? '-' }}</td>
+                                <td>{{ $ticket->order->user->email ?? '-' }}</td>
+                                <td>
+                                    @if($ticket->checked_in_at)
+                                        {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td class="text-end pe-3">
+                                    <div class="d-inline-flex gap-2 align-items-center ticket-actions">
+                                        @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                                            <button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="İptal">
+                                                İptal
+                                            </button>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                        <a href="{{ route('admin.tickets.show', $ticket) }}" class="btn btn-outline-primary btn-sm">Detay</a>
+                                        <a href="{{ route('admin.tickets.edit', $ticket) }}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        {{ $tickets->links('pagination::bootstrap-5') }}
+    </div>
+@endif
 
 <script>
     // Routes mapping for admin (cancel only)

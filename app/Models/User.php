@@ -138,9 +138,6 @@ class User extends Authenticatable
          * - Enum'ın string değeri
          * - Örnek: 'admin'
          * 
-         * Kıyasla:
-         * if ($user->role === UserRole::ADMIN) { ... }
-         * // Aynı sonuç ama bu biraz daha kolay
          */
         return ($this->role instanceof \BackedEnum ? $this->role->value : (string) $this->role) === UserRole::ADMIN->value;
     }

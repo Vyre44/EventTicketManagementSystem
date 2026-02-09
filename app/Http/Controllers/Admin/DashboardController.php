@@ -9,6 +9,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use App\Enums\TicketStatus;
 use App\Enums\OrderStatus;
+use App\Enums\UserRole;
 
 /**
  * Admin Dashboard Controller
@@ -61,6 +62,32 @@ class DashboardController extends Controller
             'total_events' => Event::count(),
 
             /**
+             * TOPLAM ORGANIZATÖR SAYISI
+             * 
+             * SQL: SELECT COUNT(*) FROM users WHERE role = 'organizer'
+             * 
+             * AÇIKLAMA:
+             * Sistemde kaç organizatör kullanıcı vardır?
+             * 
+             * DASHBOARD'DA KULLANIM:
+             * "Toplam {{ $stats['total_organizers'] }} organizatör"
+             */
+            'total_organizers' => User::where('role', UserRole::ORGANIZER)->count(),
+
+            /**
+             * TOPLAM KATILIMCI SAYISI
+             * 
+             * SQL: SELECT COUNT(*) FROM users WHERE role = 'attendee'
+             * 
+             * AÇIKLAMA:
+             * Sistemde kaç katılımcı (müşteri) kullanıcı vardır?
+             * 
+             * DASHBOARD'DA KULLANIM:
+             * "Toplam {{ $stats['total_attendees'] }} katılımcı"
+             */
+            'total_attendees' => User::where('role', UserRole::ATTENDEE)->count(),
+
+            /**
              * TOPLAM SİPARİŞ SAYISI
              * 
              * SQL: SELECT COUNT(*) FROM orders
@@ -75,23 +102,24 @@ class DashboardController extends Controller
             'total_orders' => Order::count(),
 
             /**
-             * TOPLAM BİLET SAYISI
+             * TOPLAM BİLET SAYISI (Aktif/Geçerli)
              * 
-             * SQL: SELECT COUNT(*) FROM tickets
+             * SQL: SELECT COUNT(*) FROM tickets WHERE status IN ('active', 'checked_in')
              * 
              * AÇIKLAMA:
-             * Tüm sipariş'lerin tüm biletlerinin sayısı
-             * Her sipariş 1-N bilet içerebilir
+             * İptal ve iade hariç, aktif ve kullanılmış bilet sayısı
+             * Geçerli biletlerin sayısı = toplam satılan - iptal - iade
              * 
              * ÖRNEK:
-             * - Sipariş 1: 5 bilet
-             * - Sipariş 2: 3 bilet
-             * - Toplam: 8 bilet
+             * - Satılan: 10 bilet
+             * - İptal: 2 bilet
+             * - İade: 1 bilet
+             * - Geçerli/Aktif: 7 bilet
              * 
              * DASHBOARD'DA KULLANIM:
-             * "Toplam {{ $stats['total_tickets'] }} bilet satıldı"
+             * "Toplam {{ $stats['total_tickets'] }} geçerli bilet"
              */
-            'total_tickets' => Ticket::count(),
+            'total_tickets' => Ticket::whereIn('status', [TicketStatus::ACTIVE, TicketStatus::CHECKED_IN])->count(),
 
             /**
              * CHECK-İN YAPILAN BİLET SAYISI
@@ -133,7 +161,27 @@ class DashboardController extends Controller
              * DASHBOARD'DA KULLANIM:
              * "{{ $stats['paid_orders'] }} ödenen sipariş"
              */
-            'paid_orders' => Order::where('status', OrderStatus::PAID)->count(),
+              'paid_orders' => Order::where('status', OrderStatus::PAID)->count(),
+
+              /**
+               * TOPLAM GELİR - PAID Siparişlerin Tutarları Toplamı
+               * 
+               * Açıklama:
+               * - Sadece ödenmiş (PAID) siparişlerin tutarları toplanır
+               * - Cancelled/Refunded siparişler dahil değildir
+               * - Bütçe planlama, finansal rapor, KPI takibi için kullanılır
+               * 
+               * Veri Türü:
+               * - decimal(10,2)
+               * - Örn: 1234.50 (TL)
+               * 
+               * SQL Equivalenti:
+               * SELECT SUM(total_amount) FROM orders WHERE status = 'paid'
+               * 
+               * DASHBOARD'DA KULLANIM:
+               * "Toplam Gelir (PAID): {{ $stats['total_revenue'] ?? 0 }} ₺"
+               */
+              'total_revenue' => Order::where('status', OrderStatus::PAID)->sum('total_amount'),
         ];
 
         /**

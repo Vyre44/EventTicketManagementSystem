@@ -1,4 +1,17 @@
-/* Bootstrap 5 CSS kullanılıyor - attendee/layouts/app.blade.php'de CDN üzerinden import */
-/* Tailwind directive'leri kaldırıldı (Attendee layout Bootstrap 5'e çevrildi) */
+/* Bootstrap 5 CSS - Vite üzerinden import */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Role accent bar */
+.role-accent-admin {
+    border-top: 3px solid var(--bs-danger);
+}
+
+.role-accent-organizer {
+    border-top: 3px solid var(--bs-primary);
+}
+
+.role-accent-attendee {
+    border-top: 3px solid var(--bs-success);
+}
 
 /* Custom overrides varsa buraya ekle */

@@ -1,29 +1,63 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold">{{ $event->title }}</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">{{ $event->title }}</h1>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-primary btn-sm">Düzenle</a>
+        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body d-flex justify-content-between align-items-start">
         <div>
-            <a href="{{ route('admin.events.edit', $event) }}" class="bg-yellow-600 text-white px-4 py-2 rounded">Düzenle</a>
-            <a href="{{ route('admin.events.index') }}" class="bg-gray-200 px-4 py-2 rounded ml-2">Listeye Dön</a>
+            <div class="text-muted">Etkinlik Ozeti</div>
+            <div class="h5 mb-0">{{ $event->title }}</div>
+        </div>
+        <span class="badge bg-secondary">{{ $event->status?->value ?? $event->status }}</span>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="text-muted">Başlangıç</div>
+                        <div class="fw-semibold">{{ $event->start_time?->format('d.m.Y H:i') }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted">Bitiş</div>
+                        <div class="fw-semibold">{{ $event->end_time?->format('d.m.Y H:i') ?? '-' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted">Organizatör ID</div>
+                        <div class="fw-semibold">{{ $event->organizer_id }}</div>
+                    </div>
+                </div>
+                @if($event->description)
+                    <hr>
+                    <div>
+                        <div class="text-muted">Açıklama</div>
+                        <div>{{ $event->description }}</div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
-
-    <div class="bg-white shadow rounded p-6 space-y-3">
-        <div><strong>Başlangıç:</strong> {{ $event->start_time?->format('d.m.Y H:i') }}</div>
-        <div><strong>Bitiş:</strong> {{ $event->end_time?->format('d.m.Y H:i') ?? '-' }}</div>
-        <div><strong>Durum:</strong> {{ $event->status?->value ?? $event->status }}</div>
-        <div><strong>Organizatör ID:</strong> {{ $event->organizer_id }}</div>
-        @if($event->description)
-            <div><strong>Açıklama:</strong> {{ $event->description }}</div>
-        @endif
-        @if($event->cover_image_url)
-            <div>
-                <strong>Kapak:</strong><br>
-                <img src="{{ $event->cover_image_url }}" alt="Kapak" style="max-width:600px;max-height:400px;object-fit:cover;border-radius:0.5rem;">
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted mb-2">Kapak</div>
+                @if($event->cover_image_url)
+                    <img src="{{ $event->cover_image_url }}" alt="Kapak" class="img-fluid rounded">
+                @else
+                    <div class="text-muted">Kapak gorseli yok.</div>
+                @endif
             </div>
-        @endif
+        </div>
     </div>
 </div>
 @endsection

@@ -1,36 +1,109 @@
 @extends('layouts.app')
 
 @section('content')
-<h1>Orders</h1>
-<form method="get" style="margin-bottom:16px">
-    <select name="status">
-        <option value="">Status (All)</option>
-        @foreach($statuses as $status)
-            <option value="{{ $status->value }}" @selected(request('status') == $status->value)>{{ $status->name }}</option>
-        @endforeach
-    </select>
-    <input type="text" name="q" value="{{ request('q') }}" placeholder="Order ID or User Email">
-    <button type="submit">Filter</button>
-</form>
-<table border="1" cellpadding="6" cellspacing="0">
-    <tr>
-        <th>Order ID</th>
-        <th>User Email</th>
-        <th>Status</th>
-        <th>Ticket Count</th>
-        <th>Created At</th>
-        <th>İşlem</th>
-    </tr>
-    @foreach($orders as $order)
-    <tr>
-        <td>{{ $order->id }}</td>
-        <td>{{ $order->user->email ?? '-' }}</td>
-        <td>{{ $order->status->name ?? $order->status }}</td>
-        <td>{{ $order->tickets_count }}</td>
-        <td>{{ $order->created_at }}</td>
-        <td><a href="{{ route('admin.orders.show', $order) }}">Show</a></td>
-    </tr>
-    @endforeach
-</table>
-{{ $orders->links() }}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h4 mb-0">Siparişler</h1>
+        <div class="text-muted">Tüm siparişleri yönetin</div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Durum</label>
+                <select name="status" class="form-select">
+                    <option value="">Tüm Durumlar</option>
+                    @foreach($statuses as $status)
+                        <option value="{{ $status->value }}" @selected(request('status') == $status->value)>
+                            @if($status->value === 'pending')
+                                Beklemede
+                            @elseif($status->value === 'paid')
+                                Ödendi
+                            @elseif($status->value === 'cancelled')
+                                İptal
+                            @elseif($status->value === 'refunded')
+                                İade
+                            @else
+                                {{ $status->name }}
+                            @endif
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Sipariş ID veya Kullanıcı E-posta</label>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Sipariş ID veya kullanıcı e-posta" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrele</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Sipariş ID</th>
+                        <th>Kullanıcı E-posta</th>
+                        <th>Durum</th>
+                        <th>Bilet Sayısı</th>
+                        <th>Oluşturulma</th>
+                        <th class="text-end pe-3">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($orders as $order)
+                    <tr>
+                        <td class="ps-3 fw-semibold">#{{ $order->id }}</td>
+                        <td>{{ $order->user->email ?? '-' }}</td>
+                        <td>
+                            @php
+                                $statusValue = $order->status->value ?? $order->status;
+                                $statusLabel = '';
+                                $badgeClass = 'bg-secondary';
+                                
+                                if ($statusValue === 'pending') {
+                                    $statusLabel = 'Beklemede';
+                                    $badgeClass = 'bg-warning';
+                                } elseif ($statusValue === 'paid') {
+                                    $statusLabel = 'Ödendi';
+                                    $badgeClass = 'bg-success';
+                                } elseif ($statusValue === 'cancelled') {
+                                    $statusLabel = 'İptal';
+                                    $badgeClass = 'bg-danger';
+                                } elseif ($statusValue === 'refunded') {
+                                    $statusLabel = 'İade';
+                                    $badgeClass = 'bg-secondary';
+                                } else {
+                                    $statusLabel = $order->status->name ?? $statusValue;
+                                }
+                            @endphp
+                            <span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span>
+                        </td>
+                        <td>{{ $order->tickets_count }}</td>
+                        <td>{{ $order->created_at?->format('d.m.Y H:i') ?? '-' }}</td>
+                        <td class="text-end pe-3">
+                            <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-outline-primary btn-sm">Detay</a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Sipariş bulunamadı</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    {{ $orders->links('pagination::bootstrap-5') }}
+</div>
 @endsection

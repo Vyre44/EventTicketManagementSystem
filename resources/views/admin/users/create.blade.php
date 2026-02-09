@@ -1,23 +1,67 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Yeni Kullanici</h1>
+    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Don</a>
+</div>
+
 @if(session('success'))
-    <div style="color:green">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 @if($errors->any())
-    <div style="color:red">
-        @foreach($errors->all() as $err) {{ $err }}<br>@endforeach
+    <div class="alert alert-danger">
+        @foreach($errors->all() as $err)
+            <div>{{ $err }}</div>
+        @endforeach
     </div>
 @endif
 
-<h1>Yeni Kullanıcı</h1>
-<form method="POST" action="{{ route('admin.users.store') }}">
-    @csrf
-    <input name="name" placeholder="Ad" value="{{ old('name') }}">
-    <input name="email" placeholder="Email" value="{{ old('email') }}">
-    <select name="role">
-        @foreach(\App\Enums\UserRole::cases() as $role)
-            <option value="{{ $role->value }}" @selected(old('role') === $role->value)>{{ $role->value }}</option>
-        @endforeach
-    </select>
-    <input name="password" type="password" placeholder="Şifre">
-    <input name="password_confirmation" type="password" placeholder="Şifre Tekrar">
-    <button type="submit">Kaydet</button>
-</form>
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="POST" action="{{ route('admin.users.store') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Ad</label>
+                        <input name="name" placeholder="Ad" value="{{ old('name') }}" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input name="email" placeholder="Email" value="{{ old('email') }}" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select name="role" class="form-select">
+                            @foreach(\App\Enums\UserRole::cases() as $role)
+                                <option value="{{ $role->value }}" @selected(old('role') === $role->value)>{{ $role->value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sifre</label>
+                        <input name="password" type="password" placeholder="Sifre" class="form-control">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Sifre Tekrar</label>
+                        <input name="password_confirmation" type="password" placeholder="Sifre Tekrar" class="form-control">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">Iptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="fw-semibold mb-2">Yardim</div>
+                <div class="text-muted">Rol secimi, kullanicinin yetkilerini belirler.</div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

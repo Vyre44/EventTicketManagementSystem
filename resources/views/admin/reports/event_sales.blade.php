@@ -5,12 +5,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h4 mb-1">Etkinlik Bazlı Satış Raporu</h1>
-            <div class="text-muted">Event seçimi ile AJAX rapor</div>
+            <div class="text-muted">Etkinlik seçimi ile rapor</div>
         </div>
-        <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-secondary">Raporlara Dön</a>
+        <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-secondary btn-sm">Raporlara Dön</a>
     </div>
 
-    <div class="card mb-4">
+    <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3 align-items-end">
                 <div class="col-md-8">
@@ -23,7 +23,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <button id="fetch-report" class="btn btn-primary w-100">Raporu Getir</button>
+                    <button id="fetch-report" class="btn btn-primary btn-sm w-100">Raporu Getir</button>
                 </div>
             </div>
         </div>
@@ -32,37 +32,37 @@
     <div id="ajax-alert-container"></div>
 
     <div id="report-container" class="d-none">
-        <div class="card mb-4">
+        <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <h5 class="card-title" id="report-title"></h5>
                 <div class="row g-3">
                     <div class="col-md-3">
                         <div class="p-3 bg-success-subtle rounded">
-                            <div class="text-muted small">PAID Sipariş</div>
+                            <div class="text-muted small">Ödenen Sipariş</div>
                             <div class="fw-bold" id="paid-orders">0</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="p-3 bg-primary-subtle rounded">
-                            <div class="text-muted small">PAID Gelir</div>
+                            <div class="text-muted small">Ödenen Gelir</div>
                             <div class="fw-bold" id="paid-revenue">0 ₺</div>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="p-3 bg-warning-subtle rounded">
-                            <div class="text-muted small">Pending</div>
+                            <div class="text-muted small">Beklemede</div>
                             <div class="fw-bold" id="pending-count">0</div>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="p-3 bg-danger-subtle rounded">
-                            <div class="text-muted small">Cancelled</div>
+                            <div class="text-muted small">İptal</div>
                             <div class="fw-bold" id="cancelled-count">0</div>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="p-3 bg-secondary-subtle rounded">
-                            <div class="text-muted small">Refunded</div>
+                            <div class="text-muted small">İade</div>
                             <div class="fw-bold" id="refunded-count">0</div>
                         </div>
                     </div>

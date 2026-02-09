@@ -1,108 +1,99 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <!-- Alert Container (AJAX) -->
-    <div id="ajax-alert-container"></div>
-
-    <div class="mb-6">
-        <a href="{{ route('admin.tickets.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
-            ← Tüm Biletler
-        </a>
-        <h1 class="text-3xl font-bold mb-2">Bilet #{{ $ticket->id }} Detayı</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Bilet #{{ $ticket->id }}</h1>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.tickets.index') }}" class="btn btn-outline-secondary btn-sm">Tüm Biletler</a>
+        <a href="{{ route('admin.tickets.edit', $ticket) }}" class="btn btn-primary btn-sm">Düzenle</a>
     </div>
+</div>
 
-    <!-- Bilet Bilgileri -->
-    <div class="bg-white border rounded-lg p-6 mb-6" data-ticket-id="{{ $ticket->id }}" data-ticket-status="{{ $ticket->status->value }}">
-        <div class="flex justify-between items-start mb-4">
-            <div>
-                <h2 class="text-2xl font-bold font-mono">{{ $ticket->code }}</h2>
-                <div class="text-gray-600 text-sm mt-2 space-y-1">
-                    <div>🎫 <strong>Etkinlik:</strong> {{ $ticket->ticketType->event->title }}</div>
-                    <div>🏷️ <strong>Bilet Tipi:</strong> {{ $ticket->ticketType->name }}</div>
-                    <div>💰 <strong>Fiyat:</strong> {{ number_format($ticket->ticketType->price, 2) }} ₺</div>
-                    <div>📅 <strong>Oluşturulma:</strong> {{ $ticket->created_at->format('d.m.Y H:i') }}</div>
-                </div>
-            </div>
+<div class="card shadow-sm mb-4" data-ticket-id="{{ $ticket->id }}" data-ticket-status="{{ $ticket->status->value }}">
+    <div class="card-body d-flex justify-content-between align-items-start">
+        <div>
+            <div class="text-muted">Bilet Kodu</div>
+            <div class="h5 mb-1 font-monospace">{{ $ticket->code }}</div>
+            <div class="text-muted">Oluşturulma: {{ $ticket->created_at->format('d.m.Y H:i') }}</div>
+        </div>
+        <span class="ticket-status-badge">
+            @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                <span class="badge bg-primary">Aktif</span>
+            @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
+                <span class="badge bg-success">Kullanıldı</span>
+                @if($ticket->checked_in_at)
+                    <div class="text-muted small mt-2">Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}</div>
+                @endif
+            @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
+                <span class="badge bg-danger">İptal</span>
+            @elseif($ticket->status === \App\Enums\TicketStatus::REFUNDED)
+                <span class="badge bg-secondary">İade</span>
+            @endif
+        </span>
+    </div>
+</div>
 
-            <!-- Status Badge -->
-            <div>
-                <span class="ticket-status-badge">
-                    @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
-                        <span class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
-                            Aktif
-                        </span>
-                    @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
-                        <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold">
-                            ✅ Kullanıldı
-                        </span>
-                        @if($ticket->checked_in_at)
-                            <div class="text-xs text-gray-600 mt-2">
-                                Check-in: {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
-                            </div>
-                        @endif
-                    @elseif($ticket->status === \App\Enums\TicketStatus::CANCELLED)
-                        <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold">
-                            ❌ İptal
-                        </span>
-                    @elseif($ticket->status === \App\Enums\TicketStatus::REFUNDED)
-                        <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full font-semibold">
-                            🔄 İade
-                        </span>
-                    @endif
-                </span>
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="fw-semibold mb-2">Bilet Bilgileri</div>
+                <div class="text-muted">Etkinlik</div>
+                <div class="fw-semibold mb-2">{{ $ticket->ticketType->event->title }}</div>
+                <div class="text-muted">Bilet Tipi</div>
+                <div class="fw-semibold mb-2">{{ $ticket->ticketType->name }}</div>
+                <div class="text-muted">Fiyat</div>
+                <div class="fw-semibold">{{ number_format($ticket->ticketType->price, 2) }} ₺</div>
             </div>
         </div>
-
-        <hr class="my-4">
-
-        <!-- Sipariş ve Müşteri Bilgileri -->
-        @if($ticket->order)
-            <div class="mb-4">
-                <h3 class="font-bold mb-2">Sipariş Bilgileri</h3>
-                <div class="text-gray-700 space-y-1 text-sm">
-                    <div>📌 <strong>Sipariş No:</strong> 
-                        <a href="{{ route('admin.orders.show', $ticket->order) }}" class="text-blue-600 hover:text-blue-800">
-                            #{{ $ticket->order->id }}
-                        </a>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="fw-semibold mb-2">Sipariş Bilgileri</div>
+                @if($ticket->order)
+                    <div class="text-muted">Sipariş No</div>
+                    <div class="fw-semibold mb-2">
+                        <a href="{{ route('admin.orders.show', $ticket->order) }}" class="link-primary">#{{ $ticket->order->id }}</a>
                     </div>
-                    <div>👤 <strong>Müşteri:</strong> {{ $ticket->order->user->name }}</div>
-                    <div>📧 <strong>E-mail:</strong> {{ $ticket->order->user->email }}</div>
+                    <div class="text-muted">Müşteri</div>
+                    <div class="fw-semibold mb-2">{{ $ticket->order->user->name }}</div>
+                    <div class="text-muted">E-mail</div>
+                    <div class="fw-semibold mb-2">{{ $ticket->order->user->email }}</div>
                     @if($ticket->order->user->phone)
-                        <div>📱 <strong>Telefon:</strong> {{ $ticket->order->user->phone }}</div>
+                        <div class="text-muted">Telefon</div>
+                        <div class="fw-semibold mb-2">{{ $ticket->order->user->phone }}</div>
                     @endif
-                    <div>💳 <strong>Sipariş Durumu:</strong>
+                    <div class="text-muted">Sipariş Durumu</div>
+                    <div class="fw-semibold">
                         @if($ticket->order->status === \App\Enums\OrderStatus::PENDING)
-                            <span class="text-yellow-600">⏳ Ödeme Bekliyor</span>
+                            <span class="badge bg-warning text-dark">Ödeme Bekliyor</span>
                         @elseif($ticket->order->status === \App\Enums\OrderStatus::PAID)
-                            <span class="text-green-600">✅ Ödendi</span>
+                            <span class="badge bg-success">Ödendi</span>
                         @elseif($ticket->order->status === \App\Enums\OrderStatus::CANCELLED)
-                            <span class="text-red-600">❌ İptal</span>
+                            <span class="badge bg-danger">İptal</span>
                         @elseif($ticket->order->status === \App\Enums\OrderStatus::REFUNDED)
-                            <span class="text-gray-600">🔄 İade</span>
+                            <span class="badge bg-secondary">İade</span>
                         @endif
                     </div>
-                </div>
+                @else
+                    <div class="text-muted">Bu bilet için sipariş bilgisi yok.</div>
+                @endif
             </div>
-        @endif
+        </div>
     </div>
+</div>
 
-    <!-- İşlem Butonları -->
-    <div class="flex gap-3 flex-wrap ticket-actions mb-6">
-        @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
-            <button class="ticket-action-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg" data-action="cancel">
-                ❌ İptal Et
-            </button>
-        @else
-            <span class="text-gray-600 text-sm font-medium italic">Bu bilet için işlem yapılamaz.</span>
-        @endif
-    </div>
-
-    <!-- Other Actions -->
-    <div class="flex gap-3">
-        <a href="{{ route('admin.tickets.edit', $ticket) }}" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg">
-            ✏️ Düzenle
-        </a>
+<div class="card shadow-sm">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div class="fw-semibold">İşlemler</div>
+        <div class="d-flex gap-2 ticket-actions">
+            @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                <button class="ticket-action-btn btn btn-outline-danger" data-action="cancel">İptal Et</button>
+            @else
+                <span class="text-muted">Bu bilet için işlem yapılamaz.</span>
+            @endif
+        </div>
     </div>
 </div>
 

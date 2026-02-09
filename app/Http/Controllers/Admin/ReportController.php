@@ -92,6 +92,31 @@ class ReportController extends Controller
             ], 404);
         }
 
+        // Bilet sayımları: OrderStatus üzerinden
+        $pendingTicketCount = Ticket::whereHas('ticketType', function ($q) use ($event) {
+            $q->where('event_id', $event->id);
+        })
+        ->whereHas('order', function ($q) {
+            $q->where('status', OrderStatus::PENDING);
+        })
+        ->count();
+
+        $cancelledTicketCount = Ticket::whereHas('ticketType', function ($q) use ($event) {
+            $q->where('event_id', $event->id);
+        })
+        ->whereHas('order', function ($q) {
+            $q->where('status', OrderStatus::CANCELLED);
+        })
+        ->count();
+
+        $refundedTicketCount = Ticket::whereHas('ticketType', function ($q) use ($event) {
+            $q->where('event_id', $event->id);
+        })
+        ->whereHas('order', function ($q) {
+            $q->where('status', OrderStatus::REFUNDED);
+        })
+        ->count();
+
         $ordersQuery = Order::where('event_id', $event->id);
         $data = [
             'event' => [
@@ -100,9 +125,9 @@ class ReportController extends Controller
             ],
             'paid_orders' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->count(),
             'paid_revenue' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->sum('total_amount'),
-            'pending_count' => (clone $ordersQuery)->where('status', OrderStatus::PENDING)->count(),
-            'cancelled_count' => (clone $ordersQuery)->where('status', OrderStatus::CANCELLED)->count(),
-            'refunded_count' => (clone $ordersQuery)->where('status', OrderStatus::REFUNDED)->count(),
+            'pending_count' => $pendingTicketCount,
+            'cancelled_count' => $cancelledTicketCount,
+            'refunded_count' => $refundedTicketCount,
         ];
 
         return response()->json([
@@ -170,13 +195,40 @@ class ReportController extends Controller
         ->whereIn('status', [TicketStatus::ACTIVE, TicketStatus::CHECKED_IN])
         ->count();
         
+        // Pending ticket count: Event'e ait PENDING durumundaki biletler
+        $pendingTicketCount = Ticket::whereHas('ticketType', function ($q) use ($event) {
+            $q->where('event_id', $event->id);
+        })
+        ->whereHas('order', function ($q) {
+            $q->where('status', OrderStatus::PENDING);
+        })
+        ->count();
+        
+        // Cancelled ticket count: OrderStatus = CANCELLED olan siparişlerdeki biletler
+        $cancelledTicketCount = Ticket::whereHas('ticketType', function ($q) use ($event) {
+            $q->where('event_id', $event->id);
+        })
+        ->whereHas('order', function ($q) {
+            $q->where('status', OrderStatus::CANCELLED);
+        })
+        ->count();
+        
+        // Refunded ticket count: OrderStatus = REFUNDED olan siparişlerdeki biletler
+        $refundedTicketCount = Ticket::whereHas('ticketType', function ($q) use ($event) {
+            $q->where('event_id', $event->id);
+        })
+        ->whereHas('order', function ($q) {
+            $q->where('status', OrderStatus::REFUNDED);
+        })
+        ->count();
+        
         $summary = [
             'paid_revenue' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->sum('total_amount'),
             'paid_count' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->count(),
             'paid_tickets' => $paidTicketCount,
-            'pending_count' => (clone $ordersQuery)->where('status', OrderStatus::PENDING)->count(),
-            'cancelled_count' => (clone $ordersQuery)->where('status', OrderStatus::CANCELLED)->count(),
-            'refunded_count' => (clone $ordersQuery)->where('status', OrderStatus::REFUNDED)->count(),
+            'pending_count' => $pendingTicketCount,
+            'cancelled_count' => $cancelledTicketCount,
+            'refunded_count' => $refundedTicketCount,
             'total_orders' => (clone $ordersQuery)->count(),
         ];
 
@@ -245,6 +297,18 @@ class ReportController extends Controller
              * ?status=active  -> uygula (filled() = true)
              */
             $query->where('status', $request->input('status'));
+        }
+
+        /**
+         * ADIM 2.5: ORDER STATUS FİLTRESİ UYGULA
+         * 
+         * URL: /tickets?order_status=paid
+         * Bilet'in associated order'ına göre filter
+         */
+        if ($request->filled('order_status')) {
+            $query->whereHas('order', function ($q) use ($request) {
+                $q->where('status', $request->input('order_status'));
+            });
         }
 
         /**

@@ -87,7 +87,32 @@
                 button.disabled = true;
                 button.textContent = '🔄 Sipariş oluşturuluyor...';
                 
-                const formData = new FormData(buyForm);
+                // FormData oluştur ve sadece miktar > 0 olan biletleri ekle
+                const formData = new FormData();
+                
+                // CSRF token'ı form'dan al
+                const tokenInput = buyForm.querySelector('input[name="_token"]');
+                if (tokenInput) {
+                    formData.append('_token', tokenInput.value);
+                } else {
+                    formData.append('_token', getCsrfToken());
+                }
+                
+                let hasTickets = false;
+                Array.from(qtyInputs).forEach(input => {
+                    const qty = parseInt(input.value) || 0;
+                    if (qty > 0) {
+                        formData.append(input.name, qty);
+                        hasTickets = true;
+                    }
+                });
+                
+                if (!hasTickets) {
+                    showAlert('Lütfen en az 1 bilet seçiniz.', 'error');
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    return;
+                }
 
                 fetch(buyForm.action, {
                     method: 'POST',
@@ -231,18 +256,25 @@
                             badge.innerHTML = '<span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">✅ Ödendi</span>';
                         }
                         
-                        // Replace action buttons
+                        // Replace action buttons (if element exists)
                         const actionsDiv = document.getElementById('order-actions');
-                        actionsDiv.innerHTML = `
-                            <button id="order-refund-btn" data-order-id="${orderId}" class="w-full md:w-auto bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 transition">
-                                ↩️ İade Talep Et
-                            </button>
-                        `;
+                        if (actionsDiv) {
+                            actionsDiv.innerHTML = `
+                                <button id="order-refund-btn" data-order-id="${orderId}" class="w-full md:w-auto bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 transition">
+                                    ↩️ İade Talep Et
+                                </button>
+                            `;
+                            
+                            // Attach refund listener
+                            document.getElementById('order-refund-btn').addEventListener('click', refundHandler);
+                        }
                         
-                        // Attach refund listener
-                        document.getElementById('order-refund-btn').addEventListener('click', refundHandler);
+                            showAlert('✓ Ödeme başarılı! Biletleriniz hazır. Biletler sayfasına yönlendiriliyorsunuz...', 'success');
                         
-                        showAlert('✓ Ödeme başarılı! Biletleriniz hazır.', 'success');
+                        // Redirect to order details page to see tickets
+                        setTimeout(() => {
+                            window.location.href = `/orders/${orderId}`;
+                        }, 1500);
                     } else {
                         showAlert(data.message || 'Ödeme işlemi başarısız oldu.', 'error');
                         btn.disabled = false;

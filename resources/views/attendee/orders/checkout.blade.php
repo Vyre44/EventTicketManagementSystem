@@ -44,7 +44,7 @@
                     <!-- Ödeme Formu -->
                     <form method="POST" action="{{ route('attendee.orders.pay', $order) }}" id="pay-form">
                         @csrf
-                        <div class="d-grid gap-3">
+                        <div id="order-actions" class="d-grid gap-3">
                             <button 
                                 type="button"
                                 id="order-pay-btn"

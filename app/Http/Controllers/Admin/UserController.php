@@ -21,6 +21,20 @@ class UserController extends Controller
     public function index()
     {
         $q = request('q');
+        $sortBy = request('sortBy', 'id');
+        $sortDir = request('sortDir', 'desc');
+        
+        // Geçerli sütunları kontrol et
+        $allowedColumns = ['id', 'name', 'email', 'role'];
+        if (!in_array($sortBy, $allowedColumns)) {
+            $sortBy = 'id';
+        }
+        
+        // Geçerli yönü kontrol et
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
+        
         $users = User::query()
             ->when($q, fn($query) =>
                 $query->where(function($q2) use ($q) {
@@ -28,10 +42,10 @@ class UserController extends Controller
                        ->orWhere('email', 'like', "%$q%");
                 })
             )
-            ->latest()
+            ->orderBy($sortBy, $sortDir)
             ->paginate(20)
             ->withQueryString();
-        return view('admin.users.index', compact('users', 'q'));
+        return view('admin.users.index', compact('users', 'q', 'sortBy', 'sortDir'));
     }
 
     public function show(User $user)

@@ -37,10 +37,38 @@
             <table class="table table-striped table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">No</th>
-                        <th>Ad</th>
-                        <th>E-posta</th>
-                        <th>Rol</th>
+                        <th class="ps-3">
+                            <a href="{{ route('admin.users.index', ['q' => $q, 'sortBy' => 'id', 'sortDir' => ($sortBy === 'id' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="text-decoration-none text-dark">
+                                No
+                                @if($sortBy === 'id')
+                                    <i class="bi bi-arrow-{{ $sortDir === 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ route('admin.users.index', ['q' => $q, 'sortBy' => 'name', 'sortDir' => ($sortBy === 'name' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="text-decoration-none text-dark">
+                                Ad
+                                @if($sortBy === 'name')
+                                    <i class="bi bi-arrow-{{ $sortDir === 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ route('admin.users.index', ['q' => $q, 'sortBy' => 'email', 'sortDir' => ($sortBy === 'email' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="text-decoration-none text-dark">
+                                E-posta
+                                @if($sortBy === 'email')
+                                    <i class="bi bi-arrow-{{ $sortDir === 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ route('admin.users.index', ['q' => $q, 'sortBy' => 'role', 'sortDir' => ($sortBy === 'role' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="text-decoration-none text-dark">
+                                Rol
+                                @if($sortBy === 'role')
+                                    <i class="bi bi-arrow-{{ $sortDir === 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </a>
+                        </th>
                         <th class="text-end pe-3">İşlem</th>
                     </tr>
                 </thead>

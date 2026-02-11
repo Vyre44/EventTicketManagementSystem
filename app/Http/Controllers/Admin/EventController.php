@@ -18,18 +18,32 @@ use Illuminate\Support\Facades\Storage;
  */
 class EventController extends Controller
 {
-    // Admin: Tüm eventleri listeler
+    /**
+     * Index - Tüm etkinlikleri listele (pagination ile)
+     * Admin tüm etkinlikleri görebilir (draft veya published)
+     */
     public function index()
     {
         $events = Event::latest()->paginate(10);
         return view('admin.events.index', compact('events'));
     }
 
+    /**
+     * Show - Etkinlik detay sayfası
+     * Route model binding ile etkinlik otomatik yüklenir
+     */
     public function show(Event $event)
     {
         return view('admin.events.show', compact('event'));
     }
 
+    /**
+     * Store - Etkinlik kaydetme (FormRequest ile validate)
+     * Dosya yüklemesi: public/storage/events klasörüne
+     * Admin etkinliği oluşturur (organizer_id auto-fill olmaz)
+     * Create - Etkinlik oluşturma formu
+     * Organizatör seçimi zorunludur (admin isterse)
+     */
     public function create()
     {
         return view('admin.events.create');
@@ -71,6 +85,11 @@ class EventController extends Controller
             $validated['cover_image_path'] = $request->file('cover_image')->store('events', 'public');
         }
         
+    /**
+     * Destroy - Etkinlik silme
+     * Cascade delete: Events silinirse TicketTypes, Tickets, Orders da silinir (foreign keys)
+     * Dosya temizliği: cover_image Storage'dan silinir
+     */
         $event->update($validated);
         
         if ($request->expectsJson()) {

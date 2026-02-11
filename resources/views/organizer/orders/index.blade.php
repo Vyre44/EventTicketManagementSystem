@@ -1,4 +1,8 @@
-{{-- Organizatör siparişler sayfası --}}
+{{-- 
+    Organizatör Siparişler Sayfası
+    Yalnız kendi etkinlikleri için alınan siparişleri listeler.
+    Filtreler: durum (PENDING, PAID, CANCELLED). Arama: sipariş ID, müşteri email.
+--}}
 @extends('layouts.app')
 
 @section('content')

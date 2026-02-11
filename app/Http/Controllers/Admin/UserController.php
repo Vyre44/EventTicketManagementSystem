@@ -18,6 +18,11 @@ use Illuminate\Support\Facades\Hash;
  */
 class UserController extends Controller
 {
+    /**
+     * Index - Kullanıcı listesi (arama, sıralama, sayfalama)
+     * Filtreler: q (ad veya email), sortBy (id, name, email, role), sortDir (asc/desc)
+     * Admin yetkisi ile tüm kullanıcılar gösterilir
+     */
     public function index()
     {
         $q = request('q');

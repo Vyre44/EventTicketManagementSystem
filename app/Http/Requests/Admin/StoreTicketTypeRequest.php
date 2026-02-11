@@ -4,6 +4,13 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * StoreTicketTypeRequest - Bilet tipi oluşturma validasyonu
+ * 
+ * Controller: Admin/TicketTypeController@store, Organizer/TicketTypeController@store
+ * Event'e bağlı bilet tipi tanımlama (VIP, Standard, ekonomik vb.)
+ * Stok yönetimi: total_quantity ve remaining_quantity
+ */
 class StoreTicketTypeRequest extends FormRequest
 {
     public function authorize() { return true; }

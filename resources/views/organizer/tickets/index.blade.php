@@ -1,4 +1,8 @@
-{{-- Organizatör biletleri yönetimi sayfası --}}
+{{-- 
+    Organizatör Biletleri Yönetimi Sayfası
+    Yalnız kendi etkinlikleri için oluşturulan biletleri listeler.
+    Filtreler: durum, etkinlik. Arama: bilet kodı, müşteri email. İşlem: check-in (doğrulama).
+--}}
 @extends('layouts.app')
 
 @section('content')

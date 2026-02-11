@@ -1,4 +1,9 @@
-{{-- Admin bilet tipleri yönetimi sayfası --}}
+{{-- 
+    Admin Bilet Tipleri Yönetimi Sayfası
+    Bilet tiplerini listeler (Özel, Standart, Ekonomik vb.).
+    Filtreler: etkinlik, isim araması. Stoğlama: toplam ve kalan miktar.
+    İşlemler: oluştur, düzenle, sil, detay görüntüleme.
+--}}
 @extends('layouts.app')
 
 @section('content')

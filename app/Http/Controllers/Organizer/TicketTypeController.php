@@ -8,6 +8,15 @@ use App\Http\Requests\Organizer\UpdateTicketTypeRequest;
 use App\Models\Event;
 use App\Models\TicketType;
 
+/**
+ * Organizer TicketType Controller - Bilet Tipi CRUD
+ * 
+ * Yetkilendirme: Organizer sadece kendi etkinlikleri için bilet tipi yönetebilir
+ * assertEventOwnership(): Event sahiplik kontrolü (admin bypass)
+ * assertTicketTypeBelongsToEvent(): TicketType'ın Event'e ait olup olmadığı kontrol
+ * Stok yönetimi: remaining_quantity = total_quantity - satılan_bilet
+ * Form: AJAX ve HTML form desteği
+ */
 class TicketTypeController extends Controller
 {
     public function __construct()

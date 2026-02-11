@@ -1,4 +1,9 @@
-{{-- Etkinlikler Yönetim Sayfası --}}
+{{-- 
+    Admin Etkinlikler Yönetim Sayfası
+    Tüm etkinlikleri listeler (yayında, taslak, sonlanmış).
+    Admin: oluştur, düzenle, sil, detay görüntüleme işlemleri yapabilir.
+    Sayfalama ve hızlı filtre seçeneği mevcut.
+--}}
 @extends('layouts.app')
 
 @section('content')

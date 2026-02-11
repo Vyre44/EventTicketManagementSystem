@@ -7,6 +7,12 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use App\Enums\UserRole;
 
+/**
+ * UpdateUserRequest - Kullanıcı güncelleme validasyonu
+ * 
+ * Controller: Admin/UserController@update
+ * Admin tarafından kullanıcı bilgileri (ad, email, rol) güncellemesi
+ */
 class UpdateUserRequest extends FormRequest
 {
     public function authorize() { return true; }

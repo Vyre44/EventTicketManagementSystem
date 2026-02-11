@@ -1,4 +1,8 @@
-{{-- Ziyaretçilerin sipariş (order) listesini göstermek için sayfa --}}
+{{-- 
+    Katılımcı Siparişler Sayfası
+    Kullanıcının geçmiş sipariş listesi (PENDING, PAID, CANCELLED, REFUNDED).
+    Filtreler: durum. Arama: sipariş ID. Detay ve ticket viewing bağlantıları.
+--}}
 @extends('attendee.layouts.app')
 
 {{-- Sayfa içeriği --}}

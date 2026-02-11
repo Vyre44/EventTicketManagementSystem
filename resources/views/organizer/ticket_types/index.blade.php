@@ -1,4 +1,8 @@
-{{-- layouts.app ana düzenini kullanıyoruz --}}
+{{-- 
+    Organizatör Bilet Tipleri Yönetimi Sayfası
+    Etkinliğe ait bilet tiplerini listeler (Özel, Standart, Ekonomik).
+    İşlemler: oluştur, düzenle, sil (satılmış biletler kontrolü ile). Stoğ: kalan/toplam miktar.
+--}}
 @extends('layouts.app')
 
 @section('content')

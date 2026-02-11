@@ -1,4 +1,9 @@
-{{-- Organizatör etkinlik biletleri raporu --}}
+{{-- 
+    Organizatör Etkinlik Biletleri Raporu
+    Belirli bir etkinliğin biletlerini detaylı listeler.
+    Filtreler: durum (ACTIVE, CHECKED_IN, CANCELLED). Arama: bilet ID, kod, email.
+    İşlem: CSV export (verileri indir).
+--}}
 @extends('layouts.app')
 
 @section('content')

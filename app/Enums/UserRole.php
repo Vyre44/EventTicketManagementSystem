@@ -120,35 +120,4 @@ enum UserRole: string
      * - Ticket::whereHas('order', fn($q) => $q->where('user_id', $user->id))
      */
     case ATTENDEE = 'attendee';
-
-    /**
-     * ============================================================
-     * HELPER METHOD'LAR (Extend edilebilir)
-     * ============================================================
-     * 
-     * AÇIKLAMA:
-     * Enum'a custom method'lar eklenebilir (PHP 8.1+)
-     * 
-     * ÖRNEK EXTENSION (Eğer gerekirse):
-     * 
-     * public function label(): string {
-     *     return match($this) {
-     *         self::ADMIN => 'Yönetici',
-     *         self::ORGANIZER => 'Organizatör',
-     *         self::ATTENDEE => 'Katılımcı',
-     *     };
-     * }
-     * 
-     * public function canManageAllEvents(): bool {
-     *     return $this === self::ADMIN;
-     * }
-     * 
-     * public function canPurchaseTickets(): bool {
-     *     return $this === self::ATTENDEE;
-     * }
-     * 
-     * KULLANIM:
-     * echo UserRole::ADMIN->label();  // "Yönetici"
-     * if (UserRole::ADMIN->canManageAllEvents()) { ... }
-     */
 }

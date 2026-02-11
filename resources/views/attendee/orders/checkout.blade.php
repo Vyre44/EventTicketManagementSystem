@@ -1,4 +1,8 @@
-{{-- Katılımcılar için ödeme (checkout) sayfası --}}
+{{-- 
+    Katılımcı Ödeme (Checkout) Sayfası
+    Sipariş özeti: biletler, miktarlar, tutarlar. Ödeme formu (kredi kartı bilgileri).
+    PENDING -> PAID geçişini sağlayan form. Hata mesajları ve validasyon gösterimi.
+--}}
 @extends('attendee.layouts.app')
 
 @section('content')

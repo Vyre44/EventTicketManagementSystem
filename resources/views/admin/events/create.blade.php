@@ -1,4 +1,9 @@
-{{-- Yeni etkinlik oluşturma formu (Admin) --}}
+{{-- 
+    Admin Yeni Etkinlik Oluşturma Formu
+    Admin tarafından sistem etkinlik oluşturma (organizatör seçimli).
+    Başlık, açıklama, saat, konum, kapak görseli gibi bilgileri giriş formu.
+    Validasyon: Backend (Laravel) tarafından yapılır.
+--}}
 @extends('layouts.app')
 
 @section('content')

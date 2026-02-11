@@ -1,4 +1,9 @@
-{{-- Check-in formu (Admin) --}}
+{{-- 
+    Admin Check-in Formu
+    Etkinliğe gelen kullanıcıların biletlerini doğrulama (QR/barcode).
+    Admin tüm etkinliklere check-in yapabilir (ownership bypass).
+    Son kontrol edilen biletler listesi ve real-time durum güncellemesi.
+--}}
 @extends('layouts.app')
 
 @section('content')

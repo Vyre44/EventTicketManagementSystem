@@ -1,4 +1,8 @@
-{{-- Ana sayfa şablonunu kullan --}}
+{{-- 
+    Organizatör Etkinlikleri Yönetimi Sayfası
+    Yalnız kendi oluşturduğu etkinlikleri listeler (DRAFT, PUBLISHED, STARTED, ENDED).
+    Filtreler: durum. Arama: başlık veya konum. İşlemler: oluştur, düzenle, sil.
+--}}
 @extends('layouts.app')
 
 {{-- İçerik bölümünü tanımla --}}

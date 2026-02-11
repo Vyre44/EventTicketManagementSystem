@@ -1,4 +1,9 @@
-{{-- Admin biletler sayfası --}}
+{{-- 
+    Admin Biletler Sayfası
+    Tüm biletleri listeler (ACTIVE, CHECKED_IN, CANCELLED, REFUNDED).
+    Filtreler: status, event, user email. Arama: bilet ID veya kodu.
+    İşlemler: detay, check-in/undo, iptal.
+--}}
 @extends('layouts.app')
 
 @section('content')

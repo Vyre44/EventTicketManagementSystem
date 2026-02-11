@@ -1,4 +1,9 @@
-{{-- Ana sayfa şablonunu kullan --}}
+{{-- 
+    Admin Dashboard/Aña Sayfası
+    Sistem istatistikleri: toplam etkinlik, sipariş, bilet, check-in miktarı.
+    Grafik ve kartlar: Aggregate sorgulamaları (count, sum).
+    Hızlı erişim: Yönetim paneli link'leri.
+--}}
 @extends('layouts.app')
 
 {{-- İçerik bölümü --}}

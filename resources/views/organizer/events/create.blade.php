@@ -1,4 +1,8 @@
-{{-- Ana sayfa şablonunu (layouts.app) kullan --}}
+{{-- 
+    Organizatör Yeni Etkinlik Oluşturma Formu
+    Kendi etkinliğini oluşturma (başlık, açıklama, saat, konum, kapak görseli).
+    Baş durum: DRAFT (yayınlanmamış). Bilet tipleri oluşturulduktan sonra yayınlanabilir.
+--}}
 @extends('layouts.app')
 
 {{-- İçerik bölümünü tanımla (ana şablonun içine yerleşecek) --}}

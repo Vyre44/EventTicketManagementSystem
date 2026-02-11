@@ -1,4 +1,8 @@
-{{-- Ziyaretçiler için etkinlik listesi sayfası --}}
+{{-- 
+    Katılımcı Etkinlikler Sayfası
+    Yayınlanmış etkinlikleri listeler (PUBLISHED durumu). Stok bitmiş olanlar grayed-out gösterilir.
+    Arama: başlık veya açıklama. Sayfalama: 12 etkinlik/sayfa. Bilet satın alma link'leri.
+--}}
 @extends('attendee.layouts.app')
 
 {{-- Sayfa içeriği --}}

@@ -1,4 +1,9 @@
-{{-- Admin siparişler sayfası --}}
+{{-- 
+    Admin Siparişler Sayfası
+    Tüm kullanıcı siparişlerini listeler (PENDING, PAID, CANCELLED, REFUNDED).
+    Filtreler: status, event. Arama: sipariş ID veya müşteri email.
+    İşlemler: sipariş detayı, biletleri görüntüleme.
+--}}
 @extends('layouts.app')
 
 @section('content')

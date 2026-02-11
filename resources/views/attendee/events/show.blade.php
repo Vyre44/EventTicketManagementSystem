@@ -1,4 +1,8 @@
-{{-- Ziyaretçi şablonunu kullan --}}
+{{-- 
+    Katılımcı Etkinlik Detay Sayfası
+    Etkinlik açıklaması, bilet tipleri ve fiyatlar. Bilet seçimi form'u (Satın Al).
+    Stok kontrol: remaining_quantity > 0 biletleri seçilebilir. Organizatör bilgisi.
+--}}
 @extends('attendee.layouts.app')
 
 {{-- İçerik bölümü başla --}}

@@ -1,4 +1,9 @@
-{{-- Etkinlik raporları ana sayfası (Admin) --}}
+{{-- 
+    Admin Raporlar Sayfası
+    Etkinlik ve bilet istatistiklerini görüntülemek için ana sayfa.
+    Raporlar: etkinlik satışları, etkinlik biletleri, gelir analizi.
+    CSV export: Detaylı veri indirme özelliği.
+--}}
 @extends('layouts.app')
 
 @section('content')

@@ -1,4 +1,8 @@
-{{-- Ziyaretçi siparişi detay sayfası --}}
+{{-- 
+    Katılımcı Siparişi Detay Sayfası
+    PENDING: Ödeme sayfası ve ödeme formu. PAID: Biletler ve QR code gösterme.
+    Bilet detayları: kod, durum, check-in saati. İndirme ve paylaşma seçeneği.
+--}}
 @extends('attendee.layouts.app')
 
 {{-- İçerik bölümü başla --}}

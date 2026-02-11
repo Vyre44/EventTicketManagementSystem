@@ -6,6 +6,12 @@ use App\Enums\TicketStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * StoreTicketRequest - Bilet oluşturma validasyonu
+ * 
+ * Controller: Admin/TicketController@store
+ * Admin tarafından manuel bilet oluşturma (satın alma işlemi dışı)
+ */
 class StoreTicketRequest extends FormRequest
 {
     public function authorize(): bool

@@ -1,4 +1,9 @@
-{{-- layouts.app ana düzenini kullanıyoruz --}}
+{{-- 
+    Admin Kullanıcılar Sayfası
+    Sistem kullanıcılarını listeler (ADMIN, ORGANIZER, ATTENDEE).
+    Filtreler: rol, arama (ad/email). Sıralama: ID, ad, email, rol.
+    İşlemler: yeni kullanıcı, düzenle, sil.
+--}}
 @extends('layouts.app')
 
 @section('content')

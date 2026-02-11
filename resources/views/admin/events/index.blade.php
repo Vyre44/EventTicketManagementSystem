@@ -1,28 +1,24 @@
-{{-- layouts.app ana düzenini kullanıyoruz (navbar, container, footer dahil) --}}
+{{-- Etkinlikler Yönetim Sayfası --}}
 @extends('layouts.app')
 
-{{-- @section ile "content" adlı bölümü dolduruyoruz --}}
 @section('content')
-{{-- Başlık ve "Yeni Etkinlik" butonu yan yana --}}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">Etkinlikler</h1>
     <a href="{{ route('admin.events.create') }}" class="btn btn-primary btn-sm">Yeni Etkinlik</a>
 </div>
 
-{{-- Bilgilendirme kartı --}}
+{{-- Bilgilendirme Kartı --}}
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <div class="text-muted">Bu sayfada etkinlikleri listeleyip yönetebilirsiniz.</div>
     </div>
 </div>
 
-{{-- Etkinlikler tablosu kartı --}}
+{{-- Etkinlikler Tablosu --}}
 <div class="card shadow-sm">
     <div class="card-body p-0">
-        {{-- table-responsive mobilde yatay kaydırma sağlar --}}
         <div class="table-responsive">
             <table class="table table-striped table-hover mb-0">
-                {{-- Tablo başlığı --}}
                 <thead class="table-light">
                     <tr>
                         <th class="ps-3">Başlık</th>
@@ -35,18 +31,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Tüm etkinlikleri döngüyle listele --}}
                     @foreach($events as $event)
                         <tr>
-                            {{-- Etkinlik başlığı --}}
+                            {{-- Etkinlik Başlığı --}}
                             <td class="ps-3">
                                 <strong>{{ $event->title }}</strong>
                             </td>
-                            {{-- Organizatör adı --}}
+                            {{-- Organizatör Adı --}}
                             <td>
                                 {{ $event->organizer->name ?? '-' }}
                             </td>
-                            {{-- Kapak resmi varsa göster, yoksa "-" --}}
+                            {{-- Kapak Resmi --}}
                             <td>
                                 @if($event->cover_image_url)
                                     <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="img-thumbnail" style="max-width: 80px; max-height: 60px;">
@@ -54,9 +49,9 @@
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            {{-- Başlangıç zamanı (nullable operator ile güvenli) --}}
+                            {{-- Başlangıç Tarihi --}}
                             <td>{{ $event->start_time?->format('d.m.Y H:i') ?? '-' }}</td>
-                            {{-- Bitiş zamanı: end_time, end_date veya end_at alanlarından biri --}}
+                            {{-- Bitiş Tarihi --}}
                             @php
                                 $endValue = $event->end_time ?? $event->end_date ?? $event->end_at;
                                 $endLabel = $endValue instanceof \DateTimeInterface
@@ -64,7 +59,7 @@
                                     : ($endValue ? \Illuminate\Support\Carbon::parse($endValue)->format('d.m.Y H:i') : '-');
                             @endphp
                             <td>{{ $endLabel }}</td>
-                            {{-- Etkinlik durumu (enum value) --}}
+                            {{-- Durum Etiketi --}}
                             <td>
                                 @php
                                     $statusValue = $event->status instanceof \BackedEnum 
@@ -90,13 +85,12 @@
                                 @endphp
                                 <span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span>
                             </td>
-                            {{-- İşlem butonları: görüntüle, düzenle, rapor, sil --}}
+                            {{-- İşlem Butonları --}}
                             <td class="text-end pe-3">
                                 <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ route('admin.events.show', $event) }}" class="btn btn-outline-primary btn-sm">Görüntüle</a>
                                     <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
                                     <a href="{{ route('admin.reports.events.tickets', $event) }}" class="btn btn-outline-success btn-sm">Rapor</a>
-                                    {{-- DELETE isteği için form --}}
                                     <form method="POST" action="{{ route('admin.events.destroy', $event) }}" class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -112,7 +106,7 @@
     </div>
 </div>
 
-{{-- Laravel paginator'ün Bootstrap 5 stilinde sayfalama linkleri --}}
+{{-- Sayfalama --}}
 <div class="mt-3">
     {{ $events->links('pagination::bootstrap-5') }}
 </div>

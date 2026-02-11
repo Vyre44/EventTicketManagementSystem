@@ -405,20 +405,16 @@ function updateAdminTicketUI(ticketId, action) {
  * @param {HTMLElement} container - Bilet satırı
  * @param {string} status - Yeni status
  * 
- * TAILWIND CSS RENKLER:
- * - ACTIVE: Blue (bg-blue-100, text-blue-800)
- * - CHECKED_IN: Green (bg-green-100, text-green-800)
- * - CANCELLED: Red (bg-red-100, text-red-800)
- * - REFUNDED: Gray (bg-gray-100, text-gray-800)
+ * BOOTSTRAP 5 BADGE RENKLER:
+ * - ACTIVE: Primary (bg-primary) - Mavi
+ * - CHECKED_IN: Success (bg-success) - Yeşil
+ * - CANCELLED: Danger (bg-danger) - Kırmızı
+ * - REFUNDED: Secondary (bg-secondary) - Gri
  * 
- * CSS AÇIKLAMA:
- * - bg-blue-100: Light blue background
- * - text-blue-800: Dark blue text
- * - px-3: Horizontal padding (left+right)
- * - py-1: Vertical padding (top+bottom)
- * - rounded-full: Fully rounded edges (pill shape)
- * - text-xs: Extra small font size
- * - font-semibold: Semi-bold weight
+ * BOOTSTRAP CLASS AÇIKLAMASI:
+ * - badge: Bootstrap badge stilini uygula (pills biçimi)
+ * - bg-primary/success/danger/secondary: Arka plan rengi
+ * - Icon'lar: ✅ (Kullanıldı), ❌ (İptal), 🔄 (İade)
  */
 function updateStatusBadge(container, status) {
     /**

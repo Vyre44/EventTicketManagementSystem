@@ -26,6 +26,7 @@
                 <thead class="table-light">
                     <tr>
                         <th class="ps-3">Başlık</th>
+                        <th>Organizatör</th>
                         <th>Kapak</th>
                         <th>Başlangıç</th>
                         <th>Bitiş</th>
@@ -34,16 +35,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- $events{{-- Kapak resmi varsa göster, yoksa "-" --}}
+                    {{-- Tüm etkinlikleri döngüyle listele --}}
+                    @foreach($events as $event)
+                        <tr>
+                            {{-- Etkinlik başlığı --}}
+                            <td class="ps-3">
+                                <strong>{{ $event->title }}</strong>
+                            </td>
+                            {{-- Organizatör adı --}}
+                            <td>
+                                {{ $event->organizer->name ?? '-' }}
+                            </td>
+                            {{-- Kapak resmi varsa göster, yoksa "-" --}}
+                            <td>
                                 @if($event->cover_image_url)
-                                    <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="img-thumbnail w-25 h-auto">
+                                    <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="img-thumbnail" style="max-width: 80px; max-height: 60px;">
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            {{-- Nullable operator (?->) ile start_time varsa format, yoksa "-" --}}
+                            {{-- Başlangıç zamanı (nullable operator ile güvenli) --}}
                             <td>{{ $event->start_time?->format('d.m.Y H:i') ?? '-' }}</td>
-                            {{-- @php ile PHP kodu çalıştırıyoruz: bitiş tarihini farklı alanlardan al --}}
+                            {{-- Bitiş zamanı: end_time, end_date veya end_at alanlarından biri --}}
                             @php
                                 $endValue = $event->end_time ?? $event->end_date ?? $event->end_at;
                                 $endLabel = $endValue instanceof \DateTimeInterface
@@ -51,32 +64,35 @@
                                     : ($endValue ? \Illuminate\Support\Carbon::parse($endValue)->format('d.m.Y H:i') : '-');
                             @endphp
                             <td>{{ $endLabel }}</td>
+                            {{-- Etkinlik durumu (enum value) --}}
                             <td>
-                                {{-- Durumu enum veya string olarak al ve Türkçe'ye çevir --}}$endLabel = $endValue instanceof \DateTimeInterface
-                                    ? $endValue->format('d.m.Y H:i')
-                                    : ($endValue ? \Illuminate\Support\Carbon::parse($endValue)->format('d.m.Y H:i') : '-');
-                            @endphp
-                            <td>{{ $endLabel }}</td>
-                            <td>
-                                @php{{-- Durum değerine göre Türkçe etiket ve renk ata --}}
+                                @php
+                                    $statusValue = $event->status instanceof \BackedEnum 
+                                        ? $event->status->value 
+                                        : (string) $event->status;
+                                    
                                     if ($statusValue === 'published') {
                                         $statusLabel = 'Yayında';
                                         $badgeClass = 'bg-success';
                                     } elseif ($statusValue === 'draft') {
                                         $statusLabel = 'Taslak';
                                         $badgeClass = 'bg-warning';
+                                    } elseif ($statusValue === 'ended') {
+                                        $statusLabel = 'Bitti';
+                                        $badgeClass = 'bg-secondary';
                                     } elseif ($statusValue === 'cancelled') {
                                         $statusLabel = 'İptal';
                                         $badgeClass = 'bg-danger';
                                     } else {
-                                        $statusLabel = $event->status?->name ?? $statusValue;
+                                        $statusLabel = $statusValue;
+                                        $badgeClass = 'bg-light text-dark';
                                     }
                                 @endphp
                                 <span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span>
                             </td>
+                            {{-- İşlem butonları: görüntüle, düzenle, rapor, sil --}}
                             <td class="text-end pe-3">
-                                {{-- İşlem butonları: görüntüle, düzenle, rapor, sil --}}
-                                <div class="d-inline-flex gap-2">
+                                <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ route('admin.events.show', $event) }}" class="btn btn-outline-primary btn-sm">Görüntüle</a>
                                     <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
                                     <a href="{{ route('admin.reports.events.tickets', $event) }}" class="btn btn-outline-success btn-sm">Rapor</a>
@@ -96,11 +112,7 @@
     </div>
 </div>
 
-{{-- Laravel paginator'ün Bootstrap 5 stilinde sayfalama linkleri --}}            </table>
-        </div>
-    </div>
-</div>
-
+{{-- Laravel paginator'ün Bootstrap 5 stilinde sayfalama linkleri --}}
 <div class="mt-3">
     {{ $events->links('pagination::bootstrap-5') }}
 </div>

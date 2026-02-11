@@ -37,8 +37,8 @@
                         <div class="fw-semibold">{{ $event->end_time?->format('d.m.Y H:i') ?? '-' }}</div>
                     </div>
                     <div class="col-md-6">
-                        <div class="text-muted">Organizatör No</div>
-                        <div class="fw-semibold">{{ $event->organizer_id }}</div>
+                        <div class="text-muted">Organizatör</div>
+                        <div class="fw-semibold">{{ $event->organizer->name ?? '-' }}</div>
                     </div>
                 </div>
                 {{-- Açıklama varsa göster --}}

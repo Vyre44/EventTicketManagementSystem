@@ -9,14 +9,6 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <a href="{{ route('admin.reports.event-sales') }}" class="btn btn-primary">
-            🔎 Etkinlik Bazlı Satış Raporu (AJAX)
-        </a>
-    </div>
-</div>
-
 @if($events->isEmpty())
     <div class="card shadow-sm">
         <div class="card-body text-center py-5">
@@ -25,6 +17,28 @@
         </div>
     </div>
 @else
+    {{-- Arama / Filtreleme Alanı --}}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-9">
+                    <label class="form-label fw-semibold small">Etkinlik Ara</label>
+                    <input 
+                        type="text" 
+                        id="eventSearchInput" 
+                        class="form-control" 
+                        placeholder="Etkinlik adı veya organizatör yazın..."
+                    >
+                </div>
+                <div class="col-md-3">
+                    <button id="clearSearchBtn" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Temizle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -39,7 +53,7 @@
                             <th class="text-center pe-3">İşlem</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="eventsTableBody">
                         @foreach($events as $event)
                             <tr>
                                 <td class="ps-3">
@@ -86,4 +100,63 @@
         </div>
     </div>
 @endif
+
+<script>
+    /**
+     * FRONT-END ARAMA / FİLTRELEME
+     * 
+     * Tablo satırlarını gerçek zamanlı olarak filtrele
+     * Küçük/büyük harf duyarsız
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('eventSearchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const tableBody = document.getElementById('eventsTableBody');
+
+        // Arama input'u - keyup event'inde filtreleme yap
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                filterTable(searchTerm);
+            });
+        }
+
+        // Temizle butonu - input'u boşalt ve tüm satırları göster
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                filterTable('');
+            });
+        }
+
+        /**
+         * Tablo Filtreleme Fonksiyonu
+         * 
+         * @param {string} searchTerm - Arama metni (küçük harfli)
+         */
+        function filterTable(searchTerm) {
+            if (!tableBody) return;
+
+            const rows = tableBody.querySelectorAll('tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                // Satırın tüm text içeriğini al
+                const rowText = row.innerText.toLowerCase();
+
+                // Arama terimi satır içinde var mı?
+                if (searchTerm === '' || rowText.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Hiç eşleşme yoksa mesaj göster (opsiyonel)
+            // İsteğe bağlı olarak eklenebilir
+        }
+    });
+</script>
+
 @endsection

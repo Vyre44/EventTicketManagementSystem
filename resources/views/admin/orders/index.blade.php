@@ -1,3 +1,4 @@
+{{-- Admin siparişler sayfası --}}
 @extends('layouts.app')
 
 @section('content')
@@ -8,14 +9,17 @@
     </div>
 </div>
 
+{{-- Filtreleme formu --}}
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Durum</label>
+                {{-- Duruma göre filtreleme dropdown'u --}}
                 <select name="status" class="form-select">
                     <option value="">Tüm Durumlar</option>
                     @foreach($statuses as $status)
+                        {{-- @selected yardımcısı Laravel 9+ ile gelir, seçili durumu ayarlar --}}
                         <option value="{{ $status->value }}" @selected(request('status') == $status->value)>
                             @if($status->value === 'pending')
                                 Beklemede
@@ -34,6 +38,7 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Sipariş No veya Kullanıcı E-posta</label>
+                {{-- Önceki arama terimini korumak için value="{{ request('q') }}" --}}
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Sipariş No veya kullanıcı e-posta" class="form-control">
             </div>
             <div class="col-md-2">
@@ -43,9 +48,11 @@
     </div>
 </div>
 
+{{-- Siparişler tablosu --}}
 <div class="card shadow-sm">
     <div class="card-body p-0">
         <div class="table-responsive">
+            {{-- align-middle ile tüm hücreleri dikey ortala --}}
             <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
@@ -58,11 +65,13 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {{-- @forelse veri yoksa @empty bloğunu çalıştırır --}}
                     @forelse($orders as $order)
                     <tr>
                         <td class="ps-3 fw-semibold">#{{ $order->id }}</td>
                         <td>{{ $order->user->email ?? '-' }}</td>
                         <td>
+                            {{-- Sipariş durumuna göre Türkçe etiket ve renk --}}
                             @php
                                 $statusValue = $order->status->value ?? $order->status;
                                 $statusLabel = '';
@@ -86,6 +95,7 @@
                             @endphp
                             <span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span>
                         </td>
+                        {{-- tickets_count ilişki ile bilet sayısını göster --}}
                         <td>{{ $order->tickets_count }}</td>
                         <td>{{ $order->created_at?->format('d.m.Y H:i') ?? '-' }}</td>
                         <td class="text-end pe-3">
@@ -93,6 +103,7 @@
                         </td>
                     </tr>
                     @empty
+                    {{-- Sipariş yoksa boş durum mesajı --}}
                     <tr>
                         <td colspan="6" class="text-center text-muted py-4">Sipariş bulunamadı</td>
                     </tr>
@@ -103,6 +114,7 @@
     </div>
 </div>
 
+{{-- Sayfalama linkleri --}}
 <div class="mt-3">
     {{ $orders->links('pagination::bootstrap-5') }}
 </div>

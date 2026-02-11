@@ -1,6 +1,9 @@
 /* Bootstrap 5 CSS - Vite üzerinden import */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+/* Bootstrap Icons CSS */
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
 /* Role accent bar */
 .role-accent-admin {
     border-top: 3px solid var(--bs-danger);

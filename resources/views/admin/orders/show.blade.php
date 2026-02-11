@@ -1,3 +1,4 @@
+{{-- Sipariş detay sayfası (Admin) --}}
 @extends('layouts.app')
 
 @section('content')

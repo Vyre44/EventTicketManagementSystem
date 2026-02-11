@@ -1,40 +1,121 @@
+{{-- Kayıt sayfası: Yeni kullanıcı oluşturma formu (Bootstrap 5) --}}
 @extends('layouts.app')
 
+{{-- İçerik bölümü başla --}}
 @section('content')
-<div class="container mx-auto px-4 py-10 max-w-md">
-    <h1 class="text-2xl font-bold mb-6">Kayıt Ol</h1>
-
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
-        @csrf
-
-        <div>
-            <label class="block font-semibold mb-1">Ad Soyad</label>
-            <input type="text" name="name" value="{{ old('name') }}" class="w-full border rounded px-3 py-2" required>
-            @error('name')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
+<div class="row justify-content-center" style="margin-top: 60px;">
+    <div class="col-lg-5 col-md-6">
+        {{-- Proje başlığı --}}
+        <div class="text-center mb-5">
+            <h1 class="h3 fw-bold text-primary mb-1">🎫 Bilet Yönetim Sistemi</h1>
         </div>
 
-        <div>
-            <label class="block font-semibold mb-1">E-posta</label>
-            <input type="email" name="email" value="{{ old('email') }}" class="w-full border rounded px-3 py-2" required>
-            @error('email')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
+        {{-- Kayıt kartı --}}
+        <div class="card shadow-sm">
+            <div class="card-body p-5">
+                {{-- Kart başlığı --}}
+                <h2 class="h4 fw-bold mb-4 text-center">Kayıt Ol</h2>
+
+                {{-- Kayıt formu: POST isteği ile yeni kullanıcı oluşturur --}}
+                <form method="POST" action="{{ route('register') }}">
+                    {{-- CSRF token: Güvenlik için gerekli --}}
+                    @csrf
+
+                    {{-- Ad Soyad giriş alanı --}}
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-semibold">
+                            <i class="bi bi-person me-1"></i>Ad Soyad
+                        </label>
+                        {{-- old('name'): Form hata alırsa önceki değeri yeniden göster --}}
+                        <input 
+                            type="text" 
+                            class="form-control @error('name') is-invalid @enderror" 
+                            id="name"
+                            name="name" 
+                            value="{{ old('name') }}" 
+                            placeholder="Adınız ve soyadınız"
+                            required
+                        >
+                        {{-- @error: Validasyon hatası varsa hata mesajı göster --}}
+                        @error('name')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- E-posta giriş alanı --}}
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">
+                            <i class="bi bi-envelope me-1"></i>E-posta
+                        </label>
+                        <input 
+                            type="email" 
+                            class="form-control @error('email') is-invalid @enderror" 
+                            id="email"
+                            name="email" 
+                            value="{{ old('email') }}" 
+                            placeholder="ornek@email.com"
+                            required
+                        >
+                        @error('email')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Şifre giriş alanı --}}
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-semibold">
+                            <i class="bi bi-lock me-1"></i>Şifre
+                        </label>
+                        <input 
+                            type="password" 
+                            class="form-control @error('password') is-invalid @enderror" 
+                            id="password"
+                            name="password" 
+                            placeholder="En az 8 karakter"
+                            required
+                        >
+                        @error('password')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Şifre tekrar alanı (doğrulama için) --}}
+                    <div class="mb-4">
+                        <label for="password_confirmation" class="form-label fw-semibold">
+                            <i class="bi bi-lock-check me-1"></i>Şifre (Tekrar)
+                        </label>
+                        <input 
+                            type="password" 
+                            class="form-control @error('password_confirmation') is-invalid @enderror" 
+                            id="password_confirmation"
+                            name="password_confirmation" 
+                            placeholder="Şifreyi Tekrarlayın"
+                            required
+                        >
+                        @error('password_confirmation')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Kayıt butonu --}}
+                    <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
+                        <i class="bi bi-check-circle me-2"></i>Kayıt Ol
+                    </button>
+                </form>
+
+                {{-- Divider --}}
+                <hr class="my-4">
+
+                {{-- Giriş sayfasına link (zaten hesabı olan kullanıcılar için) --}}
+                <p class="text-center text-muted mb-0">
+                    Zaten hesabınız var mı? 
+                    <a href="{{ route('login') }}" class="text-primary fw-semibold text-decoration-none">
+                        Giriş Yap
+                    </a>
+                </p>
+            </div>
         </div>
-
-        <div>
-            <label class="block font-semibold mb-1">Şifre</label>
-            <input type="password" name="password" class="w-full border rounded px-3 py-2" required>
-            @error('password')<div class="text-red-600 text-sm">{{ $message }}</div>@enderror
-        </div>
-
-        <div>
-            <label class="block font-semibold mb-1">Şifre (Tekrar)</label>
-            <input type="password" name="password_confirmation" class="w-full border rounded px-3 py-2" required>
-        </div>
-
-        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded">Kayıt Ol</button>
-
-        <p class="text-sm text-center">
-            Zaten hesabınız var mı? <a href="{{ route('login') }}" class="text-blue-600">Giriş Yap</a>
-        </p>
-    </form>
+    </div>
 </div>
+{{-- İçerik bölümü bitir --}}
 @endsection

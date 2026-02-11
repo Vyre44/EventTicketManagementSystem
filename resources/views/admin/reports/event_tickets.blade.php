@@ -1,3 +1,4 @@
+{{-- Etkinlik biletleri raporu (Admin) --}}
 @extends('layouts.app')
 
 @section('content')

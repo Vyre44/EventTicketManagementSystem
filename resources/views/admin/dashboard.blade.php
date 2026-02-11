@@ -1,6 +1,10 @@
+{{-- Ana sayfa şablonunu kullan --}}
 @extends('layouts.app')
 
+{{-- İçerik bölümü --}}
 @section('content')
+
+{{-- Sayfa başlığı --}}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="h4 mb-0">Yönetici Paneli</h1>
@@ -8,29 +12,37 @@
     </div>
 </div>
 
+{{-- İstatistik kartları: 4 sütunlu grid (responsive) --}}
 <div class="row g-3 mb-4">
+    {{-- İstatistik kartı: Toplam Etkinlik --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <div class="text-muted">Toplam Etkinlik</div>
+                    {{-- Controller'dan gelen $stats dizisinden değeri al --}}
                     <div class="h4 text-primary mb-0">{{ $stats['total_events'] }}</div>
                 </div>
                 <div class="fs-3 text-primary">📅</div>
             </div>
         </div>
     </div>
+    
+    {{-- İstatistik kartı: Toplam Organizatör --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <div class="text-muted">Toplam Organizatör</div>
+                    {{-- ?? 0: Eğer değer yoksa 0 göster --}}
                     <div class="h4 text-primary mb-0">{{ $stats['total_organizers'] ?? 0 }}</div>
                 </div>
                 <div class="fs-3 text-secondary">🎭</div>
             </div>
         </div>
     </div>
+    
+    {{-- İstatistik kartı: Toplam Katılımcı --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -42,6 +54,8 @@
             </div>
         </div>
     </div>
+    
+    {{-- İstatistik kartı: Toplam Sipariş --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -53,17 +67,22 @@
             </div>
         </div>
     </div>
+    
+    {{-- İstatistik kartı: Toplam Gelir --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <div class="text-muted">Toplam Gelir (Ödendi)</div>
+                    {{-- number_format: Sayıyı ondalıklı formata çevir (örn: 1234.56) --}}
                     <div class="h4 text-success mb-0">{{ number_format($stats['total_revenue'] ?? 0, 2) }} ₺</div>
                 </div>
                 <div class="fs-3 text-success">💰</div>
             </div>
         </div>
     </div>
+    
+    {{-- İstatistik kartı: Toplam Bilet --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -75,6 +94,8 @@
             </div>
         </div>
     </div>
+    
+    {{-- İstatistik kartı: Kullanılan Bilet (Check-in yapılmış) --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -86,6 +107,8 @@
             </div>
         </div>
     </div>
+    
+    {{-- İstatistik kartı: Ödenen Sipariş --}}
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -99,6 +122,7 @@
     </div>
 </div>
 
+{{-- Bugünkü istatistikler kartı --}}
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -121,10 +145,12 @@
     </div>
 </div>
 
+{{-- Hızlı erişim linkleri kartı --}}
 <div class="card shadow-sm">
     <div class="card-body">
         <div class="h5 mb-3">Hızlı Erişim</div>
         <div class="row g-3">
+            {{-- Etkinlikler sayfasına link --}}
             <div class="col-md-4">
                 <a href="{{ route('admin.events.index') }}" class="text-decoration-none">
                     <div class="border rounded p-3 h-100">
@@ -133,6 +159,7 @@
                     </div>
                 </a>
             </div>
+            {{-- Siparişler sayfasına link --}}
             <div class="col-md-4">
                 <a href="{{ route('admin.orders.index') }}" class="text-decoration-none">
                     <div class="border rounded p-3 h-100">
@@ -141,6 +168,7 @@
                     </div>
                 </a>
             </div>
+            {{-- Biletler sayfasına link --}}
             <div class="col-md-4">
                 <a href="{{ route('admin.tickets.index') }}" class="text-decoration-none">
                     <div class="border rounded p-3 h-100">
@@ -149,6 +177,7 @@
                     </div>
                 </a>
             </div>
+            {{-- Kullanıcılar sayfasına link --}}
             <div class="col-md-4">
                 <a href="{{ route('admin.users.index') }}" class="text-decoration-none">
                     <div class="border rounded p-3 h-100">
@@ -157,6 +186,7 @@
                     </div>
                 </a>
             </div>
+            {{-- Raporlar sayfasına link --}}
             <div class="col-md-4">
                 <a href="{{ route('admin.reports.index') }}" class="text-decoration-none">
                     <div class="border rounded p-3 h-100">
@@ -168,4 +198,6 @@
         </div>
     </div>
 </div>
+
+{{-- İçerik bölümünü kapat --}}
 @endsection

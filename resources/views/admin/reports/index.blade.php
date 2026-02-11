@@ -1,3 +1,4 @@
+{{-- Etkinlik raporları ana sayfası (Admin) --}}
 @extends('layouts.app')
 
 @section('content')
@@ -48,6 +49,8 @@
                                             <span class="badge bg-success">● Yayında</span>
                                         @elseif($event->status === \App\Enums\EventStatus::DRAFT)
                                             <span class="badge bg-warning">● Taslak</span>
+                                        @elseif($event->status === \App\Enums\EventStatus::ENDED)
+                                            <span class="badge bg-secondary">● Bitti</span>
                                         @elseif($event->status === \App\Enums\EventStatus::CANCELLED)
                                             <span class="badge bg-danger">● İptal</span>
                                         @endif

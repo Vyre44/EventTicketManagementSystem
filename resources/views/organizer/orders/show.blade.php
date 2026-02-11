@@ -1,3 +1,4 @@
+{{-- Organizatör sipariş detay sayfası --}}
 @extends('layouts.app')
 
 @section('content')

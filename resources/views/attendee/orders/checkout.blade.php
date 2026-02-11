@@ -1,3 +1,4 @@
+{{-- Katılımcılar için ödeme (checkout) sayfası --}}
 @extends('attendee.layouts.app')
 
 @section('content')
@@ -5,6 +6,7 @@
     <h1 class="h4 fw-bold mb-4">Ödeme Sayfası</h1>
 
     <div class="row">
+        {{-- Ödeme formu taraflı --}}
         <!-- Form Bölümü -->
         <div class="col-lg-8 mb-4">
             <div class="card shadow-sm">
@@ -24,6 +26,7 @@
                         </div>
                     </div>
 
+                    {{-- Hata mesajları --}}
                     @if($errors->any())
                         <div class="alert alert-danger" role="alert">
                             <ul class="mb-0 ps-3">
@@ -34,6 +37,7 @@
                         </div>
                     @endif
 
+                    {{-- Demo/Test uyarısı --}}
                     <!-- Ödeme Uyarısı -->
                     <div class="alert alert-warning" role="alert">
                         <strong>⚠️ Not:</strong> Bu bir deneme projesidir. Gerçek ödeme işlemi yapılmamaktadır. 
@@ -41,10 +45,12 @@
                         ve biletleriniz oluşturulacaktır.
                     </div>
 
+                    {{-- Ödeme formu --}}
                     <!-- Ödeme Formu -->
                     <form method="POST" action="{{ route('attendee.orders.pay', $order) }}" id="pay-form">
                         @csrf
                         <div id="order-actions" class="d-grid gap-3">
+                            {{-- Ödemeyi tamamla butonu --}}
                             <button 
                                 type="button"
                                 id="order-pay-btn"
@@ -53,6 +59,7 @@
                             >
                                 ✅ Ödemeyi Tamamla
                             </button>
+                            {{-- İptal butonu --}}
                             <button 
                                 type="button"
                                 id="order-cancel-btn"
@@ -67,14 +74,18 @@
             </div>
         </div>
 
+        {{-- Özet taraflı --}}
         <!-- Özet Bölümü -->
         <div class="col-lg-4">
+            {{-- Sipariş özet kartı --}}
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="h5 fw-bold mb-3">Sipariş Özeti</h2>
 
+                    {{-- Bilet detayları --}}
                     <!-- Bilet Detayları -->
                     <div class="mb-3">
+                        {{-- Her bilet tipini ve miktarını göster --}}
                         @foreach($ticketTypeQuantities as $ticketTypeId => $quantity)
                             @php
                                 $ticketType = $ticketTypes->get($ticketTypeId);
@@ -90,6 +101,7 @@
 
                     <hr>
 
+                    {{-- Toplam tutar --}}
                     <!-- Toplam Tutar -->
                     <div class="d-flex justify-content-between">
                         <span class="fw-bold">Toplam Tutar:</span>

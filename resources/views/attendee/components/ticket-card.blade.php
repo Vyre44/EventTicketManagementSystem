@@ -1,3 +1,4 @@
+{{-- Bilet kartı komponenti - Ekran seçim kartı --}}
 @props(['ticketType', 'name' => null])
 
 @php

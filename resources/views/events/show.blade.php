@@ -1,3 +1,4 @@
+{{-- Redireciona - Bu dosya kullanımsızdır --}}
 @extends('layouts.app')
 
 @section('content')

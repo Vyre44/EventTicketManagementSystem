@@ -1,14 +1,18 @@
+{{-- Yeni kullanıcı oluşturma formu --}}
 @extends('layouts.app')
 
 @section('content')
+{{-- Sayfa başlığı ve geri dön linki --}}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">Yeni Kullanıcı</h1>
     <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
+{{-- Session başarı mesajı --}}
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
+{{-- Validation hataları --}}
 @if($errors->any())
     <div class="alert alert-danger">
         @foreach($errors->all() as $err)
@@ -19,12 +23,14 @@
 
 <div class="row g-3">
     <div class="col-lg-8">
+        {{-- Kullanıcı bilgileri formu --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <form method="POST" action="{{ route('admin.users.store') }}">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Ad</label>
+                        {{-- old() helper form gönderildiğinde eski değeri korur --}}
                         <input name="name" placeholder="Ad" value="{{ old('name') }}" class="form-control">
                     </div>
                     <div class="mb-3">
@@ -33,6 +39,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Rol</label>
+                        {{-- UserRole enum'ından roller --}}
                         <select name="role" class="form-select">
                             @foreach(\App\Enums\UserRole::cases() as $role)
                                 <option value="{{ $role->value }}" @selected(old('role') === $role->value)>{{ $role->value }}</option>
@@ -56,6 +63,7 @@
         </div>
     </div>
     <div class="col-lg-4">
+        {{-- Yardım kartı --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="fw-semibold mb-2">Yardım</div>

@@ -1,6 +1,8 @@
+{{-- Organizatör etkinlik detay sayfası --}}
 @extends('layouts.app')
 
 @section('content')
+{{-- Üst başlık ve yönetim butonları --}}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="h4 mb-0">{{ $event->title }}</h1>
@@ -12,6 +14,7 @@
     </div>
 </div>
 
+{{-- Etkinlik durumu (Yayında/Taslak/İptal) --}}
 <div class="card shadow-sm mb-4">
     <div class="card-body d-flex justify-content-between align-items-start">
         <div>
@@ -19,6 +22,7 @@
             <div class="h5 mb-0">{{ $event->title }}</div>
         </div>
         @php
+            // Etkinlik statüsünü elde et ve Türkçeye çevir
             $statusValue = $event->status->value ?? $event->status;
             $statusLabel = $statusValue;
             $badgeClass = 'bg-secondary';
@@ -39,26 +43,31 @@
 </div>
 
 <div class="row g-3 mb-4">
+    {{-- Etkinlik bilgileri --}}
     <div class="col-lg-8">
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="text-muted">Başlangıç</div>
+                        {{-- Etkinliğin başlangıç tarihi ve saati --}}
                         <div class="fw-semibold">{{ $event->start_time?->format('d.m.Y H:i') ?? '-' }}</div>
                     </div>
                     <div class="col-md-6">
                         <div class="text-muted">Bitiş</div>
+                        {{-- Etkinliğin bitiş tarihi ve saati --}}
                         <div class="fw-semibold">{{ $event->end_time?->format('d.m.Y H:i') ?? '-' }}</div>
                     </div>
                     <div class="col-12">
                         <div class="text-muted">Açıklama</div>
+                        {{-- Etkinlik açıklaması (varsa) --}}
                         <div>{{ $event->description ?? '-' }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    {{-- Kapak resmi --}}
     <div class="col-lg-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
@@ -73,10 +82,14 @@
     </div>
 </div>
 
+{{-- Yönetim butonları --}}
 <div class="card shadow-sm">
     <div class="card-body d-flex flex-wrap gap-2">
+        {{-- Bilet tipleri yönetim sayfası --}}
         <a href="{{ route('organizer.events.ticket-types.index', $event) }}" class="btn btn-outline-info btn-sm">Bilet Tipleri</a>
+        {{-- Giriş kontrolü sayfası --}}
         <a href="{{ route('organizer.events.checkin.form', $event) }}" class="btn btn-outline-success btn-sm">Giriş Kontrolü</a>
+        {{-- Biletler raporu --}}
         <a href="{{ route('organizer.reports.events.tickets', $event) }}" class="btn btn-outline-dark btn-sm">Rapor</a>
     </div>
 </div>

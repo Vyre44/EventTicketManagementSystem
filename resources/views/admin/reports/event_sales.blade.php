@@ -1,3 +1,4 @@
+{{-- Etkinlik satış raporu (Admin) --}}
 @extends('layouts.app')
 
 @section('content')
@@ -18,7 +19,16 @@
                     <select id="event-select" class="form-select">
                         <option value="">-- Etkinlik seçin --</option>
                         @foreach($events as $event)
-                            <option value="{{ $event->id }}">{{ $event->title }}</option>
+                            <option value="{{ $event->id }}" data-status="{{ $event->status->value }}">
+                                {{ $event->title }} 
+                                @if($event->status->value === 'published')
+                                    (🟢 Yayında)
+                                @elseif($event->status->value === 'draft')
+                                    (📝 Taslak)
+                                @elseif($event->status->value === 'ended')
+                                    (⏹️ Bitti)
+                                @endif
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -73,13 +83,23 @@
 </div>
 
 <script>
+function getStatusBadge(status) {
+    const statusMap = {
+        'published': { bg: 'bg-success-subtle', text: 'text-success-emphasis', label: '🟢 Yayında' },
+        'draft': { bg: 'bg-warning-subtle', text: 'text-warning-emphasis', label: '📝 Taslak' },
+        'ended': { bg: 'bg-secondary-subtle', text: 'text-secondary-emphasis', label: '⏹️ Bitti' }
+    };
+    const config = statusMap[status] || { bg: 'bg-light', text: 'text-dark', label: status };
+    return `<span class="badge ${config.bg} ${config.text} ms-2">${config.label}</span>`;
+}
+
 function getCsrfToken() {
     return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
         || document.querySelector('input[name="_token"]')?.value
         || '';
 }
 
-function showAlert(message, type = 'success') {
+function showAlert(type, message) {
     const container = document.getElementById('ajax-alert-container');
     const alertClass = type === 'success' ? 'alert-success' : (type === 'warning' ? 'alert-warning' : 'alert-danger');
     container.innerHTML = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
@@ -96,7 +116,7 @@ function formatCurrency(value) {
 document.getElementById('fetch-report').addEventListener('click', async function() {
     const eventId = document.getElementById('event-select').value;
     if (!eventId) {
-        showAlert('Lütfen bir etkinlik seçin.', 'warning');
+        showAlert('warning', 'Lütfen bir etkinlik seçin.');
         return;
     }
 
@@ -113,21 +133,22 @@ document.getElementById('fetch-report').addEventListener('click', async function
         const payload = await res.json();
 
         if (!res.ok || !payload.success) {
-            showAlert(payload.message || 'Rapor alınamadı.', 'error');
+            showAlert('error', payload.message || 'Rapor alınamadı.');
             return;
         }
 
         const data = payload.data;
-        document.getElementById('report-title').innerText = data.event.title + ' - Satış Özeti';
+        const titleWithStatus = data.event.title + getStatusBadge(data.event.status);
+        document.getElementById('report-title').innerHTML = titleWithStatus + ' - Satış Özeti';
         document.getElementById('paid-orders').innerText = data.paid_orders;
         document.getElementById('paid-revenue').innerText = formatCurrency(data.paid_revenue);
         document.getElementById('pending-count').innerText = data.pending_count;
         document.getElementById('cancelled-count').innerText = data.cancelled_count;
         document.getElementById('refunded-count').innerText = data.refunded_count;
         document.getElementById('report-container').classList.remove('d-none');
-        showAlert(payload.message || 'Rapor başarıyla getirildi.', 'success');
+        showAlert('success', payload.message || 'Rapor başarıyla getirildi.');
     } catch (err) {
-        showAlert('Sunucu ile bağlantı hatası.', 'error');
+        showAlert('error', 'Sunucu ile bağlantı hatası.');
     }
 });
 </script>

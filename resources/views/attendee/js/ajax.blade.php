@@ -1,3 +1,4 @@
+{{-- JavaScript dosyası - Attendee AJAX işlemleri (Bilet seçim, sipariş oluşturma, ...) --}}
 <script>
     /**
      * ATTENDEE AJAX HANDLER
@@ -77,7 +78,7 @@
                 }, 0);
                 
                 if (totalQty === 0) {
-                    showAlert('Lütfen en az 1 bilet seçiniz.', 'error');
+                    showAlert('error', 'Lütfen en az 1 bilet seçiniz.');
                     return;
                 }
                 
@@ -108,7 +109,7 @@
                 });
                 
                 if (!hasTickets) {
-                    showAlert('Lütfen en az 1 bilet seçiniz.', 'error');
+                    showAlert('error', 'Lütfen en az 1 bilet seçiniz.');
                     button.disabled = false;
                     button.textContent = originalText;
                     return;
@@ -132,19 +133,19 @@
                 .then(data => {
                     if (data.success) {
                         // Success: redirect to order
-                        showAlert('✓ Siparişiniz oluşturuldu! Ödeme sayfasına yönlendiriliyorsunuz...', 'success');
+                        showAlert('success', '✓ Siparişiniz oluşturuldu! Ödeme sayfasına yönlendiriliyorsunuz...');
                         setTimeout(() => {
                             window.location.href = data.data.redirect_url;
                         }, 1500);
                     } else {
                         // Error
-                        showAlert(data.message || 'İşlem başarısız oldu.', 'error');
+                        showAlert('error', data.message || 'İşlem başarısız oldu.');
                         button.disabled = false;
                         button.textContent = originalText;
                     }
                 })
                 .catch(error => {
-                    showAlert('Bir hata oluştu: ' + error.message, 'error');
+                    showAlert('error', 'Bir hata oluştu: ' + error.message);
                     button.disabled = false;
                     button.textContent = originalText;
                 });
@@ -189,30 +190,30 @@
                         // Update status badge
                         const badge = document.getElementById('order-status-badge');
                         if (badge) {
-                            badge.innerHTML = '<span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">❌ İptal Edildi</span>';
+                            badge.innerHTML = '<span class="badge bg-danger-subtle text-danger-emphasis ps-3 pe-3 py-1 fw-semibold">❌ İptal Edildi</span>';
                         }
                         
                         // Update ticket badges
                         document.querySelectorAll('.ticket-status-badge').forEach(el => {
-                            el.innerHTML = '<span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">❌ İptal Edildi</span>';
+                            el.innerHTML = '<span class="badge bg-danger-subtle text-danger-emphasis ps-3 pe-3 py-1 fw-semibold">❌ İptal Edildi</span>';
                         });
                         
                         // Hide action buttons (if element exists)
                         const actionsContainer = document.getElementById('order-actions');
                         if (actionsContainer) {
-                            actionsContainer.innerHTML = '<p class="text-gray-600">Sipariş iptal edilmiştir.</p>';
+                            actionsContainer.innerHTML = '<p class="text-muted">Sipariş iptal edilmiştir.</p>';
                         }
                         
-                        showAlert('✓ Siparişiniz başarıyla iptal edildi.', 'success');
+                        showAlert('success', '✓ Siparişiniz başarıyla iptal edildi.');
                     } else {
-                        showAlert(data.message || 'İptal işlemi başarısız oldu.', 'error');
+                        showAlert('error', data.message || 'İptal işlemi başarısız oldu.');
                         btn.disabled = false;
                         btn.textContent = originalText;
                     }
                 })
                 .catch(error => {
                     console.error('Cancel error:', error);
-                    showAlert('Bir hata oluştu: ' + error.message, 'error');
+                    showAlert('error', 'Bir hata oluştu: ' + error.message);
                     btn.disabled = false;
                     btn.textContent = originalText;
                 });
@@ -253,14 +254,14 @@
                         // Update status badge
                         const badge = document.getElementById('order-status-badge');
                         if (badge) {
-                            badge.innerHTML = '<span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">✅ Ödendi</span>';
+                            badge.innerHTML = '<span class="badge bg-success-subtle text-success-emphasis ps-3 pe-3 py-1 fw-semibold">✅ Ödendi</span>';
                         }
                         
                         // Replace action buttons (if element exists)
                         const actionsDiv = document.getElementById('order-actions');
                         if (actionsDiv) {
                             actionsDiv.innerHTML = `
-                                <button id="order-refund-btn" data-order-id="${orderId}" class="w-full md:w-auto bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 transition">
+                                <button id="order-refund-btn" data-order-id="${orderId}" class="w-100 w-md-auto btn btn-warning px-3 py-2 fw-semibold">
                                     ↩️ İade Talep Et
                                 </button>
                             `;
@@ -269,21 +270,21 @@
                             document.getElementById('order-refund-btn').addEventListener('click', refundHandler);
                         }
                         
-                            showAlert('✓ Ödeme başarılı! Biletleriniz hazır. Biletler sayfasına yönlendiriliyorsunuz...', 'success');
+                            showAlert('success', '✓ Ödeme başarılı! Biletleriniz hazır. Biletler sayfasına yönlendiriliyorsunuz...');
                         
                         // Redirect to order details page to see tickets
                         setTimeout(() => {
                             window.location.href = `/orders/${orderId}`;
                         }, 1500);
                     } else {
-                        showAlert(data.message || 'Ödeme işlemi başarısız oldu.', 'error');
+                        showAlert('error', data.message || 'Ödeme işlemi başarısız oldu.');
                         btn.disabled = false;
                         btn.textContent = originalText;
                     }
                 })
                 .catch(error => {
                     console.error('Pay error:', error);
-                    showAlert('Bir hata oluştu: ' + error.message, 'error');
+                    showAlert('error', 'Bir hata oluştu: ' + error.message);
                     btn.disabled = false;
                     btn.textContent = originalText;
                 });
@@ -326,27 +327,27 @@
                     // Update status badge
                     const badge = document.getElementById('order-status-badge');
                     if (badge) {
-                        badge.innerHTML = '<span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">🔄 İade Edildi</span>';
+                        badge.innerHTML = '<span class="badge bg-light text-dark ps-3 pe-3 py-1 fw-semibold">🔄 İade Edildi</span>';
                     }
                     
                     // Update ticket badges
                     document.querySelectorAll('.ticket-status-badge').forEach(el => {
-                        el.innerHTML = '<span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">🔄 İade Edildi</span>';
+                        el.innerHTML = '<span class="badge bg-light text-dark ps-3 pe-3 py-1 fw-semibold">🔄 İade Edildi</span>';
                     });
                     
                     // Hide action buttons
-                    document.getElementById('order-actions').innerHTML = '<p class="text-gray-600">İade işlemi tamamlanmıştır. Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.</p>';
+                    document.getElementById('order-actions').innerHTML = '<p class="text-muted">İade işlemi tamamlanmıştır. Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.</p>';
                     
-                    showAlert('✓ İade işlemi başarılı. Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.', 'success');
+                    showAlert('success', '✓ İade işlemi başarılı. Ödemeniz 3-5 gün içinde hesabınıza yatırılacaktır.');
                 } else {
-                    showAlert(data.message || 'İade işlemi başarısız oldu.', 'error');
+                    showAlert('error', data.message || 'İade işlemi başarısız oldu.');
                     btn.disabled = false;
                     btn.textContent = originalText;
                 }
             })
             .catch(error => {
                 console.error('Refund error:', error);
-                showAlert('Bir hata oluştu: ' + error.message, 'error');
+                showAlert('error', 'Bir hata oluştu: ' + error.message);
                 btn.disabled = false;
                 btn.textContent = originalText;
             });
@@ -361,16 +362,16 @@
     // =====================================================
     // HELPER FUNCTION: Show Alert
     // =====================================================
-    function showAlert(message, type = 'info') {
+    function showAlert(type, message, duration = 5000) {
         const container = document.querySelector('.container');
         const alertDiv = document.createElement('div');
         
         const classes = {
-            'success': 'bg-green-100 border-green-400 text-green-700',
-            'error': 'bg-red-100 border-red-400 text-red-700',
-            'warning': 'bg-yellow-100 border-yellow-400 text-yellow-700',
-            'info': 'bg-blue-100 border-blue-400 text-blue-700',
-        }[type] || 'bg-blue-100 border-blue-400 text-blue-700';
+            'success': 'alert alert-success',
+            'error': 'alert alert-danger',
+            'warning': 'alert alert-warning',
+            'info': 'alert alert-info',
+        }[type] || 'alert alert-info';
         
         const icon = {
             'success': '✓',
@@ -379,14 +380,14 @@
             'info': 'ℹ',
         }[type] || 'ℹ';
         
-        alertDiv.className = `border rounded-lg px-4 py-3 mb-4 ${classes} alert-${type}`;
-        alertDiv.innerHTML = `<span class="text-lg mr-2">${icon}</span> ${message}`;
+        alertDiv.className = `${classes} mb-4`;
+        alertDiv.innerHTML = `<span class="fs-5 me-2">${icon}</span> ${message}`;
         
         container.insertBefore(alertDiv, container.firstChild);
         
-        // Auto-dismiss after 5 seconds
+        // Auto-dismiss after duration
         setTimeout(() => {
             alertDiv.remove();
-        }, 5000);
+        }, duration);
     }
 </script>

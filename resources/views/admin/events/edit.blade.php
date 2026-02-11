@@ -1,3 +1,4 @@
+{{-- Mevcut etkinliği düzenle formu (Admin) --}}
 @extends('layouts.app')
 
 @section('content')
@@ -8,10 +9,12 @@
 
 <div class="row g-3">
     <div class="col-lg-8">
+        {{-- Hata mesajları gösterilecek container --}}
         <div id="error-container" class="alert alert-danger d-none" role="alert">
             <div id="error-text"></div>
         </div>
 
+        {{-- Etkinlik düzenle formu --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <form id="event-form" method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data">
@@ -30,6 +33,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Kapak Görseli</label>
+                        {{-- Mevcut kapak varsa göster --}}
                         @if($event->cover_image_url)
                             <div class="mb-2">
                                 <img src="{{ $event->cover_image_url }}" alt="Kapak" class="img-fluid rounded">
@@ -44,6 +48,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Başlangıç</label>
+                        {{-- format() ile datetime-local isminde değeri format et --}}
                         <input type="datetime-local" name="start_time" value="{{ old('start_time', $event->start_time?->format('Y-m-d\TH:i')) }}" class="form-control" required>
                     </div>
 
@@ -66,6 +71,7 @@
         </div>
     </div>
     <div class="col-lg-4">
+        {{-- Bilgi kartı --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="fw-semibold mb-2">Notlar</div>
@@ -75,7 +81,9 @@
     </div>
 </div>
 
+{{-- AJAX form submission --}}
 <script>
+// Form submit işlemini AJAX ile yap
 document.getElementById('event-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -85,11 +93,13 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
     const errorText = document.getElementById('error-text');
     const originalBtnText = submitBtn.textContent;
     
+    // Buttonı devre dışı bırak
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Güncelleniyor...';
+    submitBtn.textContent = 'GüncelleniyOr...';
     errorContainer.classList.add('d-none');
     errorText.innerHTML = '';
     
+    // FormData kullanarak file upload destekle
     const formData = new FormData(form);
     
     fetch(form.action, {
@@ -101,6 +111,7 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
         }
     })
     .then(response => {
+        // 413 File Too Large hatası
         if (response.status === 413) {
             throw new Error('Dosya çok büyük. Kapak görseli en fazla 2MB olabilir.');
         }
@@ -112,8 +123,10 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
     })
     .then(result => {
         if (result.ok) {
+            // Başarılı ise etkinlikler sayfasına yönlendir
             window.location.href = "{{ route('admin.events.index') }}";
         } else {
+            // Hata listesiı formatla ve göster
             let errorMsg = '';
             if (result.data.errors) {
                 Object.values(result.data.errors).forEach(err => {

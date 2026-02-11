@@ -1,3 +1,4 @@
+{{-- Yeni etkinlik oluşturma formu (Admin) --}}
 @extends('layouts.app')
 
 @section('content')
@@ -8,10 +9,12 @@
 
 <div class="row g-3">
     <div class="col-lg-8">
+        {{-- Hata gösterilecek container --}}
         <div id="error-container" class="alert alert-danger d-none" role="alert">
             <div id="error-text"></div>
         </div>
 
+        {{-- Etkinlik formu --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <form id="event-form" method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data">
@@ -60,6 +63,7 @@
         </div>
     </div>
     <div class="col-lg-4">
+        {{-- Yardım kartı --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="fw-semibold mb-2">Yardım</div>
@@ -69,7 +73,9 @@
     </div>
 </div>
 
+{{-- AJAX form submission --}}
 <script>
+// Form submit işlemini AJAX ile yap
 document.getElementById('event-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -79,11 +85,13 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
     const errorText = document.getElementById('error-text');
     const originalBtnText = submitBtn.textContent;
     
+    // Buttonı devre dışı bırak ve "Kaydediliyor..." mesajı göster
     submitBtn.disabled = true;
     submitBtn.textContent = 'Kaydediliyor...';
     errorContainer.classList.add('d-none');
     errorText.innerHTML = '';
     
+    // FormData kullanarak file upload destekle
     const formData = new FormData(form);
     
     fetch(form.action, {
@@ -95,6 +103,7 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
         }
     })
     .then(response => {
+        // 413 File Too Large hatasını özel olarak ele al
         if (response.status === 413) {
             throw new Error('Dosya çok büyük. Kapak görseli en fazla 2MB olabilir.');
         }
@@ -106,8 +115,10 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
     })
     .then(result => {
         if (result.ok) {
+            // Başarılı ise etkinlikler sayfasına yönlendir
             window.location.href = "{{ route('admin.events.index') }}";
         } else {
+            // Hata varsa göster
             let errorMsg = '';
             if (result.data.errors) {
                 Object.values(result.data.errors).forEach(err => {

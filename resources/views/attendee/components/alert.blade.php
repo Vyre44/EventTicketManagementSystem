@@ -1,3 +1,4 @@
+{{-- Uyarı komponenti (Blade component) --}}
 @props(['type' => 'info', 'dismissible' => true])
 
 @php

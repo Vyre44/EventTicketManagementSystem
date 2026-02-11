@@ -1,3 +1,4 @@
+{{-- Organizatör bilet detay sayfası --}}
 @extends('layouts.app')
 
 @section('content')

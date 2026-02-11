@@ -1,14 +1,18 @@
+{{-- Admin bilet tipleri yönetimi sayfası --}}
 @extends('layouts.app')
 
 @section('content')
+{{-- Sayfa başlığı ve yeni bilet tipi butonu --}}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">Bilet Tipleri</h1>
     <a href="{{ route('admin.ticket-types.create') }}" class="btn btn-primary btn-sm">Yeni Bilet Tipi</a>
 </div>
 
+{{-- Session başarı mesajı varsa göster --}}
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
+{{-- Validation hataları varsa göster --}}
 @if($errors->any())
     <div class="alert alert-danger">
         @foreach($errors->all() as $err)
@@ -17,11 +21,13 @@
     </div>
 @endif
 
+{{-- Filtreleme formu: etkinlik ve ad arama --}}
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <form method="get" action="{{ route('admin.ticket-types.index') }}" class="row g-2 align-items-end">
             <div class="col-md-4">
                 <label class="form-label">Etkinlik</label>
+                {{-- @selected yardımcısı Laravel 9+ ile gelir, seçili durumu işaretler --}}
                 <select name="event_id" class="form-select">
                     <option value="">Tüm Etkinlikler</option>
                     @foreach($events as $event)
@@ -40,6 +46,7 @@
     </div>
 </div>
 
+{{-- Bilet tipleri tablosu --}}
 <div class="card shadow-sm">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -64,12 +71,14 @@
                             <td>{{ $tt->price }}</td>
                             <td>{{ $tt->quota }}</td>
                             <td>
+                                {{-- is_active değerine göre badge rengi --}}
                                 <span class="badge {{ $tt->is_active ? 'bg-success' : 'bg-secondary' }}">{{ $tt->is_active ? 'Evet' : 'Hayır' }}</span>
                             </td>
                             <td class="text-end pe-3">
                                 <div class="d-inline-flex gap-2">
                                     <a href="{{ route('admin.ticket-types.show', $tt) }}" class="btn btn-outline-primary btn-sm">Görüntüle</a>
                                     <a href="{{ route('admin.ticket-types.edit', $tt) }}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
+                                    {{-- DELETE isteği için form --}}
                                     <form method="POST" action="{{ route('admin.ticket-types.destroy', $tt) }}" class="d-inline">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="btn btn-outline-danger btn-sm">Sil</button>
@@ -84,6 +93,7 @@
     </div>
 </div>
 
+{{-- Sayfalama linkleri --}}
 <div class="mt-3">
     {{ $ticketTypes->links('pagination::bootstrap-5') }}
 </div>

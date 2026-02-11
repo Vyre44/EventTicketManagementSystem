@@ -1,6 +1,8 @@
+{{-- Bilet detay sayfası (Admin) --}}
 @extends('layouts.app')
 
 @section('content')
+{{-- Başlık ve yönetim butonları --}}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">Bilet #{{ $ticket->id }}</h1>
     <div class="d-flex gap-2">

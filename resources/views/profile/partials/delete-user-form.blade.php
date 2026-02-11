@@ -1,55 +1,77 @@
-<section class="space-y-6">
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Delete Account') }}
-        </h2>
+{{-- Hesap silme formu - Geri dönüşü olmayan işlem - Bootstrap 5 --}}
+<h6 class="text-danger mb-3">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <strong>Uyarı:</strong> Hesabınız kalıcı olarak silinecektir. Bu işlem geri alınamaz!
+</h6>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
-        </p>
-    </header>
+<p class="text-muted small mb-4">
+    Hesabınız silindikten sonra, tüm verileri ve kişisel bilgilerini kalıcı olarak kaybedeceksiniz. 
+    Lütfen devam etmeden önce önemli verilerinizi indirin.
+</p>
 
-    <x-danger-button
-        x-data=""
-        x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-    >{{ __('Delete Account') }}</x-danger-button>
+<div class="d-grid gap-2 d-md-flex justify-content-md-start">
+    <button 
+        type="button" 
+        class="btn btn-danger" 
+        data-bs-toggle="modal" 
+        data-bs-target="#confirmUserDeletion"
+    >
+        <i class="bi bi-trash-fill"></i> Hesabı Sil
+    </button>
+</div>
 
-    <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
-            @csrf
-            @method('delete')
-
-            <h2 class="text-lg font-medium text-gray-900">
-                {{ __('Are you sure you want to delete your account?') }}
-            </h2>
-
-            <p class="mt-1 text-sm text-gray-600">
-                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
-            </p>
-
-            <div class="mt-6">
-                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-
-                <x-text-input
-                    id="password"
-                    name="password"
-                    type="password"
-                    class="mt-1 block w-3/4"
-                    placeholder="{{ __('Password') }}"
-                />
-
-                <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+{{-- Silme Onayı Modal --}}
+<div class="modal fade" id="confirmUserDeletion" tabindex="-1" aria-labelledby="confirmUserDeletionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmUserDeletionLabel">
+                    <i class="bi bi-exclamation-triangle"></i> Hesabınızı Silmek İstiyor musunuz?
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
             </div>
 
-            <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
-                    {{ __('Cancel') }}
-                </x-secondary-button>
+            <form method="post" action="{{ route('profile.destroy') }}">
+                @csrf
+                @method('DELETE')
 
-                <x-danger-button class="ms-3">
-                    {{ __('Delete Account') }}
-                </x-danger-button>
-            </div>
-        </form>
-    </x-modal>
-</section>
+                <div class="modal-body">
+                    <div class="alert alert-danger mb-4">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Bu işlem geri alınamaz!</strong> Hesabınız ve tüm verileri kalıcı olarak silinecektir.
+                    </div>
+
+                    <p class="text-muted mb-3">
+                        Devam etmek için lütfen şifrenizi girin:
+                    </p>
+
+                    <label for="password" class="form-label fw-semibold">
+                        <i class="bi bi-lock-fill"></i> Şifre
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control @error('password', 'userDeletion') is-invalid @enderror" 
+                        placeholder="Şifrenizi girin"
+                        autofocus
+                    >
+                    @error('password', 'userDeletion')
+                        <div class="invalid-feedback d-block">
+                            <i class="bi bi-exclamation-circle"></i> {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> İptal
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill"></i> Hesabı Kalıcı Olarak Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

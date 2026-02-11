@@ -1,3 +1,4 @@
+{{-- Durum rozeti komponenti - Renkli durum göstergesi --}}
 @props(['status'])
 
 @php

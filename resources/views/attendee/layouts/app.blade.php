@@ -1,20 +1,25 @@
+{{-- Ziyaretçi (Attendee) paneli için ana sayfa şablonu --}}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    {{-- UTF-8 karakter kodlaması (Türkçe karakterler için gerekli) --}}
     <meta charset="UTF-8">
+    {{-- Responsive tasarım ayarı (mobil cihazlar için) --}}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- CSRF koruması: form gönderişi güvenliği için token --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Sayfa başlığı --}}
     <title>@yield('title', 'Etkinlik Biletleri')</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     
-    <!-- Scripts (Vite: Bootstrap 5 CSS+JS imported) -->
+    {{-- Vite: Stil ve JavaScript dosyaları yükleniyor (Bootstrap 5 içindekiler) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-light">
-    <!-- NAVBAR -->
+    {{-- Üst gezinme çubuğu (navbar) --}}
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm role-accent-attendee">
         <div class="container">
             <!-- Logo -->

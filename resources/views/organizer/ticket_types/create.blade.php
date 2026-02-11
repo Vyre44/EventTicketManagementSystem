@@ -1,7 +1,9 @@
+{{-- Organizatör bilet tipi oluşturma formu (AJAX ile) --}}
 @extends('layouts.app')
 
 @section('content')
 <div class="container py-4">
+    {{-- Başlık ve geri butonu --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h4 mb-0">Yeni Bilet Tipi</h1>
         <a href="{{ route('organizer.events.ticket-types.index', $event) }}" class="btn btn-outline-secondary">Geri</a>

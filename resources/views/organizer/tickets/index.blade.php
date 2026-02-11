@@ -1,14 +1,17 @@
+{{-- Organizatör biletleri yönetimi sayfası --}}
 @extends('layouts.app')
 
 @section('content')
 <div class="container-fluid">
-    <!-- Alert Container (AJAX) -->
+    {{-- AJAX uyarı mesajları burada görünür --}}
     <div id="ajax-alert-container"></div>
 
+    {{-- Sayfa başlığı --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="h4 mb-1">Biletler</h1>
             <p class="text-muted mb-0">
+                {{-- Admin ise tüm biletler, organizatör ise kendi etkinlik biletleri --}}
                 @if(auth()->user()->isAdmin())
                     Tüm biletleri yönetin
                 @else
@@ -31,6 +34,7 @@
                     <select name="status" class="form-select">
                         <option value="">Tüm Durumlar</option>
                         @foreach($statuses as $status)
+                            {{-- Durum değerinin Türkçe etiketleri --}}
                             <option value="{{ $status->value }}" @selected(request('status') == $status->value)>
                                 @if($status->value === 'active')
                                     Aktif
@@ -54,11 +58,13 @@
         </div>
     </div>
 
+    {{-- Bilet yoksa boş durum mesajı --}}
     @if($tickets->isEmpty())
         <div class="card">
             <div class="card-body text-center text-muted">Henüz bilet bulunmamaktadır.</div>
         </div>
     @else
+        {{-- Biletler tablosu --}}
         <div class="card shadow-sm">
             <div class="table-responsive">
                 <table class="table table-striped table-hover align-middle mb-0">
@@ -74,11 +80,14 @@
                     </thead>
                     <tbody>
                         @foreach($tickets as $ticket)
+                            {{-- data-ticket-id ve data-ticket-status JavaScript işlemleri için --}}
                             <tr data-ticket-id="{{ $ticket->id }}" data-ticket-status="{{ $ticket->status->value }}">
+                                {{-- font-monospace ile kod daha okunaklı --}}
                                 <td class="font-monospace">{{ $ticket->code }}</td>
                                 <td class="fw-medium">{{ $ticket->ticketType->event->title }}</td>
                                 <td>{{ $ticket->ticketType->name }}</td>
                                 <td>
+                                    {{-- Müşteri bilgileri --}}
                                     @if($ticket->order)
                                         <div>{{ $ticket->order->user->name }}</div>
                                         <div class="text-muted small">{{ $ticket->order->user->email }}</div>
@@ -87,6 +96,7 @@
                                     @endif
                                 </td>
                                 <td>
+                                    {{-- Bilet durumu badge --}}
                                     <span class="ticket-status-badge">
                                         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                             <span class="badge bg-primary">Aktif</span>
@@ -100,8 +110,10 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
+                                    {{-- Duruma göre farklı butonlar --}}
                                     <div class="d-flex gap-2 justify-content-center align-items-center ticket-actions">
                                         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                                            {{-- Aktif bilette giriş onayla ve iptal --}}
                                             <button class="ticket-action-btn btn btn-sm btn-outline-success" data-action="checkin" title="Giriş Kontrolü">
                                                 ✅ Giriş Onayla
                                             </button>
@@ -109,6 +121,7 @@
                                                 ❌ İptal
                                             </button>
                                         @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
+                                            {{-- Kullanılmış bilette geri alma --}}
                                             <button class="ticket-action-btn btn btn-sm btn-outline-warning" data-action="undo" title="Giriş Onayını Geri Al">
                                                 ↩️ Geri Al
                                             </button>
@@ -134,8 +147,9 @@
     @endif
 </div>
 
+{{-- JavaScript route tanımları --}}
 <script>
-    // Route'ları Blade'den al
+    // AJAX butonları için route'ları Blade'den al
     const routeNameMap = {
         'checkin': '{{ route("organizer.tickets.checkin", ["ticket" => "__TICKET_ID__"]) }}',
         'undo': '{{ route("organizer.tickets.checkinUndo", ["ticket" => "__TICKET_ID__"]) }}',

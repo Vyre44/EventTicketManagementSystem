@@ -1,3 +1,4 @@
+{{-- Etkinlik kartı komponenti - Event listesi bulunan kart --}}
 @props(['event'])
 
 <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">

@@ -1,25 +1,30 @@
+{{-- Ziyaretçilerin sipariş (order) listesini göstermek için sayfa --}}
 @extends('attendee.layouts.app')
 
+{{-- Sayfa içeriği --}}
 @section('content')
 <div class="container py-4">
-    <!-- Header -->
+    {{-- Başlık bölümü --}}
     <div class="mb-4">
-        <h1 class="mb-2">🎫 Siparişlerim</h1>
+        <h1 class="mb-2">🎜 Siparişlerim</h1>
         <p class="text-muted">Aldığınız biletleri ve sipariş durumlarını görebilirsiniz.</p>
     </div>
 
-    <!-- Empty State -->
+    {{-- Boş durum mesajı (eğer sipariş yoksa) --}}
     @if($orders->isEmpty())
+        {{-- Sipariş yok ise göster --}}
         <div class="text-center py-5">
-            <div class="fs-1 mb-4">🎪</div>
+            {{-- Emoji --}}
+            <div class="fs-1 mb-4">🁪</div>
             <h2 class="mb-2">Henüz Siparişiniz Yok</h2>
-            <p class="text-muted mb-4">Hemen etkinlikleri keşfedin ve biletinizi satın alın!</p>
+            <p class="text-muted mb-4">Hemen etkinlikleri keşedin ve biletinizi satın alın!</p>
+            {{-- Etkinlikleri keşetme sayfasına linki --}}
             <a href="{{ route('attendee.events.index') }}" class="btn btn-primary btn-lg">
-                🎪 Etkinlikleri Keşfet
+                🁪 Etkinlikleri Keşfet
             </a>
         </div>
     @else
-        <!-- Orders List -->
+        {{-- Sipariş listesi --}}
         <div class="vstack gap-3">
             @foreach($orders as $order)
                 <div class="card p-4" style="cursor: pointer;" onclick="window.location.href='{{ route('attendee.orders.show', $order) }}'">

@@ -1,3 +1,4 @@
+{{-- Bilet oluşturma formu (Admin) --}}
 @extends('layouts.app')
 
 @section('content')

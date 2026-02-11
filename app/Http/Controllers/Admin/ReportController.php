@@ -122,6 +122,7 @@ class ReportController extends Controller
             'event' => [
                 'id' => $event->id,
                 'title' => $event->title,
+                'status' => $event->status->value,
             ],
             'paid_orders' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->count(),
             'paid_revenue' => (clone $ordersQuery)->where('status', OrderStatus::PAID)->sum('total_amount'),

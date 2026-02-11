@@ -1,3 +1,4 @@
+{{-- Yeni bilet tipi oluşturma formu (Admin) --}}
 @extends('layouts.app')
 
 @section('content')
@@ -6,6 +7,7 @@
     <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
 </div>
 
+{{-- Validation hataları --}}
 @if($errors->any())
     <div class="alert alert-danger">
         @foreach($errors->all() as $err)
@@ -16,12 +18,14 @@
 
 <div class="row g-3">
     <div class="col-lg-8">
+        {{-- Bilet tipi formu --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <form method="POST" action="{{ route('admin.ticket-types.store') }}">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Etkinlik</label>
+                        {{-- Oluşturduğu etkinlikleri seç --}}
                         <select name="event_id" class="form-select">
                             @foreach($events as $event)
                                 <option value="{{ $event->id }}" @selected(old('event_id') == $event->id)>{{ $event->title }}</option>
@@ -34,14 +38,17 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Fiyat</label>
+                        {{-- step="0.01" ile çnde2 ondalık kredi seçilebilir --}}
                         <input name="price" type="number" step="0.01" placeholder="Fiyat" value="{{ old('price') }}" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Kota</label>
+                        {{-- Kaç bilet satılabileceği --}}
                         <input name="quota" type="number" placeholder="Kota" value="{{ old('quota') }}" class="form-control">
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Durum</label>
+                        {{-- Bilet tipi aktif mi pasif mi --}}
                         <select name="is_active" class="form-select">
                             <option value="1" @selected(old('is_active') == 1)>Aktif</option>
                             <option value="0" @selected(old('is_active') == 0)>Pasif</option>
@@ -56,6 +63,7 @@
         </div>
     </div>
     <div class="col-lg-4">
+        {{-- Yardım kartı --}}
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="fw-semibold mb-2">Yardım</div>

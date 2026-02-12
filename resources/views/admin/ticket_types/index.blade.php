@@ -63,7 +63,6 @@
                         <th>Ad</th>
                         <th>Fiyat</th>
                         <th>Kota</th>
-                        <th>Aktif</th>
                         <th class="text-end pe-3">İşlem</th>
                     </tr>
                 </thead>
@@ -74,11 +73,7 @@
                             <td>{{ $tt->event->title ?? '-' }}</td>
                             <td>{{ $tt->name }}</td>
                             <td>{{ $tt->price }}</td>
-                            <td>{{ $tt->quota }}</td>
-                            <td>
-                                {{-- is_active değerine göre badge rengi --}}
-                                <span class="badge {{ $tt->is_active ? 'bg-success' : 'bg-secondary' }}">{{ $tt->is_active ? 'Evet' : 'Hayır' }}</span>
-                            </td>
+                            <td>{{ $tt->total_quantity }}</td>
                             <td class="text-end pe-3">
                                 <div class="d-inline-flex gap-2">
                                     <a href="{{ route('admin.ticket-types.show', $tt) }}" class="btn btn-outline-primary btn-sm">Görüntüle</a>

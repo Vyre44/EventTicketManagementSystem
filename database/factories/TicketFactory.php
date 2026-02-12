@@ -25,7 +25,6 @@ class TicketFactory extends Factory
     public function forSameEvent(): static
     {
         return $this->afterMaking(function (Ticket $ticket) {
-            // afterMaking değil, afterCreating daha güvenli ama mantık için burada gösteriyorum
         })->afterCreating(function (Ticket $ticket) {
             // order'ın event'ine göre ticket type üret
             $order = $ticket->order()->first();

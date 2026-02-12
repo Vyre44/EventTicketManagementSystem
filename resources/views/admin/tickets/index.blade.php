@@ -50,8 +50,8 @@
                 <input type="text" name="user_email" value="{{ request('user_email') }}" placeholder="Kullanıcı e-posta" class="form-control">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Etkinlik No</label>
-                <input type="text" name="event_id" value="{{ request('event_id') }}" placeholder="Etkinlik No" class="form-control">
+                <label class="form-label">Etkinlik Adı</label>
+                    <input type="text" name="event_search" value="{{ request('event_search') }}" placeholder="Etkinlik Adı" class="form-control">
             </div>
             <div class="col-md-1">
                 <button type="submit" class="btn btn-outline-primary w-100">Filtrele</button>
@@ -93,7 +93,13 @@
                                 <td>
                                     {{-- Bilet durumuna göre badge --}}
                                     <span class="ticket-status-badge">
-                                        @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                                        @if($ticket->order && $ticket->order->status === \App\Enums\OrderStatus::PENDING)
+                                            <span class="badge bg-warning text-dark">⏳ Ödeme Bekliyor</span>
+                                        @elseif($ticket->order && $ticket->order->status === \App\Enums\OrderStatus::CANCELLED)
+                                            <span class="badge bg-secondary">İptal</span>
+                                        @elseif($ticket->order && $ticket->order->status === \App\Enums\OrderStatus::REFUNDED)
+                                            <span class="badge bg-info">🔄 İade</span>
+                                        @elseif($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                             <span class="badge bg-primary">Aktif</span>
                                         @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
                                             <span class="badge bg-success">Kullanıldı</span>
@@ -120,7 +126,15 @@
                                     <div class="d-inline-flex gap-2 align-items-center ticket-actions">
                                         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                             {{-- Aktif bilette giriş onayla ve iptal butonları --}}
-                                            <button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Giriş Kontrolü">
+                                            @php
+                                                $isPaid = $ticket->order && $ticket->order->status === \App\Enums\OrderStatus::PAID;
+                                            @endphp
+                                            <button 
+                                                class="ticket-action-btn btn btn-outline-success btn-sm" 
+                                                data-action="checkin" 
+                                                title="{{ $isPaid ? 'Giriş Kontrolü' : 'Ödeme tamamlanmadan giriş yapılamaz' }}"
+                                                @if(!$isPaid) disabled @endif
+                                            >
                                                 ✅ Giriş Onayla
                                             </button>
                                             <button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="İptal">

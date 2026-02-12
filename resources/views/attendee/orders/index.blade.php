@@ -10,7 +10,7 @@
 <div class="container py-4">
     {{-- Başlık bölümü --}}
     <div class="mb-4">
-        <h1 class="mb-2">🎜 Siparişlerim</h1>
+        <h1 class="mb-2">Siparişlerim</h1>
         <p class="text-muted">Aldığınız biletleri ve sipariş durumlarını görebilirsiniz.</p>
     </div>
 

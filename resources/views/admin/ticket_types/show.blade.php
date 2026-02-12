@@ -18,8 +18,6 @@
             <div class="text-muted">Bilet Tipi</div>
             <div class="h5 mb-0">{{ $ticketType->name }}</div>
         </div>
-        {{-- Aktif/Pasif durumu badge'i --}}
-        <span class="badge {{ $ticketType->is_active ? 'bg-success' : 'bg-secondary' }}">{{ $ticketType->is_active ? 'Evet' : 'Hayır' }}</span>
     </div>
 </div>
 
@@ -36,8 +34,8 @@
                 <div class="fw-semibold">{{ $ticketType->price }}</div>
             </div>
             <div class="col-md-6">
-                <div class="text-muted">Kota</div>
-                <div class="fw-semibold">{{ $ticketType->quota }}</div>
+                <div class="text-muted">Toplam Kontenjan</div>
+                <div class="fw-semibold">{{ $ticketType->total_quantity }}</div>
             </div>
         </div>
     </div>

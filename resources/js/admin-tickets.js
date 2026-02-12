@@ -655,13 +655,13 @@ function getAdminButtonsForStatus(status) {
          * Bootstrap 5 button class'ları kullanıyoruz
          * Not: Button'lar arasında boşluk bırak (d-inline-flex gap-2 için)
          */
-        'active': '<button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Check-in Yap">✅ Check-in</button> ' +
-                  '<button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="Bileti İptal Et">❌ İptal</button> ',
+        'active': '<button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Giriş Kontrolü">✅ Giriş Onayla</button> ' +
+                  '<button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="İptal">❌ İptal</button> ',
         
         /**
          * CHECKED_IN: Sadece Undo button'u
          */
-        'checked_in': '<button class="ticket-action-btn btn btn-outline-warning btn-sm" data-action="undo" title="Check-in Geri Al">↩️ Geri Al</button> ',
+        'checked_in': '<button class="ticket-action-btn btn btn-outline-warning btn-sm" data-action="undo" title="Geri Al">↩️ Geri Al</button> ',
         
         /**
          * CANCELLED: Hiç button

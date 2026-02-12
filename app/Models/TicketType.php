@@ -42,7 +42,6 @@ class TicketType extends Model
     protected $casts = [
         'sale_start' => 'datetime',  // String -> Carbon\Carbon
         'sale_end' => 'datetime',    // String -> Carbon\Carbon
-        'is_active' => 'boolean',    // String/int -> bool
     ];
 
     /**

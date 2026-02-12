@@ -102,7 +102,13 @@
                                 <td>
                                     {{-- Bilet durumu badge --}}
                                     <span class="ticket-status-badge">
-                                        @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
+                                        @if($ticket->order && $ticket->order->status === \App\Enums\OrderStatus::PENDING)
+                                            <span class="badge bg-warning text-dark">⏳ Ödeme Bekliyor</span>
+                                        @elseif($ticket->order && $ticket->order->status === \App\Enums\OrderStatus::CANCELLED)
+                                            <span class="badge bg-secondary">İptal</span>
+                                        @elseif($ticket->order && $ticket->order->status === \App\Enums\OrderStatus::REFUNDED)
+                                            <span class="badge bg-info">🔄 İade</span>
+                                        @elseif($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                             <span class="badge bg-primary">Aktif</span>
                                         @elseif($ticket->status === \App\Enums\TicketStatus::CHECKED_IN)
                                             <span class="badge bg-success">✅ Kullanıldı</span>
@@ -118,7 +124,15 @@
                                     <div class="d-flex gap-2 justify-content-center align-items-center ticket-actions">
                                         @if($ticket->status === \App\Enums\TicketStatus::ACTIVE)
                                             {{-- Aktif bilette giriş onayla ve iptal --}}
-                                            <button class="ticket-action-btn btn btn-sm btn-outline-success" data-action="checkin" title="Giriş Kontrolü">
+                                            @php
+                                                $isPaid = $ticket->order && $ticket->order->status === \App\Enums\OrderStatus::PAID;
+                                            @endphp
+                                            <button 
+                                                class="ticket-action-btn btn btn-sm btn-outline-success" 
+                                                data-action="checkin" 
+                                                title="{{ $isPaid ? 'Giriş Kontrolü' : 'Ödeme tamamlanmadan giriş yapılamaz' }}"
+                                                @if(!$isPaid) disabled @endif
+                                            >
                                                 ✅ Giriş Onayla
                                             </button>
                                             <button class="ticket-action-btn btn btn-sm btn-outline-danger" data-action="cancel" title="İptal Et">

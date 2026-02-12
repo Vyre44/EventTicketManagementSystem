@@ -41,18 +41,10 @@
                         {{-- step="0.01" ile çnde2 ondalık kredi seçilebilir --}}
                         <input name="price" type="number" step="0.01" placeholder="Fiyat" value="{{ old('price') }}" class="form-control">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Kota</label>
-                        {{-- Kaç bilet satılabileceği --}}
-                        <input name="quota" type="number" placeholder="Kota" value="{{ old('quota') }}" class="form-control">
-                    </div>
                     <div class="mb-4">
-                        <label class="form-label">Durum</label>
-                        {{-- Bilet tipi aktif mi pasif mi --}}
-                        <select name="is_active" class="form-select">
-                            <option value="1" @selected(old('is_active') == 1)>Aktif</option>
-                            <option value="0" @selected(old('is_active') == 0)>Pasif</option>
-                        </select>
+                        <label class="form-label">Toplam Kontenjan</label>
+                        {{-- Kaç bilet satılabileceği --}}
+                        <input name="total_quantity" type="number" placeholder="Toplam kontenjan" value="{{ old('total_quantity') }}" class="form-control">
                     </div>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Kaydet</button>

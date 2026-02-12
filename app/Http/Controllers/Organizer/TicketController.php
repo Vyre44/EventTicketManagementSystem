@@ -104,34 +104,50 @@ class TicketController extends Controller
             return back()->with('error', $message);
         }
 
-        // Sadece CHECKED_IN durumundaki biletler geri alınabilir
-        if ($ticket->status !== TicketStatus::CHECKED_IN) {
-            $message = 'Bu bilet check-in geri alınamaz. Sadece kullanılan biletler geri alınabilir.';
-            if (request()->expectsJson()) {
-                return response()->json([
+        // Transaction + lockForUpdate ile race condition engelini
+        $result = DB::transaction(function () use ($ticket) {
+            // Ticket'i lock ile çek
+            $freshTicket = Ticket::lockForUpdate()->findOrFail($ticket->id);
+            
+            // Sadece CHECKED_IN durumundaki biletler geri alınabilir
+            if ($freshTicket->status !== TicketStatus::CHECKED_IN) {
+                return [
                     'success' => false,
-                    'message' => $message,
-                    'data' => null
-                ], 422);
+                    'message' => 'Bu bilet check-in geri alınamaz. Sadece kullanılan biletler geri alınabilir.',
+                    'status' => 422
+                ];
             }
-            return back()->with('error', $message);
-        }
-
-        // Check-in'i geri al
-        $ticket->update([
-            'status' => TicketStatus::ACTIVE,
-            'checked_in_at' => null,
-        ]);
+            
+            // Check-in'i geri al (CHECKED_IN → ACTIVE)
+            if (!$freshTicket->undoCheckIn()) {
+                return [
+                    'success' => false,
+                    'message' => 'Check-in geri alma başarısız oldu.',
+                    'status' => 422
+                ];
+            }
+            
+            return [
+                'success' => true,
+                'message' => 'Bilet check-in\'i başarıyla geri alındı.',
+                'status' => 200,
+                'ticket' => $freshTicket->fresh()
+            ];
+        });
 
         if (request()->expectsJson()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Bilet check-in\'i başarıyla geri alındı.',
-                'data' => ['ticket' => $ticket]
-            ]);
+                'success' => $result['success'],
+                'message' => $result['message'],
+                'data' => $result['ticket'] ?? null
+            ], $result['status']);
         }
 
-        return back()->with('success', 'Bilet check-in\'i başarıyla geri alındı.');
+        if (!$result['success']) {
+            return back()->with('error', $result['message']);
+        }
+
+        return back()->with('success', $result['message']);
     }
 
     /**
@@ -220,40 +236,71 @@ class TicketController extends Controller
             return back()->with('error', $message);
         }
 
-        // Sadece ACTIVE durumundaki biletler check-in yapılabilir
-        if ($ticket->status !== TicketStatus::ACTIVE) {
-            $message = 'Bu bilet check-in yapılamaz. Sadece aktif biletlere check-in yapılabilir.';
+        // Order status kontrolü - sadece PAID order'lar check-in yapılabilir
+        $order = $ticket->order;
+        
+        if (!$order || $order->status !== \App\Enums\OrderStatus::PAID) {
+            $message = 'Bu bilet için ödeme tamamlanmamış.';
+            
             if (request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => $message,
                     'data' => null
-                ], 422);
+                ], 403);
             }
+            
             return back()->with('error', $message);
         }
 
-        // Check-in yap
-        if (!$ticket->checkIn()) {
-            $message = 'Check-in başarısız oldu.';
-            if (request()->expectsJson()) {
-                return response()->json([
+        // Transaction + lockForUpdate ile race condition engelini
+        $result = DB::transaction(function () use ($ticket) {
+            // Ticket'i lock ile çek (double check-in koruması)
+            $freshTicket = Ticket::lockForUpdate()->findOrFail($ticket->id);
+            
+            // Sadece ACTIVE durumundaki biletler check-in yapılabilir
+            if ($freshTicket->status !== TicketStatus::ACTIVE) {
+                $message = 'Bu bilet check-in yapılamaz. Durum: ' . $freshTicket->status->value;
+                if ($freshTicket->status === TicketStatus::CHECKED_IN) {
+                    $time = $freshTicket->checked_in_at?->format('d.m.Y H:i');
+                    $message = 'Bu bilet daha önce kullanılmış.' . ($time ? " (".$time.")" : '');
+                }
+                return [
                     'success' => false,
                     'message' => $message,
-                    'data' => null
-                ], 422);
+                    'status' => 422
+                ];
             }
-            return back()->with('error', $message);
-        }
+            
+            // Check-in yap
+            if (!$freshTicket->checkIn()) {
+                return [
+                    'success' => false,
+                    'message' => 'Check-in başarısız oldu.',
+                    'status' => 422
+                ];
+            }
+            
+            return [
+                'success' => true,
+                'message' => 'Bilet başarıyla check-in yapıldı.',
+                'status' => 200,
+                'ticket' => $freshTicket->fresh()
+            ];
+        });
 
         if (request()->expectsJson()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Bilet başarıyla check-in yapıldı.',
-                'data' => ['ticket' => $ticket]
-            ]);
+                'success' => $result['success'],
+                'message' => $result['message'],
+                'data' => $result['ticket'] ?? null
+            ], $result['status']);
         }
 
-        return back()->with('success', 'Bilet başarıyla check-in yapıldı.');
+        if (!$result['success']) {
+            return back()->with('error', $result['message']);
+        }
+
+        return back()->with('success', $result['message']);
     }
 }

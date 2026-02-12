@@ -95,7 +95,7 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
     
     // Buttonı devre dışı bırak
     submitBtn.disabled = true;
-    submitBtn.textContent = 'GüncelleniyOr...';
+    submitBtn.textContent = 'Güncelleniyor...';
     errorContainer.classList.add('d-none');
     errorText.innerHTML = '';
     

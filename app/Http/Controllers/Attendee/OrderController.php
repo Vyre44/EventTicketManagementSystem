@@ -48,6 +48,18 @@ class OrderController extends Controller
             return back()->withErrors(['event' => 'Bu etkinlik için bilet satışı yapılmamaktadır.']);
         }
 
+        // Etkinlik tarihi geçmişse satın almayı engelle
+        if ($event->start_time && $event->start_time->isPast()) {
+            $message = 'Etkinlik tarihi geçmiş.';
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
+            return back()->withErrors(['event' => $message]);
+        }
+
         $ticketTypeQuantities = $request->ticket_types; // ['ticket_type_id' => quantity]
 
         try {
@@ -60,6 +72,15 @@ class OrderController extends Controller
 
                     if ($ticketType->event_id !== $event->id) {
                         throw new \InvalidArgumentException('Geçersiz bilet tipi.');
+                    }
+
+                    // Sale window kontrolü
+                    if ($ticketType->sale_start && now()->isBefore($ticketType->sale_start)) {
+                        throw new \InvalidArgumentException("{$ticketType->name} için satış henüz başlamadı.");
+                    }
+                    
+                    if ($ticketType->sale_end && now()->isAfter($ticketType->sale_end)) {
+                        throw new \InvalidArgumentException("{$ticketType->name} için satış süresi doldu.");
                     }
 
                     if ($ticketType->remaining_quantity < $quantity) {
@@ -314,7 +335,10 @@ class OrderController extends Controller
                 $ticketType->increment('remaining_quantity');
             }
 
-            $order->update(['status' => OrderStatus::CANCELLED]);
+            $order->update([
+                'status' => OrderStatus::CANCELLED,
+                'cancelled_at' => now(),
+            ]);
             $cancelled = true;
         });
 

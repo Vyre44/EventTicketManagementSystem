@@ -49,7 +49,7 @@
             <div class="card shadow-sm border-danger">
                 <div class="card-header bg-danger bg-opacity-10 border-danger">
                     <h5 class="card-title mb-0 text-danger">
-                        <i class="bi bi-exclamation-triangle"></i> Hesap Silmedock
+                        <i class="bi bi-exclamation-triangle"></i> Hesap Silme
                     </h5>
                 </div>
                 <div class="card-body">

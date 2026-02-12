@@ -44,6 +44,10 @@ class Order extends Model
         
         // Ödemenin yapıldığı tarih/saat
         'paid_at',
+        
+        // İptal ve iade zamanları
+        'cancelled_at',
+        'refunded_at',
     ];
 
     /**
@@ -64,6 +68,8 @@ class Order extends Model
          * }
          */
         'paid_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+        'refunded_at' => 'datetime',
         
         /**
          * status: String -> OrderStatus Enum

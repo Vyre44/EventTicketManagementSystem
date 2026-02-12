@@ -146,9 +146,9 @@ async function handleTicketAction(action, ticketId) {
      * confirmMessages: Her action için farklı mesaj
      */
     const confirmMessages = {
-        'undo': 'Bu bilet\'in check-in\'ini geri almak istediğinizden emin misiniz?',
+        'undo': 'Bu bilet\'in giriş onayını geri almak istediğinizden emin misiniz?',
         'cancel': 'Bu bileti iptal etmek istediğinizden emin misiniz?',
-        'checkin': 'Bu bilete check-in yapmak istediğinizden emin misiniz?'
+        'checkin': 'Bu bilete giriş onayı yapmak istediğinizden emin misiniz?'
     };
 
     /**
@@ -474,13 +474,13 @@ function getButtonsForStatus(status) {
          * ACTIVE: İki button seçeneği
          * Bootstrap 5 button class'ları
          */
-        'active': '<button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Check-in">✅ Check-in</button> ' +
+        'active': '<button class="ticket-action-btn btn btn-outline-success btn-sm" data-action="checkin" title="Giriş Kontrolü">✅ Giriş Onayla</button> ' +
                   '<button class="ticket-action-btn btn btn-outline-danger btn-sm" data-action="cancel" title="İptal Et">❌ İptal</button> ',
         
         /**
          * CHECKED_IN: Sadece Undo button'u
          */
-        'checked_in': '<button class="ticket-action-btn btn btn-outline-warning btn-sm" data-action="undo" title="Check-in\'i Geri Al">↩️ Geri Al</button> ',
+        'checked_in': '<button class="ticket-action-btn btn btn-outline-warning btn-sm" data-action="undo" title="Giriş Onayını Geri Al">↩️ Geri Al</button> ',
         
         /**
          * CANCELLED / REFUNDED: Hiç button

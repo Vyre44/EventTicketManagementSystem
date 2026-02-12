@@ -24,7 +24,7 @@ class TicketController extends Controller
 {
     /**
      * Index - Eager loading with(['order.user', 'ticketType.event'])
-     * Query filters: q (search), status, event_id, user_email
+     * Query filters: q (search), status, event_search (title), user_email
      * whereHas() for nested relationship filtering
      */
     public function index(Request $request)
@@ -42,10 +42,10 @@ class TicketController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        // Filter by event (nested relationship)
-        if ($request->filled('event_id')) {
-            $query->whereHas('ticketType', function($q) {
-                $q->where('event_id', request('event_id'));
+        // Filter by event title (text search)
+        if ($request->filled('event_search')) {
+            $query->whereHas('ticketType.event', function($q) {
+                $q->where('title', 'like', '%' . request('event_search') . '%');
             });
         }
 
@@ -454,6 +454,22 @@ class TicketController extends Controller
      */
     public function checkin(Ticket $ticket)
     {
+        // Order status kontrolü - sadece PAID order'lar check-in yapılabilir
+        $order = $ticket->order;
+        
+        if (!$order || $order->status !== \App\Enums\OrderStatus::PAID) {
+            $message = 'Bu bilet için ödeme tamamlanmamış.';
+            
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
+            
+            return back()->with('error', $message);
+        }
+
         $result = DB::transaction(function () use ($ticket) {
             // Ticket'i lock ile çek (double check-in koruması)
             $freshTicket = Ticket::lockForUpdate()->findOrFail($ticket->id);

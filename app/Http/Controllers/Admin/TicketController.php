@@ -92,6 +92,8 @@ class TicketController extends Controller
      * RETURN:
      * View: admin.tickets.show
      * Data: $ticket (with relations)
+     * 
+     * Route Model Binding: Ticket
      */
     public function show(Ticket $ticket)
     {
@@ -153,8 +155,7 @@ class TicketController extends Controller
 
         return view('admin.tickets.create', compact('ticketTypes', 'orders', 'statuses'));
     }
-
-    /**
+    /**  Route Model Binding: N/A (new resource)  
      * ============================================================
      * YENİ BİLET KAYDET - STORE
      * ============================================================
@@ -184,6 +185,9 @@ class TicketController extends Controller
      * 
      * RETURN:
      * Redirect: admin.tickets.index
+     * 
+     * Request Validation: StoreTicketRequest
+     * ticket_type_id, order_id, status
      */
     public function store(StoreTicketRequest $request)
     {
@@ -331,6 +335,9 @@ class TicketController extends Controller
      * 
      * RETURN:
      * Redirect: admin.tickets.show
+     * 
+     * Request Validation: UpdateTicketRequest
+     * status (required)
      */
     public function update(UpdateTicketRequest $request, Ticket $ticket)
     {

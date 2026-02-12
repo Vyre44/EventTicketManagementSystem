@@ -39,7 +39,7 @@ class OrderController extends Controller
         $statuses = OrderStatus::cases();
         return view('admin.orders.index', compact('orders', 'statuses'));
     }
-
+    // Route Model Binding: Order    
     public function show(Order $order)
     {
         $order->load(['user', 'tickets.ticketType.event']);

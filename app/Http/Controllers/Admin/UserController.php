@@ -53,6 +53,7 @@ class UserController extends Controller
         return view('admin.users.index', compact('users', 'q', 'sortBy', 'sortDir'));
     }
 
+    // Route Model Binding: User
     public function show(User $user)
     {
         return view('admin.users.show', compact('user'));
@@ -63,6 +64,11 @@ class UserController extends Controller
         return view('admin.users.create');
     }
 
+    // Route Model Binding: N/A (new resource)
+    /**
+     * Request Validation: StoreUserRequest
+     * name, email, password, role (required|unique)
+     */
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
@@ -71,11 +77,16 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Kullanıcı oluşturuldu.');
     }
 
+    // Route Model Binding: User
     public function edit(User $user)
     {
         return view('admin.users.edit', compact('user'));
     }
 
+    /**
+     * Request Validation: UpdateUserRequest
+     * name, email (unique except current), password (optional), role
+     */
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
@@ -91,6 +102,7 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Kullanıcı güncellendi.');
     }
 
+    // Route Model Binding: User
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {

@@ -30,6 +30,10 @@ class CheckInController extends Controller
         return view('checkin.form', compact('event', 'recent'));
     }
 
+    /**
+     * Request Validation: CheckInRequest
+     * code (required|string)
+     */
     public function check(CheckInRequest $request, Event $event)
     {
         // event.owner middleware ile yetki kontrolü sağlanacak

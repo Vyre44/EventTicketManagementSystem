@@ -196,7 +196,7 @@ async function handleAdminTicketAction(action, ticketId) {
         /**
          * ADIM 3: AJAX İsteği Yap
          * 
-         * ajaxRequest: ajax-helper.js'teki merkezi fonksiyon
+         * Helper: ajaxRequest() - ajax-helper.js'teki merkezi fonksiyon
          * - CSRF token'ı otomatik ekler
          * - JSON parse eder
          * - HTTP status kontrol eder
@@ -211,13 +211,14 @@ async function handleAdminTicketAction(action, ticketId) {
          * 
          * Server: { success: true, message: "...", data: {...} }
          * 
-         * showAlert: Yeşil başarı uyarısı göster
+         * Helper: showAlert() - Yeşil başarı uyarısı göster
          * updateAdminTicketUI: Admin panelindeki satırı güncelle
          */
         if (result.success) {
             showAlert('success', result.message);
             updateAdminTicketUI(ticketId, action);
         } else {
+            // Helper: showAlert() - Hata bildirimi
             showAlert('error', result.message || 'Bilinmeyen bir hata oluştu.');
         }
     } catch (error) {
@@ -226,7 +227,7 @@ async function handleAdminTicketAction(action, ticketId) {
          * 
          * Network error, server error, validation error vb.
          * error.message: Hata açıklaması
-         * showAlert: Kırmızı hata uyarısı
+         * Helper: showAlert() - Kırmızı hata uyarısı
          */
         showAlert('error', error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
         

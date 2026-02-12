@@ -31,7 +31,7 @@ class TicketTypeController extends Controller
         $events = Event::orderByDesc('id')->get(['id', 'title']);
         return view('admin.ticket_types.index', compact('ticketTypes', 'events', 'eventId', 'q'));
     }
-
+    // Route Model Binding: TicketType   
     public function show(TicketType $ticketType)
     {
         $ticketType->load('event');
@@ -44,24 +44,34 @@ class TicketTypeController extends Controller
         return view('admin.ticket_types.create', compact('events'));
     }
 
+    /**
+     * Request Validation: StoreTicketTypeRequest
+     * event_id, name, price, total_quantity
+     */
     public function store(StoreTicketTypeRequest $request)
     {
         TicketType::create($request->validated());
         return redirect()->route('admin.ticket-types.index')->with('success', 'TicketType oluşturuldu.');
     }
 
+    // Route Model Binding: TicketType
     public function edit(TicketType $ticketType)
     {
         $events = Event::orderByDesc('id')->get(['id', 'title']);
         return view('admin.ticket_types.edit', compact('ticketType', 'events'));
     }
 
+    /**
+     * Request Validation: UpdateTicketTypeRequest
+     * event_id, name, price, total_quantity
+     */
     public function update(UpdateTicketTypeRequest $request, TicketType $ticketType)
     {
         $ticketType->update($request->validated());
         return redirect()->route('admin.ticket-types.index')->with('success', 'TicketType güncellendi.');
     }
 
+    // Route Model Binding: TicketType
     public function destroy(TicketType $ticketType)
     {
         $ticketType->delete();

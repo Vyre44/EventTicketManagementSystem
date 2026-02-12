@@ -33,6 +33,7 @@ class TicketTypeController extends Controller
         return view('organizer.ticket_types.index', compact('event', 'ticketTypes'));
     }
 
+    // Route Model Binding: Event
     public function create(Event $event)
     {
         $this->assertEventOwnership($event);
@@ -74,6 +75,10 @@ class TicketTypeController extends Controller
         return view('organizer.ticket_types.edit', compact('event', 'ticketType'));
     }
 
+    /**
+     * Request Validation: UpdateTicketTypeRequest
+     * name, price, total_quantity
+     */
     public function update(UpdateTicketTypeRequest $request, Event $event, TicketType $ticketType)
     {
         $this->assertEventOwnership($event);

@@ -263,8 +263,7 @@ class Event extends Model
     /**
      * Kapak Resmi URL'sini Döndür
      * 
-     * AÇIKLAMA:
-     * Dosya yolundan tam URL oluştur
+     * Storage/Dosya Yükleme: Dosya yolundan tam URL oluştur
      * 
      * KULLANIM:
      * $url = $event->cover_image_url;

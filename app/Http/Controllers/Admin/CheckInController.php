@@ -28,6 +28,8 @@ class CheckInController extends Controller
      * Check-in form (Admin için - tüm events)
      * 
      * GET /admin/events/{event}/checkin
+     * 
+     * Route Model Binding: Event
      */
     public function showForm(Event $event)
     {
@@ -46,6 +48,9 @@ class CheckInController extends Controller
      * Check-in işlemi (AJAX - JSON response)
      * 
      * POST /admin/events/{event}/checkin
+     * 
+     * Request Validation: CheckInRequest
+     * code (required|string)
      */
     public function check(CheckInRequest $request, Event $event)
     {

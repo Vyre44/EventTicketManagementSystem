@@ -144,7 +144,7 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth','role:admin,o
 
 
 /**
- * Authentication Routes - Laravel Breeze style
+ * Authentication Routes
  * Login, Register, Logout
  * Password Reset Flow (forgot -> reset)
  */

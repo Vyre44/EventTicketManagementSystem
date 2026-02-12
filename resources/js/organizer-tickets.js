@@ -170,7 +170,7 @@ async function handleTicketAction(action, ticketId) {
         /**
          * ADIM 2: AJAX İsteği Yap
          * 
-         * ajaxRequest: ajax-helper.js'teki merkezi fonksiyon
+         * Helper: ajaxRequest() - ajax-helper.js'teki merkezi fonksiyon
          * 
          * POST /organizer/tickets/{id}/checkin
          * Body: {} (Boş, sadece parametreler)
@@ -185,12 +185,14 @@ async function handleTicketAction(action, ticketId) {
          * 
          * result.success: true ise işlem başarılı
          * result.message: Gösterilecek mesaj
+         * Helper: showAlert() - Başarı bildirimi
          * updateTicketUI(): UI'ı güncelle
          */
         if (result.success) {
             showAlert('success', result.message);
             updateTicketUI(ticketId, action);
         } else {
+            // Helper: showAlert() - Hata bildirimi
             showAlert('error', result.message || 'Bilinmeyen bir hata oluştu.');
         }
     } catch (error) {
@@ -199,7 +201,7 @@ async function handleTicketAction(action, ticketId) {
          * 
          * Sunucu hatası, network hatası, vb.
          * error.message: Hata mesajı
-         * showAlert: Kırmızı uyarı göster
+         * Helper: showAlert() - Kırmızı uyarı göster
          */
         showAlert('error', error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
     }

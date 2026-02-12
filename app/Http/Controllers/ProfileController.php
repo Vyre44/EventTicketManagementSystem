@@ -65,6 +65,9 @@ class ProfileController extends Controller
      * 
      * @param ProfileUpdateRequest $request
      * @return RedirectResponse
+     * 
+     * Request Validation: ProfileUpdateRequest
+     * name, email, phone (optional)
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {

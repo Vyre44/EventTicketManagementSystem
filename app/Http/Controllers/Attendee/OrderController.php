@@ -34,6 +34,9 @@ class OrderController extends Controller
     * STEP 1: "Satın Al" → Order(PENDING) + Ticket(ACTIVE) + kota düş
      *
      * POST /events/{event}/buy
+     * 
+     * Request Validation: BuyTicketRequest
+     * tickets (array), tickets.*.ticket_type_id, tickets.*.quantity
      */
     public function buy(BuyTicketRequest $request, Event $event)
     {

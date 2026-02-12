@@ -49,11 +49,15 @@ class EventController extends Controller
         return view('admin.events.create');
     }
 
+    /**
+     * Request Validation: StoreEventRequest
+     * title, description, location, date, time, status, cover_image (optional)
+     */
     public function store(StoreEventRequest $request)
     {
         $validated = $request->validated();
         
-        // Cover image upload
+        // Storage/Dosya Yükleme: Cover image upload
         if ($request->hasFile('cover_image')) {
             $validated['cover_image_path'] = $request->file('cover_image')->store('events', 'public');
         }
@@ -66,17 +70,21 @@ class EventController extends Controller
         }
         return redirect()->route('admin.events.index')->with('success', 'Etkinlik başarıyla oluşturuldu.');
     }
-
+    // Route Model Binding: Event    
     public function edit(Event $event)
     {
         return view('admin.events.edit', compact('event'));
     }
 
+    /**
+     * Request Validation: UpdateEventRequest
+     * title, description, location, date, time, status, cover_image (optional)
+     */
     public function update(UpdateEventRequest $request, Event $event)
     {
         $validated = $request->validated();
         
-        // Cover image upload
+        // Storage/Dosya Yükleme: Cover image upload + eski dosya silme
         if ($request->hasFile('cover_image')) {
             // Eski resmi sil
             if ($event->cover_image_path) {
@@ -97,10 +105,10 @@ class EventController extends Controller
         }
         return redirect()->route('admin.events.index')->with('success', 'Etkinlik başarıyla güncellendi.');
     }
-
+    // Route Model Binding: Event    
     public function destroy(Event $event)
     {
-        // Cover image'ı da sil
+        // Storage/Dosya Yükleme: Cover image silme
         if ($event->cover_image_path) {
             Storage::disk('public')->delete($event->cover_image_path);
         }

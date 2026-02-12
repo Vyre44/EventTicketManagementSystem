@@ -19,6 +19,37 @@
     </div>
 </div>
 
+{{-- Filtreler --}}
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.events.index') }}" class="row g-3 align-items-end">
+            <div class="col-12 col-md-6">
+                <label for="search" class="form-label">Etkinlik Adı</label>
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    value="{{ $search ?? '' }}"
+                    class="form-control"
+                    placeholder="Etkinlik adına göre ara">
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="status" class="form-label">Durum</label>
+                <select id="status" name="status" class="form-select">
+                    <option value="">Tümü</option>
+                    <option value="published" @selected(($status ?? '') === 'published')>Yayında</option>
+                    <option value="draft" @selected(($status ?? '') === 'draft')>Taslak</option>
+                    <option value="ended" @selected(($status ?? '') === 'ended')>Bitti</option>
+                    <option value="cancelled" @selected(($status ?? '') === 'cancelled')>İptal</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Filtrele</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{-- Etkinlikler Tablosu --}}
 <div class="card shadow-sm">
     <div class="card-body p-0">

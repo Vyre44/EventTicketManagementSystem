@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -36,12 +37,12 @@ class UserFactory extends Factory
         /**
          * Varsayılan kullanıcı verisi
          */
-         return [
+        return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role' => 'attendee',
+            'role' => UserRole::ATTENDEE->value,
             'remember_token' => Str::random(10),
         ];
     }
@@ -54,8 +55,29 @@ class UserFactory extends Factory
         /**
          * Kullanıcının email adresini doğrulanmamış olarak işaretler
          */
-         return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn () => [
+            'role' => UserRole::ADMIN->value,
+        ]);
+    }
+
+    public function organizer(): static
+    {
+        return $this->state(fn () => [
+            'role' => UserRole::ORGANIZER->value,
+        ]);
+    }
+
+    public function attendee(): static
+    {
+        return $this->state(fn () => [
+            'role' => UserRole::ATTENDEE->value,
         ]);
     }
 }

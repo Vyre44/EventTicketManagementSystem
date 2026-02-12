@@ -460,7 +460,7 @@ class OrderController extends Controller
     {
         do {
             $code = strtoupper(Str::random(12));
-        } while (\App\Models\Ticket::where('code', $code)->exists());
+        } while (Ticket::where('code', $code)->exists());
 
         return $code;
     }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Http\Requests\Admin\StoreEventRequest;
 use App\Http\Requests\Admin\UpdateEventRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -22,10 +23,27 @@ class EventController extends Controller
      * Index - Tüm etkinlikleri listele (pagination ile)
      * Admin tüm etkinlikleri görebilir (draft veya published)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::latest()->paginate(10);
-        return view('admin.events.index', compact('events'));
+        $search = trim((string) $request->query('search', ''));
+        $status = trim((string) $request->query('status', ''));
+
+        $eventsQuery = Event::query();
+
+        if ($search !== '') {
+            $eventsQuery->where('title', 'like', '%' . $search . '%');
+        }
+
+        if ($status !== '') {
+            $eventsQuery->where('status', $status);
+        }
+
+        $events = $eventsQuery->latest()->paginate(10)->appends([
+            'search' => $search,
+            'status' => $status,
+        ]);
+
+        return view('admin.events.index', compact('events', 'search', 'status'));
     }
 
     /**

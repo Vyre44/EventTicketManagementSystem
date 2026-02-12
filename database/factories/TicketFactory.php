@@ -13,9 +13,10 @@ class TicketFactory extends Factory
 
     public function definition(): array
     {
+        $event = \App\Models\Event::factory();
         return [
-            'order_id' => \App\Models\Order::factory(),        // order üret
-            'ticket_type_id' => \App\Models\TicketType::factory(), 
+            'order_id' => \App\Models\Order::factory()->for($event),        // order üret
+            'ticket_type_id' => \App\Models\TicketType::factory()->for($event), 
             'code' => strtoupper(Str::random(8)),
             'status' => TicketStatus::ACTIVE->value,
             'checked_in_at' => null,
@@ -33,5 +34,37 @@ class TicketFactory extends Factory
             $ticket->ticket_type_id = $tt->id;
             $ticket->save();
         });
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn () => [
+            'status' => TicketStatus::ACTIVE->value,
+            'checked_in_at' => null,
+        ]);
+    }
+
+    public function checkedIn(): static
+    {
+        return $this->state(fn () => [
+            'status' => TicketStatus::CHECKED_IN->value,
+            'checked_in_at' => now()->subHours(2),
+        ]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn () => [
+            'status' => TicketStatus::CANCELLED->value,
+            'checked_in_at' => null,
+        ]);
+    }
+
+    public function refunded(): static
+    {
+        return $this->state(fn () => [
+            'status' => TicketStatus::REFUNDED->value,
+            'checked_in_at' => null,
+        ]);
     }
 }

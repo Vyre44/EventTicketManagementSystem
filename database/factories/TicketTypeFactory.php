@@ -11,12 +11,13 @@ class TicketTypeFactory extends Factory
 
     public function definition(): array
     {
+        $totalQuantity = $this->faker->numberBetween(10, 100);
         return [
             'event_id' => \App\Models\Event::factory(),
             'name' => $this->faker->word(),
             'price' => $this->faker->randomFloat(2, 50, 500),
-            'total_quantity' => $this->faker->numberBetween(10, 100),
-            'remaining_quantity' => $this->faker->numberBetween(0, 100),
+            'total_quantity' => $totalQuantity,
+            'remaining_quantity' => $totalQuantity,
         ];
     }
 }

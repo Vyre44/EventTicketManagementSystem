@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->dropColumn('cover_path');
-        });
+        if (Schema::hasColumn('events', 'cover_path')) {
+            Schema::table('events', function (Blueprint $table) {
+                $table->dropColumn('cover_path');
+            });
+        }
     }
 
     /**

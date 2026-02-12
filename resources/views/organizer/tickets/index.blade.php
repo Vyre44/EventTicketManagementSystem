@@ -29,11 +29,15 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label">Bilet Kodu / E-posta Ara</label>
+                <div class="col-md-3">
+                    <label class="form-label">Bilet Kodu / E-posta</label>
                     <input type="text" name="search" class="form-control" placeholder="Bilet kodu veya e-posta" value="{{ request('search') }}">
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label">Etkinlik Adı</label>
+                    <input type="text" name="event_search" class="form-control" placeholder="Etkinlik adı ara" value="{{ request('event_search') }}">
+                </div>
+                <div class="col-md-2">
                     <label class="form-label">Durum</label>
                     <select name="status" class="form-select">
                         <option value="">Tüm Durumlar</option>
@@ -79,6 +83,7 @@
                             <th>Bilet Tipi</th>
                             <th>Müşteri</th>
                             <th>Durum</th>
+                            <th>Giriş</th>
                             <th class="text-center">İşlem</th>
                         </tr>
                     </thead>
@@ -118,6 +123,14 @@
                                             <span class="badge bg-secondary">🔄 İade</span>
                                         @endif
                                     </span>
+                                </td>
+                                <td class="ticket-checkin-time">
+                                    {{-- Giriş tarihi varsa göster --}}
+                                    @if($ticket->checked_in_at)
+                                        {{ $ticket->checked_in_at->format('d.m.Y H:i') }}
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     {{-- Duruma göre farklı butonlar --}}

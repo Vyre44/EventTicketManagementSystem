@@ -43,6 +43,14 @@ class TicketController extends Controller
             $query->where('status', request('status'));
         }
 
+        // Filter by event name (title)
+        if (request()->filled('event_search')) {
+            $search = request('event_search');
+            $query->whereHas('ticketType.event', function (Builder $q) use ($search) {
+                $q->where('title', 'like', "%$search%");
+            });
+        }
+
         // Filter by code or email search
         if (request()->filled('search')) {
             $search = request('search');

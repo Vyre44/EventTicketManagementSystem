@@ -361,8 +361,9 @@ function updateStatusBadge(container, status) {
  * ============================================================
  */
 function updateCheckinTime(container, action) {
-    const cells = container.querySelectorAll('td');
-    const checkinCell = cells[6]; // 7. hücre (Check-in zamanı)
+    // Check-in zamanı hücresini bul - class kullanarak (index yerine)
+    // Bu daha güvenli çünkü sütun sırası değişse de çalışır
+    const checkinCell = container.querySelector('.ticket-checkin-time');
     
     if (!checkinCell) {
         console.warn('Check-in time cell not found');

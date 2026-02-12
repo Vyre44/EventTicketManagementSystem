@@ -18,12 +18,12 @@
 {{-- Filtreleme formu: kod, durum, kullanıcı, etkinlik --}}
 <div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form method="GET" action="" class="row g-2 align-items-end">
+        <form method="GET" action="" class="row g-3 align-items-end">
             <div class="col-md-3">
-                <label class="form-label">Kod veya No</label>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Kod veya No ara" class="form-control">
+                <label class="form-label">Kod</label>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Kod ara" class="form-control">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label">Durum</label>
                 <select name="status" class="form-select">
                     <option value="">Tüm Durumlar</option>
@@ -45,15 +45,15 @@
                     @endforeach
                 </select>
             </div>
+            <div class="col-md-2">
+                <label class="form-label">E-posta</label>
+                <input type="text" name="user_email" value="{{ request('user_email') }}" placeholder="E-posta" class="form-control">
+            </div>
             <div class="col-md-3">
-                <label class="form-label">Kullanıcı E-posta</label>
-                <input type="text" name="user_email" value="{{ request('user_email') }}" placeholder="Kullanıcı e-posta" class="form-control">
+                <label class="form-label">Etkinlik Adı</label>
+                <input type="text" name="event_search" value="{{ request('event_search') }}" placeholder="Etkinlik adı ara" class="form-control">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Etkinlik Adı</label>
-                    <input type="text" name="event_search" value="{{ request('event_search') }}" placeholder="Etkinlik Adı" class="form-control">
-            </div>
-            <div class="col-md-1">
                 <button type="submit" class="btn btn-outline-primary w-100">Filtrele</button>
             </div>
         </form>
@@ -113,7 +113,7 @@
                                 <td>{{ $ticket->ticketType->name ?? '-' }}</td>
                                 <td>{{ $ticket->ticketType->event->title ?? '-' }}</td>
                                 <td>{{ $ticket->order->user->email ?? '-' }}</td>
-                                <td>
+                                <td class="ticket-checkin-time">
                                     {{-- Giriş tarihi varsa göster --}}
                                     @if($ticket->checked_in_at)
                                         {{ $ticket->checked_in_at->format('d.m.Y H:i') }}

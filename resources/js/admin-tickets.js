@@ -503,11 +503,9 @@ function updateStatusBadge(container, status) {
  * @param {string} action - Yapılan işlem ('checkin', 'undo')
  */
 function updateCheckinTime(container, action) {
-    // Check-in zamanı hücresini bul
-    // Tablo yapısı: <tr><td>ID</td><td>Kod</td><td>Durum</td><td>Tip</td><td>Etkinlik</td><td>Kullanıcı</td><td>Check-in</td><td>İşlem</td></tr>
-    // Check-in 7. sütun (index 6)
-    const cells = container.querySelectorAll('td');
-    const checkinCell = cells[6]; // 7. hücre (0-indexed)
+    // Check-in zamanı hücresini bul - class kullanarak (index yerine)
+    // Bu daha güvenli çünkü sütun sırası değişse de çalışır
+    const checkinCell = container.querySelector('.ticket-checkin-time');
     
     if (!checkinCell) {
         console.warn('Check-in time cell not found');
